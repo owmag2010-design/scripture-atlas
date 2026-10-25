@@ -272,7 +272,7 @@ export const DISCOVERIES = [
   "description": "The scroll survived a fire that destroyed the synagogue and was a lump too brittle to open. A team led by Brent Seales made high-resolution tomographic scans of it, then used software to trace, texture and flatten the layers so the ink could be read. The result shows two columns, 35 lines on the master image (18 preserved, 17 reconstructed).",
   "connection": "The text is from the opening chapters of Leviticus. Emanuel Tov and Michael Segal found it identical in its consonants to the medieval Masoretic text. It is the oldest Pentateuch scroll in Hebrew found outside the Dead Sea Scrolls, and the earliest copy of a Pentateuch book found in a Holy Ark.",
   "establishes": "By late antiquity, a Leviticus scroll in a Judean synagogue had the same consonantal text as the later Masoretic text.",
-  "limits": "Only a small part of Leviticus survives. The radiocarbon range (most likely AD 235–340) and the earlier date suggested by the script do not agree, so the copy's exact age is uncertain.",
+  "limits": "Only a small part of Leviticus survives. The radiocarbon result (68% probability AD 235–340; about 89% probability AD 210–390) and the earlier date suggested by the script do not agree, so the copy's exact age is uncertain.",
   "status": "corroborates",
   "passages": [
    "Lev.1.1-1.17",
@@ -352,7 +352,11 @@ export const DISCOVERIES = [
     "publisher": "Center for Online Judaic Studies",
     "url": "https://cojs.org/?p=4911"
    }
-  ]
+  ],
+  "heldAt": {
+   "institution": "",
+   "ref": ""
+  }
  },
  {
   "id": "greek-minor-prophets-scroll-nahal-hever",
@@ -438,7 +442,7 @@ export const DISCOVERIES = [
    "ref": "E2746"
   },
   "language": "Greek",
-  "description": "Grenfell and Hunt dug the town's ancient rubbish dumps and recovered a vast number of papyrus fragments, most of them everyday documents. P1, found in the first season, is a codex leaf written on both sides with the beginning of Matthew. Penn received it with more than 50 other Oxyrhynchus papyri.",
+  "description": "Grenfell and Hunt dug the town's ancient rubbish dumps and recovered a vast number of papyrus fragments, most of them everyday documents. P1, found in the first season, is a codex leaf written on both sides with the beginning of Matthew.",
   "connection": "P1 preserves Matthew 1:1–9, 12 and 14–20, the genealogy of Jesus and the start of the birth narrative. The site has produced fragments of all four Gospels and of most of Paul's letters, as well as non-canonical texts such as the Gospel of Thomas.",
   "establishes": "Christians in a provincial Egyptian town were reading the New Testament writings in codex form by the 3rd century.",
   "limits": "Most Oxyrhynchus fragments are small and many are still unpublished. Their dates rest on handwriting.",
@@ -492,7 +496,7 @@ export const DISCOVERIES = [
   "description": "A parchment codex of the Greek Bible with the Old Testament, the New Testament and the letters 1 and 2 Clement; some leaves are lost. Cyril Lucar, formerly Patriarch of Alexandria, offered it as a gift for James I; it reached England only in 1627, under Charles I. It joined the British Museum with the Old Royal Library in 1757.",
   "connection": "Its text type varies by section: in the Gospels it is an early witness to the later Byzantine text, while in Revelation it is counted among the best witnesses.",
   "establishes": "A complete Greek Bible, with the New Testament followed by 1 and 2 Clement, was being produced in the 5th century.",
-  "limits": "There are gaps, including parts of Matthew, John and 1 Corinthians. Its date rests on handwriting, and its history before the 14th century is unknown.",
+  "limits": "There are gaps, including most of Matthew (1:1–25:6), John 6:50–8:52 and 2 Corinthians 4:13–12:6. Its date rests on handwriting, and its history before the 14th century is unknown.",
   "status": "corroborates",
   "passages": [],
   "people": [],
@@ -590,7 +594,7 @@ export const DISCOVERIES = [
    "ref": ""
   },
   "language": "Greek (Codex Sinaiticus leaves)",
-  "description": "The monastery's manuscripts that came to light in 1975 are known as the New Finds. Among them were leaves and fragments of Codex Sinaiticus. Constantin von Tischendorf had taken 43 leaves of the codex in 1844 and the main portion in 1859; most of it was sold to the British Museum in 1933.",
+  "description": "The monastery's manuscripts that came to light in 1975 are known as the New Finds. Among them were leaves and fragments of Codex Sinaiticus. Constantin von Tischendorf had obtained 43 leaves of the codex in 1844; the main portion left the monastery on loan in 1859, was donated to the Tsar in 1869, and was sold to the British Museum in 1933.",
   "connection": "Codex Sinaiticus is a 4th-century Greek Bible containing the whole New Testament. The 1975 leaves, together with others recovered from bindings, add to the parts of the codex held in London, Leipzig and St Petersburg. They were included in the Codex Sinaiticus Project's digital reunion of the manuscript.",
   "establishes": "Parts of Codex Sinaiticus remained at the monastery after Tischendorf's visits and were recovered in 1975.",
   "limits": "The Codex Sinaiticus Project's own pages give slightly different details of the date (May or June 1975), the room, and the count (at least 12 leaves and 24 fragments, or at least 18 leaves in whole or part).",
@@ -880,9 +884,9 @@ export const DISCOVERIES = [
    "lat": 31.741,
    "lon": 35.459
   },
-  "description": "Carbon-based ink and parchment reflect light differently at different wavelengths, so a series of images across visible and infrared wavelengths can separate ink from background. The Israel Antiquities Authority's Leon Levy Dead Sea Scrolls Digital Library uses a MegaVision system to image every fragment at high resolution, with near-infrared bands to bring out faded text. The images also allow study and condition monitoring without repeated handling.",
+  "description": "Carbon-based ink and parchment reflect light differently at different wavelengths, so a series of images across visible and infrared wavelengths can separate ink from background. The Israel Antiquities Authority's Leon Levy Dead Sea Scrolls Digital Library uses a MegaVision system with the aim of imaging every fragment at high resolution, with near-infrared bands to bring out faded text. The images also allow study and condition monitoring without repeated handling.",
   "connection": "In 2020 a team led by Joan Taylor (King's College London) imaged 51 apparently blank Qumran fragments held by the University of Manchester. Four of six fragments examined in detail had readable Hebrew or Aramaic text, and the largest showed the word 'Shabbat'.",
-  "establishes": "Imaging can reveal text that is invisible to the eye, and it makes the full set of Dead Sea Scroll fragments available for study online.",
+  "establishes": "Imaging can reveal text that is invisible to the eye, and it is making the Dead Sea Scroll fragments available for study online.",
   "limits": "It recovers only what ink remains; it cannot restore lost material, and small fragments often yield a few letters that are hard to identify. Images still need expert reading, and suggested identifications (such as a link of the 'Shabbat' fragment to Ezekiel 46) can remain tentative.",
   "dating": [],
   "sources": [
@@ -921,7 +925,7 @@ export const DISCOVERIES = [
    "placeSlug": "gath_442"
   },
   "description": "When clay or mud brick is heated strongly, its magnetic minerals record the Earth's field at that moment. The field changes over decades, so fired material from a destruction can be compared with a regional curve and with other burnt layers. In the Levant the field changed unusually fast in the Iron Age, with spikes more than twice today's strength, which makes the method sensitive.",
-  "connection": "Vaknin and colleagues (PNAS, 2022) measured 20 destruction layers at 17 sites in Israel. The burnt layers at Gath, Tel Rehov, Horvat Tevet and Tel Zayit gave matching signals and are attributed to campaigns of Hazael of Aram-Damascus; Beth-Shean was destroyed decades earlier. They also found results consistent with Sennacherib's campaign of 701 BC at Lachish and other sites, and with the Babylonian destruction of Lachish in 586 BC.",
+  "connection": "Vaknin and colleagues (PNAS, 2022) measured 20 destruction layers at 17 sites in Israel. The burnt layers at Gath, Tel Rehov, Horvat Tevet and Tel Zayit gave matching signals and are attributed to campaigns of Hazael of Aram-Damascus; Beth-Shean was destroyed decades earlier. Using the historically dated destructions of Lachish (701 and 586 BC) as reference points, they also linked destructions at Beersheba, Tel Zayit and Tell Beit Mirsim to Sennacherib's campaign of 701 BC.",
   "establishes": "Archaeomagnetism can show which destruction layers are close in time and which are not, independent of pottery and radiocarbon.",
   "limits": "Results are ranges, not exact dates, and depend on the reference curve. The method is better at showing that two layers are not contemporary than at proving they are. Linking a destruction to a named king still relies on texts and on historical judgement.",
   "dating": [
@@ -2993,11 +2997,11 @@ export const DISCOVERIES = [
    "ref": ""
   },
   "language": "",
-  "description": "The excavators exposed steps leading into a pool about 50 metres long, dated by coins and pottery. A stepped street ran from the pool area towards the Temple Mount; over 100 coins of AD 17–31 under its paving date its construction to the time of Pontius Pilate.",
+  "description": "The excavators exposed steps leading into a pool about 50 metres long, dated by coins and pottery. A stepped street ran from the pool area towards the Temple Mount; over 100 coins of AD 17–31 under its paving show it was built no earlier than about AD 31, and the excavators place its construction in the time of Pontius Pilate.",
   "connection": "John 9:7–11 says Jesus told a blind man to wash in the pool of Siloam. The pool uncovered is the Siloam pool of the late Second Temple period.",
   "establishes": "A monumental stepped pool called Siloam existed in Jerusalem in the 1st century AD, connected by a paved street to the Temple Mount.",
   "limits": "The pool's original use (ritual bathing, water supply, or both) is discussed, and only part of it has been excavated. It cannot show that the event in John 9 happened.",
-  "status": "consistent",
+  "status": "corroborates",
   "passages": [
    "John.9.7-9.11"
   ],
@@ -3010,6 +3014,11 @@ export const DISCOVERIES = [
    "stratigraphy"
   ],
   "sources": [
+   {
+    "title": "Archaeologists uncover 2,000-year-old street in Jerusalem built by Pontius Pilate (on Szanton, Hagbi, Uziel and Ariel, Tel Aviv: Journal of the Institute of Archaeology of Tel Aviv University, 2019)",
+    "publisher": "Taylor & Francis (publisher of the journal Tel Aviv)",
+    "url": "https://newsroom.taylorandfrancisgroup.com/?p=2997"
+   },
    {
     "title": "Archaeologists identify traces of 'miracle' pool",
     "publisher": "NBC News / Associated Press",
@@ -3039,7 +3048,7 @@ export const DISCOVERIES = [
   "found": {
    "year": 1913,
    "by": "Excavations in Jerusalem",
-   "where": "A partly excavated cistern in Jerusalem"
+   "where": "Jerusalem"
   },
   "location": {
    "lat": 31.7745,
@@ -3211,7 +3220,7 @@ export const DISCOVERIES = [
    "ref": "IAA No. 87-1582"
   },
   "language": "",
-  "description": "The hull, built with mortise-and-tenon joints, was preserved because it was buried in mud. It was lifted in eight days, encased in foam, and conserved in a polyethylene glycol bath until 1995. Radiocarbon tests and pottery and coins from the site date it to the 1st century BC – 1st century AD.",
+  "description": "The hull, built with mortise-and-tenon joints, was preserved because it was buried in mud. It was excavated in eight days, encased in foam, and conserved in a polyethylene glycol bath until 1995. Radiocarbon tests and pottery and coins from the site date it to the 1st century BC – 1st century AD.",
   "connection": "The Gospels describe Jesus and his disciples, several of them fishermen, using boats on the Sea of Galilee (e.g. Luke 5:1–11; Mark 4:35–41). The boat illustrates the kind of vessel used on the lake in that period.",
   "establishes": "Fishing boats of this size and construction were in use on the Sea of Galilee around the 1st century.",
   "limits": "There is no evidence connecting this boat to Jesus or any disciple; the popular name 'Jesus boat' is not a scholarly identification.",
@@ -3263,7 +3272,7 @@ export const DISCOVERIES = [
    "ref": ""
   },
   "language": "",
-  "description": "A house built around the 1st century BC had one room plastered and used for gatherings by the late 1st or 2nd century AD. By the 4th century it was a house church, replaced in the 5th century by an octagonal church; plaster fragments carry Greek, Syriac, Hebrew and Latin graffiti. The white limestone synagogue nearby is dated to about the 5th century by coins and pottery under its floors.",
+  "description": "A house built around the 1st century BC had one room plastered and used for gatherings by the late 1st or 2nd century AD. By the 4th century it was a house church, replaced in the 5th century by an octagonal church; plaster fragments carry Greek, Syriac and Hebrew graffiti. The white limestone synagogue nearby is dated to about the 5th century by coins and pottery under its floors.",
   "connection": "The Gospels say Jesus lived in Capernaum, taught in its synagogue and healed Peter's mother-in-law in Peter's house (Matt 4:13; Mark 1:21, 29; Matt 8:14). The pilgrim Egeria in the 4th century saw a church made from 'the house of the prince of the apostles'.",
   "establishes": "Christians venerated this house as Peter's by the 4th century, and Capernaum was a Jewish village in the 1st century.",
   "limits": "Matthew Grey and others judge the identification plausible but impossible to prove; it depends on whether an early Jewish-Christian community kept the memory. The visible synagogue is centuries later than Jesus, and whether its basalt foundations belong to a 1st-century synagogue is disputed.",
@@ -3290,7 +3299,7 @@ export const DISCOVERIES = [
     "url": "https://dig.corps-cmhl.huji.ac.il/rep_church_full/15904"
    },
    {
-    "title": "Arch of Titus pilot study: menorah relief colour (YU News, 24 October 2012)",
+    "title": "Simon Peter in Capernaum: An Archaeological Survey of the First-Century Village (Matthew J. Grey, in The Ministry of Peter, the Chief Apostle, 2014)",
     "publisher": "Religious Studies Center, Brigham Young University",
     "url": "https://rsc.byu.edu/ministry-peter-chief-apostle/simon-peter-capernaum-archaeological-survey-first-century-village"
    }
@@ -3375,7 +3384,7 @@ export const DISCOVERIES = [
   "description": "The letter responds to a report on Delphi's decline. It calls Gallio Claudius's 'friend and proconsul' and dates itself by the emperor's 12th year of tribunician power and 26th acclamation as imperator, which falls in the first half of AD 52.",
   "connection": "Acts 18:12–17 says Paul was brought before Gallio, 'deputy' (proconsul) of Achaia, in Corinth. Since proconsuls usually served a year, Gallio's term is placed around AD 51–52, giving a fixed point for Paul's 18-month stay (Acts 18:11).",
   "establishes": "Gallio was proconsul of Achaia in about AD 51–52.",
-  "limits": "The exact start of Gallio's term, and when in Paul's stay the hearing took place, depend on reconstruction. The text is fragmentary.",
+  "limits": "The inscription does not mention Paul: it dates Gallio's proconsulship, and it bears on Paul's stay in Corinth only through Acts 18:12. The exact start of Gallio's term, and when in Paul's stay the hearing took place, depend on reconstruction. The text is fragmentary.",
   "status": "corroborates",
   "passages": [
    "Acts.18.11-18.17"
@@ -3428,7 +3437,7 @@ export const DISCOVERIES = [
   "description": "The bronze letters are lost but their cuttings survive in two lines. They record that Erastus, in connection with his aedileship, laid the pavement at his own expense. An aedile oversaw streets, public buildings and markets.",
   "connection": "Paul sends greetings from 'Erastus the chamberlain [oikonomos] of the city' in Romans 16:23, written from Corinth; an Erastus also appears in Acts 19:22 and 2 Timothy 4:20.",
   "establishes": "A man named Erastus held public office at Corinth and paid for a paved square, probably in the mid-1st century AD.",
-  "limits": "Whether he is Paul's Erastus is debated: David Gill (1989) says the evidence allows neither certain identification nor rejection, and commentators such as Cranfield and Dunn doubt it. It is also disputed whether 'oikonomos of the city' equals the office of aedile.",
+  "limits": "Whether he is Paul's Erastus is debated: David Gill (1989) says the evidence allows neither certain identification nor rejection, while H. J. Cadbury and R. Lane Fox doubted it, and Steven Friesen (2010) argued the two men were different. The usual mid-1st-century date has also been questioned (Friesen proposed a later date, though reviewers found his evidence thin). It is also disputed whether 'oikonomos of the city' equals the office of aedile.",
   "status": "debated",
   "passages": [
    "Rom.16.23-16.23",
@@ -3452,6 +3461,11 @@ export const DISCOVERIES = [
     "title": "Another Corinthian Erastus Inscription (Andrew D. Clarke, Tyndale Bulletin 42.1, 1991)",
     "publisher": "Tyndale Bulletin",
     "url": "https://tyndalebulletin.org/article/30502.pdf"
+   },
+   {
+    "title": "Review of S. J. Friesen, D. N. Schowalter and J. C. Walters (eds), Corinth in Context (BMCR 2014.08.49)",
+    "publisher": "Bryn Mawr Classical Review",
+    "url": "https://bmcr.brynmawr.edu/?p=30422"
    }
   ]
  },
@@ -3483,7 +3497,7 @@ export const DISCOVERIES = [
   "connection": "Jesus is reported to have foretold the destruction of the Temple and the siege of Jerusalem (Matt 24:1–2; Luke 19:43–44; 21:20). The arch is a Roman monument to that destruction in AD 70.",
   "establishes": "Rome celebrated the capture of Jerusalem and displayed the Temple's vessels, including the menorah, in Titus's triumph of AD 71.",
   "limits": "The relief is a Roman artistic depiction, not an exact record of the Temple objects. It speaks to the events of AD 70, not to the dating or interpretation of the Gospel texts.",
-  "status": "corroborates",
+  "status": "consistent",
   "passages": [
    "Matt.24.1-24.2",
    "Luke.19.43-19.44",
@@ -3500,7 +3514,7 @@ export const DISCOVERIES = [
     "url": "https://numismatics.org/exhibits/26096/"
    },
    {
-    "title": "Arch of Titus pilot study: menorah relief colour (YU News, 24 October 2012)",
+    "title": "Revel Professor Steven Fine directs Arch of Titus Digital Restoration Project (YU News, 24 October 2012)",
     "publisher": "Yeshiva University",
     "url": "https://www.yu.edu/node/25288"
    }
@@ -3554,6 +3568,11 @@ export const DISCOVERIES = [
     "title": "Artifact Analysis: The Crucified Man",
     "publisher": "Religious Studies Department, Santa Clara University",
     "url": "https://webpages.scu.edu/ftp/cmurphy/courses/sctr027/artifacts/crucified-man.htm"
+   },
+   {
+    "title": "Scholars' Corner: New Analysis of the Crucified Man (on Zias and Sekeles, Israel Exploration Journal 35:1, 1985)",
+    "publisher": "Biblical Archaeology Society Library",
+    "url": "https://library.biblicalarchaeology.org/department/scholars-corner-new-analysis-of-the-crucified-man"
    }
   ]
  }

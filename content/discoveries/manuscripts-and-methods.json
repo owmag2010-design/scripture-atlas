@@ -271,7 +271,7 @@
   "description": "The scroll survived a fire that destroyed the synagogue and was a lump too brittle to open. A team led by Brent Seales made high-resolution tomographic scans of it, then used software to trace, texture and flatten the layers so the ink could be read. The result shows two columns, 35 lines on the master image (18 preserved, 17 reconstructed).",
   "connection": "The text is from the opening chapters of Leviticus. Emanuel Tov and Michael Segal found it identical in its consonants to the medieval Masoretic text. It is the oldest Pentateuch scroll in Hebrew found outside the Dead Sea Scrolls, and the earliest copy of a Pentateuch book found in a Holy Ark.",
   "establishes": "By late antiquity, a Leviticus scroll in a Judean synagogue had the same consonantal text as the later Masoretic text.",
-  "limits": "Only a small part of Leviticus survives. The radiocarbon range (most likely AD 235–340) and the earlier date suggested by the script do not agree, so the copy's exact age is uncertain.",
+  "limits": "Only a small part of Leviticus survives. The radiocarbon result (68% probability AD 235–340; about 89% probability AD 210–390) and the earlier date suggested by the script do not agree, so the copy's exact age is uncertain.",
   "status": "corroborates",
   "passages": [
    "Lev.1.1-1.17",
@@ -351,7 +351,11 @@
     "publisher": "Center for Online Judaic Studies",
     "url": "https://cojs.org/?p=4911"
    }
-  ]
+  ],
+  "heldAt": {
+   "institution": "",
+   "ref": ""
+  }
  },
  {
   "id": "greek-minor-prophets-scroll-nahal-hever",
@@ -437,7 +441,7 @@
    "ref": "E2746"
   },
   "language": "Greek",
-  "description": "Grenfell and Hunt dug the town's ancient rubbish dumps and recovered a vast number of papyrus fragments, most of them everyday documents. P1, found in the first season, is a codex leaf written on both sides with the beginning of Matthew. Penn received it with more than 50 other Oxyrhynchus papyri.",
+  "description": "Grenfell and Hunt dug the town's ancient rubbish dumps and recovered a vast number of papyrus fragments, most of them everyday documents. P1, found in the first season, is a codex leaf written on both sides with the beginning of Matthew.",
   "connection": "P1 preserves Matthew 1:1–9, 12 and 14–20, the genealogy of Jesus and the start of the birth narrative. The site has produced fragments of all four Gospels and of most of Paul's letters, as well as non-canonical texts such as the Gospel of Thomas.",
   "establishes": "Christians in a provincial Egyptian town were reading the New Testament writings in codex form by the 3rd century.",
   "limits": "Most Oxyrhynchus fragments are small and many are still unpublished. Their dates rest on handwriting.",
@@ -491,7 +495,7 @@
   "description": "A parchment codex of the Greek Bible with the Old Testament, the New Testament and the letters 1 and 2 Clement; some leaves are lost. Cyril Lucar, formerly Patriarch of Alexandria, offered it as a gift for James I; it reached England only in 1627, under Charles I. It joined the British Museum with the Old Royal Library in 1757.",
   "connection": "Its text type varies by section: in the Gospels it is an early witness to the later Byzantine text, while in Revelation it is counted among the best witnesses.",
   "establishes": "A complete Greek Bible, with the New Testament followed by 1 and 2 Clement, was being produced in the 5th century.",
-  "limits": "There are gaps, including parts of Matthew, John and 1 Corinthians. Its date rests on handwriting, and its history before the 14th century is unknown.",
+  "limits": "There are gaps, including most of Matthew (1:1–25:6), John 6:50–8:52 and 2 Corinthians 4:13–12:6. Its date rests on handwriting, and its history before the 14th century is unknown.",
   "status": "corroborates",
   "passages": [],
   "people": [],
@@ -589,7 +593,7 @@
    "ref": ""
   },
   "language": "Greek (Codex Sinaiticus leaves)",
-  "description": "The monastery's manuscripts that came to light in 1975 are known as the New Finds. Among them were leaves and fragments of Codex Sinaiticus. Constantin von Tischendorf had taken 43 leaves of the codex in 1844 and the main portion in 1859; most of it was sold to the British Museum in 1933.",
+  "description": "The monastery's manuscripts that came to light in 1975 are known as the New Finds. Among them were leaves and fragments of Codex Sinaiticus. Constantin von Tischendorf had obtained 43 leaves of the codex in 1844; the main portion left the monastery on loan in 1859, was donated to the Tsar in 1869, and was sold to the British Museum in 1933.",
   "connection": "Codex Sinaiticus is a 4th-century Greek Bible containing the whole New Testament. The 1975 leaves, together with others recovered from bindings, add to the parts of the codex held in London, Leipzig and St Petersburg. They were included in the Codex Sinaiticus Project's digital reunion of the manuscript.",
   "establishes": "Parts of Codex Sinaiticus remained at the monastery after Tischendorf's visits and were recovered in 1975.",
   "limits": "The Codex Sinaiticus Project's own pages give slightly different details of the date (May or June 1975), the room, and the count (at least 12 leaves and 24 fragments, or at least 18 leaves in whole or part).",
@@ -879,9 +883,9 @@
    "lat": 31.741,
    "lon": 35.459
   },
-  "description": "Carbon-based ink and parchment reflect light differently at different wavelengths, so a series of images across visible and infrared wavelengths can separate ink from background. The Israel Antiquities Authority's Leon Levy Dead Sea Scrolls Digital Library uses a MegaVision system to image every fragment at high resolution, with near-infrared bands to bring out faded text. The images also allow study and condition monitoring without repeated handling.",
+  "description": "Carbon-based ink and parchment reflect light differently at different wavelengths, so a series of images across visible and infrared wavelengths can separate ink from background. The Israel Antiquities Authority's Leon Levy Dead Sea Scrolls Digital Library uses a MegaVision system with the aim of imaging every fragment at high resolution, with near-infrared bands to bring out faded text. The images also allow study and condition monitoring without repeated handling.",
   "connection": "In 2020 a team led by Joan Taylor (King's College London) imaged 51 apparently blank Qumran fragments held by the University of Manchester. Four of six fragments examined in detail had readable Hebrew or Aramaic text, and the largest showed the word 'Shabbat'.",
-  "establishes": "Imaging can reveal text that is invisible to the eye, and it makes the full set of Dead Sea Scroll fragments available for study online.",
+  "establishes": "Imaging can reveal text that is invisible to the eye, and it is making the Dead Sea Scroll fragments available for study online.",
   "limits": "It recovers only what ink remains; it cannot restore lost material, and small fragments often yield a few letters that are hard to identify. Images still need expert reading, and suggested identifications (such as a link of the 'Shabbat' fragment to Ezekiel 46) can remain tentative.",
   "dating": [],
   "sources": [
@@ -920,7 +924,7 @@
    "placeSlug": "gath_442"
   },
   "description": "When clay or mud brick is heated strongly, its magnetic minerals record the Earth's field at that moment. The field changes over decades, so fired material from a destruction can be compared with a regional curve and with other burnt layers. In the Levant the field changed unusually fast in the Iron Age, with spikes more than twice today's strength, which makes the method sensitive.",
-  "connection": "Vaknin and colleagues (PNAS, 2022) measured 20 destruction layers at 17 sites in Israel. The burnt layers at Gath, Tel Rehov, Horvat Tevet and Tel Zayit gave matching signals and are attributed to campaigns of Hazael of Aram-Damascus; Beth-Shean was destroyed decades earlier. They also found results consistent with Sennacherib's campaign of 701 BC at Lachish and other sites, and with the Babylonian destruction of Lachish in 586 BC.",
+  "connection": "Vaknin and colleagues (PNAS, 2022) measured 20 destruction layers at 17 sites in Israel. The burnt layers at Gath, Tel Rehov, Horvat Tevet and Tel Zayit gave matching signals and are attributed to campaigns of Hazael of Aram-Damascus; Beth-Shean was destroyed decades earlier. Using the historically dated destructions of Lachish (701 and 586 BC) as reference points, they also linked destructions at Beersheba, Tel Zayit and Tell Beit Mirsim to Sennacherib's campaign of 701 BC.",
   "establishes": "Archaeomagnetism can show which destruction layers are close in time and which are not, independent of pottery and radiocarbon.",
   "limits": "Results are ranges, not exact dates, and depend on the reference curve. The method is better at showing that two layers are not contemporary than at proving they are. Linking a destruction to a named king still relies on texts and on historical judgement.",
   "dating": [
