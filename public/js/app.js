@@ -1696,7 +1696,7 @@ async function renderSermon(openId) {
     const paint = () => {
       canvas.width = canvas.clientWidth * devicePixelRatio; canvas.height = 70 * devicePixelRatio;
       an.getByteTimeDomainData(buf); ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const g = ctx.createLinearGradient(0, 0, canvas.width, 0); g.addColorStop(0, "#E6C063"); g.addColorStop(1, "#BA3420");
+      const g = ctx.createLinearGradient(0, 0, canvas.width, 0); g.addColorStop(0, "#F2C14E"); g.addColorStop(1, "#BA3420");
       ctx.strokeStyle = g; ctx.lineWidth = 2 * devicePixelRatio; ctx.beginPath();
       for (let k = 0; k < buf.length; k++) { const x = k / buf.length * canvas.width, y = (buf[k] / 255) * canvas.height; k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
       ctx.stroke(); raf = requestAnimationFrame(paint);

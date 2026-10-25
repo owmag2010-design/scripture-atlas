@@ -3,31 +3,33 @@
    connection between texts; vermilion rubric marks references and the words of Jesus. Scripture is set in
    EB Garamond; the interface in Schibsted Grotesk, so the text of the Bible never looks like interface. */
 :root {
-  --bg: #F4F5F8; --page: #FFFFFF; --ink: #141A2E; --muted: #586079; --line: #DEE1EA; --soft: #ECEEF4;
-  --lapis-deep: #13235B; --lapis-ink: #0E1A45; --lapis: #2546A8; --lapis-soft: #E4EAF8;
-  --gilt: #A87A1C; --gold: #E6C063; --rubric: #BA3420; --sel: #FBF0CF;
-  --hl-gold: #F8E7A8; --hl-lapis: #D9E3F8; --hl-rose: #F7D8D3; --hl-sage: #DCEAD5;
-  --sea: #DCE5F0; --land: #F5F2E9; --coast: #B6B09F; --river: #7E9CC4;
+  /* brand: ink #15120E, cream #F5EFE6, marigold #F2C14E (Scripture Atlas logo pack) */
+  --bg: #F5EFE6; --page: #FFFCF7; --ink: #15120E; --muted: #675F54; --line: #E3DACB; --soft: #EEE6D8;
+  --lapis-deep: #15120E; --lapis-ink: #0B0907; --lapis: #2E2820; --lapis-soft: #F1E7D2;
+  --gilt: #8A6408; --gold: #F2C14E; --rubric: #B5321C; --sel: #FBEAB8;
+  --hl-gold: #F9E3A0; --hl-lapis: #DCE3EE; --hl-rose: #F5D5CE; --hl-sage: #DDE8D2;
+  --sea: #E4E2DA; --land: #FAF6EE; --coast: #B9AE98; --river: #8FA3B5;
   --serif: "EB Garamond", Garamond, "Times New Roman", serif;
   --sans: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
   --sc: "Schibsted Grotesk", system-ui, sans-serif;
   --read: 1.25rem; --r: 14px; --r-sm: 9px;
-  --shadow: 0 1px 2px rgba(19, 35, 91, .06), 0 8px 24px -12px rgba(19, 35, 91, .18);
+  --shadow: 0 1px 2px rgba(21, 18, 14, .06), 0 10px 26px -14px rgba(21, 18, 14, .22);
+  --hero: radial-gradient(120% 90% at 85% 10%, #3A3124 0%, #15120E 48%, #0B0907 100%);
   color-scheme: light;
 }
 :root[data-size="s"] { --read: 1.1rem; }
 :root[data-size="l"] { --read: 1.45rem; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0D1330; --page: #141B3D; --ink: #ECEAF2; --muted: #A3A9C2; --line: #27305A; --soft: #1C2550;
-  --lapis-deep: #0A1030; --lapis-ink: #070C24; --lapis: #9DB4F5; --lapis-soft: #22305F;
-  --gilt: #E1B957; --gold: #EAC970; --rubric: #F08A72; --sel: #3A3320;
-  --hl-gold: #4A3F17; --hl-lapis: #233656; --hl-rose: #4A2A27; --hl-sage: #2C3D27; --sea: #0F1A3A; --land: #1E2648; --coast: #3B4570; --river: #4F6E99;
+  --bg: #0F0D0A; --page: #191612; --ink: #F5EFE6; --muted: #B3A897; --line: #2E2922; --soft: #221E19;
+  --lapis-deep: #0B0907; --lapis-ink: #050403; --lapis: #F5EFE6; --lapis-soft: #2E281F;
+  --gilt: #F2C14E; --gold: #F2C14E; --rubric: #F08A72; --sel: #3B3220;
+  --hl-gold: #4A3F17; --hl-lapis: #263240; --hl-rose: #4A2A27; --hl-sage: #2C3D27; --sea: #12100D; --land: #221E19; --coast: #4A4235; --river: #4F6478;
   --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.6); color-scheme: dark; } }
 :root[data-theme="dark"] {
-  --bg: #0D1330; --page: #141B3D; --ink: #ECEAF2; --muted: #A3A9C2; --line: #27305A; --soft: #1C2550;
-  --lapis-deep: #0A1030; --lapis-ink: #070C24; --lapis: #9DB4F5; --lapis-soft: #22305F;
-  --gilt: #E1B957; --gold: #EAC970; --rubric: #F08A72; --sel: #3A3320;
-  --hl-gold: #4A3F17; --hl-lapis: #233656; --hl-rose: #4A2A27; --hl-sage: #2C3D27; --sea: #0F1A3A; --land: #1E2648; --coast: #3B4570; --river: #4F6E99;
+  --bg: #0F0D0A; --page: #191612; --ink: #F5EFE6; --muted: #B3A897; --line: #2E2922; --soft: #221E19;
+  --lapis-deep: #0B0907; --lapis-ink: #050403; --lapis: #F5EFE6; --lapis-soft: #2E281F;
+  --gilt: #F2C14E; --gold: #F2C14E; --rubric: #F08A72; --sel: #3B3220;
+  --hl-gold: #4A3F17; --hl-lapis: #263240; --hl-rose: #4A2A27; --hl-sage: #2C3D27; --sea: #12100D; --land: #221E19; --coast: #4A4235; --river: #4F6478;
   --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.6); color-scheme: dark; }
 
 * { box-sizing: border-box; }
@@ -48,7 +50,10 @@ button { cursor: pointer; }
 header.site { background: var(--lapis-deep); color: #fff; position: sticky; top: 0; z-index: 20; padding-top: env(safe-area-inset-top, 0px); box-shadow: 0 1px 0 rgba(255,255,255,.06); }
 header.site .bar { max-width: 1240px; height: auto; margin: 0 auto; display: flex; align-items: center; gap: 14px; padding-block: 10px; background: none; border-radius: 0; overflow: visible; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; white-space: nowrap; }
-.brand .logo { width: 38px; height: 38px; flex: none; }
+.brand .logo-full { height: 40px; width: auto; display: block; }
+.footlogo { height: 30px; width: auto; display: block; margin-bottom: 10px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .footlogo { content: url("brand/logo-horizontal-for-dark-bg.svg"); } }
+:root[data-theme="dark"] .footlogo { content: url("brand/logo-horizontal-for-dark-bg.svg"); }
 .brand .wm { font: 700 1.28rem/1 var(--sans); letter-spacing: -.02em; }
 .brand .wm small { display: block; font: 500 .7rem/1.3 var(--sans); letter-spacing: 0; color: color-mix(in srgb, var(--gold) 80%, #fff); margin-top: 3px; }
 .gsearch { flex: 1; display: flex; min-width: 0; max-width: 560px; margin-left: auto; }
@@ -488,12 +493,12 @@ ol.lessons b { display: block; font-family: var(--serif); font-size: 1.2rem; fon
 
 /* ---------- home: hero with word threads ---------- */
 main:has(.hero2) { padding-top: 0; }
-.hero2 { position: relative; isolation: isolate; overflow: hidden; color: #fff; background: radial-gradient(120% 90% at 85% 10%, #22377E 0%, var(--lapis-deep) 45%, var(--lapis-ink) 100%);
+.hero2 { position: relative; isolation: isolate; overflow: hidden; color: #fff; background: var(--hero);
   margin-inline: calc(50% - 50vw); padding: clamp(36px, 6vw, 72px) max(16px, calc(50vw - 620px)) clamp(40px, 6vw, 64px); }
-.hero2 .heroart { position: absolute; inset: 0 0 0 auto; width: min(58%, 900px); height: 100%; object-fit: cover; z-index: -1; opacity: .55; mix-blend-mode: luminosity;
+.hero2 .heroart { position: absolute; inset: 0 0 0 auto; width: min(58%, 900px); height: 100%; object-fit: cover; z-index: -1; opacity: .5; mix-blend-mode: luminosity;
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 45%); mask-image: linear-gradient(90deg, transparent 0%, #000 45%); }
 .hero2::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background-image: radial-gradient(circle at 1px 1px, rgba(230, 192, 99, .14) 1px, transparent 1.4px); background-size: 26px 26px;
+  background-image: radial-gradient(circle at 1px 1px, rgba(242, 193, 78, .14) 1px, transparent 1.4px); background-size: 26px 26px;
   -webkit-mask-image: linear-gradient(180deg, #000, transparent 85%); mask-image: linear-gradient(180deg, #000, transparent 85%); }
 .hero-in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: clamp(24px, 4vw, 56px); align-items: center; }
 .hero-copy h1 { font: 800 clamp(2.5rem, 5.6vw, 4.4rem)/1.0 var(--sans); letter-spacing: -.035em; max-width: 13ch; }
@@ -505,21 +510,21 @@ main:has(.hero2) { padding-top: 0; }
 .hero2 .tryline button:hover { border-color: var(--gold); }
 .herocredit { position: absolute; right: max(16px, calc(50vw - 620px)); bottom: 10px; margin: 0; font-size: .72rem; color: rgba(255,255,255,.5); }
 
-.threads { margin: 0; background: rgba(9, 15, 44, .62); border: 1px solid rgba(230, 192, 99, .28); border-radius: 22px; padding: 18px 20px 14px; backdrop-filter: blur(6px); box-shadow: 0 30px 60px -30px rgba(0,0,0,.6); }
+.threads { margin: 0; background: rgba(11, 9, 7, .66); border: 1px solid rgba(242, 193, 78, .28); border-radius: 22px; padding: 18px 20px 14px; backdrop-filter: blur(6px); box-shadow: 0 30px 60px -30px rgba(0,0,0,.6); }
 .th-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
 .th-tabs button { border: 1px solid rgba(255,255,255,.18); background: transparent; color: rgba(255,255,255,.75); border-radius: 999px; padding: 4px 12px; font-size: .85rem; font-weight: 600; }
 .th-tabs button[aria-selected="true"] { background: var(--gold); border-color: var(--gold); color: var(--lapis-ink); }
 .th-stage { position: relative; display: grid; gap: clamp(54px, 8vw, 84px); padding: 4px 2px 6px; }
 .th-en { font: 400 clamp(1.15rem, 2vw, 1.45rem)/1.6 var(--serif); color: #fff; }
 .th-en .nd { font-variant-caps: all-small-caps; letter-spacing: .04em; }
-.thw { color: #fff; text-decoration: none; border-bottom: 1px solid rgba(230, 192, 99, .6); }
+.thw { color: #fff; text-decoration: none; border-bottom: 1px solid rgba(242, 193, 78, .6); }
 .thw:hover, .thw.hot, .thw:focus-visible { color: var(--gold); border-bottom-color: var(--gold); outline: none; }
 .th-src { font: 500 clamp(1.4rem, 2.4vw, 1.8rem)/1.5 var(--serif); color: var(--gold); text-align: start; word-spacing: .18em; }
 .th-src[lang="hbo"] { font-family: "Noto Serif Hebrew", var(--serif); }
 .ths { color: var(--gold); text-decoration: none; border-radius: 6px; padding: 0 2px; }
-.ths:hover, .ths.hot, .ths:focus-visible { background: rgba(230, 192, 99, .16); outline: none; }
+.ths:hover, .ths.hot, .ths:focus-visible { background: rgba(242, 193, 78, .16); outline: none; }
 .th-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-.th-svg path { fill: none; stroke: rgba(230, 192, 99, .55); stroke-width: 1.3; transition: stroke .15s, stroke-width .15s; }
+.th-svg path { fill: none; stroke: rgba(242, 193, 78, .55); stroke-width: 1.3; transition: stroke .15s, stroke-width .15s; }
 .th-svg circle { fill: var(--gold); opacity: .8; }
 .th-svg .hot { stroke: var(--gold); stroke-width: 2.4; opacity: 1; }
 @media (prefers-reduced-motion: no-preference) {
@@ -553,8 +558,8 @@ main:has(.hero2) { padding-top: 0; }
 .tile.t-big { grid-column: span 2; grid-row: span 2; }
 .tile.t-tall { grid-row: span 2; }
 .tile .tart { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
-.tile .tart.fallback { background: radial-gradient(circle at 30% 20%, #2B4594, var(--lapis-deep)); }
-.tile::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(10, 16, 48, 0) 35%, rgba(10, 16, 48, .88) 100%); }
+.tile .tart.fallback { background: radial-gradient(circle at 30% 20%, #3A3124, var(--lapis-deep)); }
+.tile::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(11, 9, 7, 0) 35%, rgba(11, 9, 7, .86) 100%); }
 .tile .tcap { position: absolute; left: 18px; right: 18px; bottom: 16px; display: grid; gap: 4px; }
 .tile .tcap b { font: 700 1.25rem/1.15 var(--sans); letter-spacing: -.015em; }
 .tile.t-big .tcap b { font-size: clamp(1.5rem, 2.4vw, 2rem); }
@@ -700,7 +705,7 @@ body.kidsmode main { max-width: 1180px; }
 .spoints blockquote { margin: 6px 0 0; padding-left: 10px; border-left: 2px solid var(--gilt); font: italic 1rem var(--serif); color: var(--muted); }
 
 /* ---------- Scripture Lens ---------- */
-.lenshead { display: grid; grid-template-columns: 1fr auto; gap: 12px 18px; align-items: end; padding: 22px 26px; margin-bottom: 18px; border-radius: var(--r); color: #fff; background: radial-gradient(120% 140% at 100% 0%, #22377E, var(--lapis-deep) 50%, var(--lapis-ink)); }
+.lenshead { display: grid; grid-template-columns: 1fr auto; gap: 12px 18px; align-items: end; padding: 22px 26px; margin-bottom: 18px; border-radius: var(--r); color: #fff; background: var(--hero); }
 .lenshead .eyebrow { color: var(--gold); }
 .lenshead h1 { font-size: clamp(2rem, 4.5vw, 3rem); letter-spacing: -.03em; }
 .lensnav { display: flex; gap: 6px; }
@@ -781,3 +786,4 @@ body.kidsmode main { max-width: 1180px; }
 .jstops li > a { grid-column: 2; color: var(--rubric); text-decoration: none; }
 .tile.t-kids::after { background: linear-gradient(180deg, rgba(60, 20, 110, 0) 35%, rgba(60, 20, 110, .82) 100%); } .tile.t-kids .tcap b { font-family: "Fredoka", var(--sans); font-size: 1.5rem; }
 .mono { overflow-wrap: anywhere; word-break: break-word; } .credits li, .reg td { overflow-wrap: anywhere; }
+@media (max-width: 720px) { .brand .logo-full { height: 34px; } }
