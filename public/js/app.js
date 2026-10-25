@@ -18,6 +18,8 @@ import { mountMap } from "./atlas-map.js";
 import { COURSES, PLANNED, STATUS } from "./courses.js";
 import { SECTIONS } from "./ai-core.js";
 import { HISTORY, NOT_HOSTED } from "./translations-info.js";
+import { KID_STORIES } from "./kids.js";
+import { sermonRefs, sermonMarkdown } from "./sermon.js";
 import { stem, glossStems, distribution, sharedStrongs, radialLayout, NODE_TYPES, clip } from "./research.js";
 import { repeatedWords, keyLemmas, mergeCrossRefs, interpretQuestions, guideMarkdown, OBSERVE, APPLY } from "./guide.js";
 import { describeMorph, languageOf, normaliseStrong, shardOf, displayStrong, isGrammaticalStrong, editionNote } from "./lang.js";
@@ -1414,12 +1416,230 @@ function renderSoon(key) {
     <section class="card"><h2 style="font-size:1.4rem">Available now</h2><p class="small">Open any verse in the reader for background, other translations, the Hebrew or Greek, cross references and connections.</p><a class="btn pri" href="#/read">Open the reader</a></section></div>`;
 }
 
+/* ---------- sermon studio: transcribe, find scriptures, outline ---------- */
+const SERMON_KEY = "scripture-atlas:sermons";
+const sermonsLoad = () => { try { return JSON.parse(localStorage.getItem(SERMON_KEY) || "[]"); } catch { return []; } };
+const sermonsSave = list => { try { localStorage.setItem(SERMON_KEY, JSON.stringify(list)); return true; } catch { return false; } };
+const LANGS = [["en-GB", "English (UK)"], ["en-US", "English (US)"], ["en-AU", "English (Australia)"], ["en-ZA", "English (South Africa)"], ["en-NG", "English (Nigeria)"], ["en-KE", "English (Kenya)"], ["sw-KE", "Kiswahili"], ["zu-ZA", "isiZulu"], ["af-ZA", "Afrikaans"], ["fr-FR", "Français"], ["pt-BR", "Português"], ["es-ES", "Español"], ["de-DE", "Deutsch"]];
+let sermonRec = null;
+async function renderSermon(openId) {
+  setNav("sermon"); setTitle("Sermon studio");
+  await getIndex();
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const saved = sermonsLoad();
+  const cur = (openId && saved.find(x => x.id === openId)) || { id: Date.now().toString(36), title: "", speaker: "", date: new Date().toISOString().slice(0, 10), transcript: "", outline: null };
+  view.innerHTML = `${artHead("tissot")}<span class="eyebrow">Sermon studio</span><h1>Record a sermon. Keep every word and every verse.</h1>
+      <p>Transcribe live from your microphone, catch each Bible reference as it is spoken, and turn the message into study notes for your small group.</p></div>
+    <div class="sermon">
+      <section class="card recorder">
+        <div class="recrow">
+          <button class="recbtn" id="rec" type="button" aria-pressed="false" ${SR ? "" : "disabled"}><span class="dot"></span><span id="reclabel">Start recording</span></button>
+          <div class="recinfo"><b id="rectime">0:00</b><span class="small" id="recstate">${SR ? "Ready. Your browser will ask to use the microphone." : "Live transcription needs Chrome, Edge or Safari. You can paste or upload a transcript instead."}</span></div>
+          <label class="sr" for="reclang">Language</label><select id="reclang">${LANGS.map(([c, l]) => `<option value="${c}" ${c === store.setting("reclang", "en-GB") ? "selected" : ""}>${l}</option>`).join("")}</select>
+        </div>
+        <canvas id="wave" height="70" aria-hidden="true"></canvas>
+        <div class="meta3"><label>Title<input id="stitle" value="${esc(cur.title)}" placeholder="Sermon title"></label><label>Speaker<input id="sspk" value="${esc(cur.speaker)}" placeholder="Speaker"></label><label>Date<input id="sdate" type="date" value="${esc(cur.date)}"></label></div>
+        <label class="sr" for="stext">Transcript</label>
+        <div class="transcript"><textarea id="stext" placeholder="The transcript appears here as you speak. You can also paste one, or edit it.">${esc(cur.transcript)}</textarea><p class="interim" id="interim" aria-live="polite"></p></div>
+        <div class="actions"><label class="btn" for="sfile">Upload a transcript<input id="sfile" type="file" accept=".txt,.vtt,.srt,text/plain" hidden></label>
+          <button class="btn" type="button" id="ssave">Save on this device</button><button class="btn" type="button" id="sdl">Download as Markdown</button><a class="btn" id="saudio" hidden download>Download the audio</a></div>
+        <p class="small">Speech is transcribed by your browser's own speech service; on some browsers that runs on the device, on others it is sent to the browser maker. Audio is kept on this device unless you download it.</p>
+      </section>
+      <aside class="sside">
+        <section class="card"><h2>Scriptures mentioned</h2><div id="srefs" class="srefs"><p class="small">Bible references appear here as they are spoken, for example “John chapter three verse sixteen”.</p></div></section>
+        <section class="card"><h2>Study notes</h2><p class="small">Make an outline, big idea, discussion questions and application from the transcript.</p>
+          <button class="btn pri" type="button" id="souts">Make study notes with AI</button><div id="sout"></div></section>
+        <section class="card"><h2>Words that recur</h2><div id="swords" class="small">None yet.</div><p class="small" id="scount"></p></section>
+        ${saved.length ? `<section class="card"><h2>Saved sermons</h2><ul class="linklist">${saved.slice().reverse().map(x => `<li><a href="#/sermon/${x.id}"><span><span class="t">${esc(x.title || "Untitled sermon")}</span><span class="d">${esc([x.speaker, x.date].filter(Boolean).join(", "))}</span></span><span class="arr">›</span></a></li>`).join("")}</ul></section>` : ""}
+      </aside>
+    </div>`;
+  const ta = $("#stext");
+  let outline = cur.outline;
+  const refresh = () => {
+    const text = ta.value;
+    const refs = sermonRefs(text, chapterCount);
+    $("#srefs").innerHTML = refs.length ? refs.map(r => `<a class="sref" href="${readUrl("kjv", r.book, r.chapter, r.verse)}" data-o="${toOsis(r.book, r.chapter, r.verse || 1)}"><b>${formatRef(r.book, r.chapter, r.verse, r.verseEnd)}</b><span class="small"></span></a>`).join("") : `<p class="small">No references yet.</p>`;
+    $("#srefs").querySelectorAll(".sref").forEach(async a => { const t = await verseText("kjv", a.dataset.o).catch(() => ""); a.querySelector("span").textContent = t; });
+    const rw = repeatedWords([text], 12);
+    $("#swords").innerHTML = rw.length ? `<div class="wcloud">${rw.map(([w, n]) => `<span style="font-size:${(0.85 + Math.min(n, 12) * .08).toFixed(2)}rem">${esc(w)}<sup>${n}</sup></span>`).join(" ")}</div>` : "None yet.";
+    const wc = (text.match(/\S+/g) || []).length;
+    $("#scount").textContent = wc ? `${wc.toLocaleString()} words, about ${Math.max(1, Math.round(wc / 130))} minute${wc > 195 ? "s" : ""} of speaking.` : "";
+  };
+  const draw = o => {
+    if (!o) return;
+    $("#sout").innerHTML = `<div class="aiout"><span class="chip ai">AI-generated from the transcript. Check it against the recording.</span>
+      <h3>${esc(o.title)}</h3><p><b>Big idea:</b> ${esc(o.bigIdea)}</p><p>${esc(o.summary)}</p>
+      <ol class="spoints">${o.points.map(p => `<li><b>${esc(p.heading)}</b><br>${esc(p.summary)}${p.quote ? `<blockquote>“${esc(p.quote)}”</blockquote>` : ""}</li>`).join("")}</ol>
+      ${o.questions.length ? `<h4>Discussion questions</h4><ul>${o.questions.map(q => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}
+      ${o.application.length ? `<h4>Application</h4><ul>${o.application.map(q => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}</div>`;
+  };
+  draw(outline); refresh();
+  let t; ta.addEventListener("input", () => { clearTimeout(t); t = setTimeout(refresh, 400); });
+  $("#reclang").addEventListener("change", e => store.setSetting("reclang", e.target.value));
+  $("#sfile").addEventListener("change", async e => {
+    const f = e.target.files[0]; if (!f) return;
+    const raw = await f.text();
+    ta.value = raw.replace(/^WEBVTT.*$/m, "").replace(/^\d+\s*$/gm, "").replace(/^[\d:.,]+\s*-->\s*[\d:.,]+.*$/gm, "").replace(/<[^>]+>/g, "").replace(/\n{2,}/g, "\n").trim();
+    refresh(); toast("Transcript loaded");
+  });
+  const current = () => ({ ...cur, title: $("#stitle").value.trim(), speaker: $("#sspk").value.trim(), date: $("#sdate").value, transcript: ta.value.trim(), outline, refs: sermonRefs(ta.value, chapterCount).map(r => formatRef(r.book, r.chapter, r.verse, r.verseEnd)) });
+  $("#ssave").addEventListener("click", () => {
+    const list = sermonsLoad().filter(x => x.id !== cur.id); list.push(current());
+    toast(sermonsSave(list) ? "Saved on this device" : "This browser blocked saving; download it instead");
+  });
+  $("#sdl").addEventListener("click", () => {
+    const blob = new Blob([sermonMarkdown(current())], { type: "text/markdown" }), a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = `sermon-${(current().title || "notes").toLowerCase().replace(/[^a-z0-9]+/g, "-")}.md`; document.body.appendChild(a); a.click(); a.remove();
+  });
+  $("#souts").addEventListener("click", async () => {
+    const b = $("#souts"); b.disabled = true; b.textContent = "Reading the sermon…"; $("#sout").innerHTML = `<p class="loading">This takes about half a minute.</p>`;
+    try {
+      const r = await fetch("api/sermon", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ transcript: ta.value, title: $("#stitle").value }) });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || "The notes could not be made.");
+      outline = j.outline; draw(outline);
+      if (j.dropped?.length) $("#sout").insertAdjacentHTML("beforeend", `<details class="small"><summary>${j.dropped.length} item${j.dropped.length > 1 ? "s" : ""} removed by the check</summary><ul>${j.dropped.map(d => `<li>${esc(d)}</li>`).join("")}</ul></details>`);
+      if (!$("#stitle").value && outline.title) $("#stitle").value = outline.title;
+    } catch (e) { $("#sout").innerHTML = `<p class="empty">${esc(e.message)}</p>`; }
+    b.disabled = false; b.textContent = "Make study notes with AI";
+  });
+
+  // live recording: speech recognition + waveform + optional audio file
+  if (!SR) return;
+  let rec = null, stream = null, raf = 0, mr = null, chunks = [], started = 0, tick = 0, wanted = false;
+  const canvas = $("#wave"), ctx = canvas.getContext("2d");
+  const setUi = on => { $("#rec").setAttribute("aria-pressed", on); $("#reclabel").textContent = on ? "Stop recording" : "Start recording"; $("#rec").classList.toggle("on", on); };
+  async function start() {
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch { $("#recstate").textContent = "The microphone was not allowed. Check the browser's permission for this site."; return; }
+    wanted = true; setUi(true); started = Date.now(); $("#recstate").textContent = "Listening…";
+    const ac = new (window.AudioContext || window.webkitAudioContext)(), an = ac.createAnalyser(); an.fftSize = 1024; ac.createMediaStreamSource(stream).connect(an);
+    const buf = new Uint8Array(an.fftSize);
+    const paint = () => {
+      canvas.width = canvas.clientWidth * devicePixelRatio; canvas.height = 70 * devicePixelRatio;
+      an.getByteTimeDomainData(buf); ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const g = ctx.createLinearGradient(0, 0, canvas.width, 0); g.addColorStop(0, "#E6C063"); g.addColorStop(1, "#BA3420");
+      ctx.strokeStyle = g; ctx.lineWidth = 2 * devicePixelRatio; ctx.beginPath();
+      for (let k = 0; k < buf.length; k++) { const x = k / buf.length * canvas.width, y = (buf[k] / 255) * canvas.height; k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+      ctx.stroke(); raf = requestAnimationFrame(paint);
+    };
+    paint();
+    tick = setInterval(() => { const s = Math.floor((Date.now() - started) / 1000); $("#rectime").textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }, 500);
+    if (window.MediaRecorder) { chunks = []; mr = new MediaRecorder(stream); mr.ondataavailable = e => chunks.push(e.data); mr.onstop = () => { const blob = new Blob(chunks, { type: mr.mimeType }); const a = $("#saudio"); if (a) { a.href = URL.createObjectURL(blob); a.download = `sermon-${$("#sdate").value}.${/mp4/.test(mr.mimeType) ? "m4a" : "webm"}`; a.hidden = false; } }; mr.start(); }
+    const listen = () => {
+      rec = new SR(); rec.lang = $("#reclang").value; rec.continuous = true; rec.interimResults = true;
+      rec.onresult = e => {
+        let interim = "";
+        for (let k = e.resultIndex; k < e.results.length; k++) {
+          const r = e.results[k];
+          if (r.isFinal) { const txt = r[0].transcript.trim(); ta.value = (ta.value ? ta.value.replace(/\s+$/, "") + " " : "") + txt.charAt(0).toUpperCase() + txt.slice(1) + (/[.?!]$/.test(txt) ? "" : "."); ta.scrollTop = ta.scrollHeight; refresh(); }
+          else interim += r[0].transcript;
+        }
+        $("#interim").textContent = interim;
+      };
+      rec.onerror = e => { if (e.error === "not-allowed") { wanted = false; $("#recstate").textContent = "Speech recognition was not allowed."; } };
+      rec.onend = () => { if (wanted) try { rec.start(); } catch {} }; // browsers stop after a pause; keep going until the user stops
+      rec.start();
+    };
+    listen(); sermonRec = { stop };
+  }
+  function stop() {
+    wanted = false; setUi(false); $("#recstate") && ($("#recstate").textContent = "Stopped. Edit the transcript, then make study notes.");
+    try { rec?.stop(); } catch {} cancelAnimationFrame(raf); clearInterval(tick);
+    try { mr?.state === "recording" && mr.stop(); } catch {} stream?.getTracks().forEach(t => t.stop());
+    if ($("#interim")) $("#interim").textContent = "";
+  }
+  $("#rec").addEventListener("click", () => ($("#rec").getAttribute("aria-pressed") === "true" ? stop() : start()));
+  addEventListener("hashchange", () => sermonRec?.stop(), { once: true });
+}
+
+/* ---------- kids: animated Bible stories ---------- */
+const kidImg = (id, cls = "") => `<img class="${cls}" src="img/kids/${id}-sm.webp" srcset="img/kids/${id}-sm.webp 720w, img/kids/${id}.webp 1600w" sizes="(max-width: 760px) 100vw, 60vw" alt="" decoding="async">`;
+function renderKids() {
+  setNav("kids"); setTitle("Kids");
+  document.body.classList.add("kidsmode");
+  view.innerHTML = `<section class="kidshero">${kidImg("hero", "kh-art")}
+      <div class="kh-copy"><h1>Bible stories, told and drawn for you.</h1><p>Pick a story. Tap the arrows to turn the page, or press <b>Read to me</b> and listen.</p></div></section>
+    <div class="shelf">${KID_STORIES.map((s, i) => `<a class="book" href="#/kids/${s.id}" style="--c:${s.colour};--tilt:${[-2, 1.5, -1, 2, -1.5, 1, -2, 1.5][i % 8]}deg">
+      <span class="cover">${kidImg(s.id)}</span><span class="spine"><b>${esc(s.title)}</b><span>${esc(s.range)} · ${s.scenes.length} pages</span></span></a>`).join("")}</div>
+    <p class="small kidsnote">Stories retold for children by Scripture Atlas, keeping close to the Bible text; each page shows where to read it. Pictures made for Scripture Atlas with an AI image tool. <a href="#/learn">Family mode</a> in Courses has more for parents and children together.</p>`;
+}
+
+let storyTimer = null;
+function renderStory(id) {
+  const s = KID_STORIES.find(x => x.id === id); if (!s) return renderKids();
+  setNav("kids"); setTitle(s.title);
+  document.body.classList.add("kidsmode");
+  const N = s.scenes.length; let i = 0, speaking = false;
+  const origins = ["30% 40%", "70% 35%", "50% 70%", "25% 60%", "65% 55%"];
+  const fx = kind => Array.from({ length: kind === "rain" ? 40 : 22 }, (_, k) => `<i style="--x:${(k * 37) % 100}%;--y:${(k * 53) % 100}%;--d:${(k % 7) * .45}s;--s:${.6 + (k % 5) * .2}"></i>`).join("");
+  view.innerHTML = `<div class="story" style="--c:${s.colour}">
+    <div class="storybar"><a class="btn" href="#/kids">‹ All stories</a><h1>${esc(s.title)}</h1><span class="small">${esc(s.range)}</span></div>
+    <div class="stage" id="stage">${kidImg(s.id, "st-art")}<div class="fx fx-${s.fx}" aria-hidden="true">${fx(s.fx)}</div>
+      <button class="turn prev" id="sprev" type="button" aria-label="Previous page">‹</button><button class="turn next" id="snext" type="button" aria-label="Next page">›</button></div>
+    <div class="pagecard" id="pagecard" aria-live="polite"></div>
+    <div class="storyctl"><div class="dots" id="dots">${s.scenes.map((_, k) => `<button type="button" data-k="${k}" aria-label="Page ${k + 1}"></button>`).join("")}<button type="button" data-k="${N}" aria-label="Quiz" class="qdot">?</button></div>
+      <button class="btn gold" type="button" id="readme">Read to me</button></div>
+    ${s.note ? `<p class="small kidsnote"><b>For grown-ups:</b> ${esc(s.note)}</p>` : ""}
+  </div>`;
+  const art = $(".st-art"), card = $("#pagecard");
+  const synth = window.speechSynthesis;
+  const stop = () => { if (synth) synth.cancel(); speaking = false; $("#readme").textContent = "Read to me"; };
+  const say = text => {
+    if (!synth) { toast("Reading aloud is not available in this browser"); return; }
+    stop(); const u = new SpeechSynthesisUtterance(text); u.rate = .92; u.pitch = 1.05;
+    const words = [...card.querySelectorAll(".sw")];
+    u.onboundary = e => { if (e.name !== "word") return; let n = 0; words.forEach(w => { const a = +w.dataset.o; w.classList.toggle("now", a <= e.charIndex && e.charIndex < a + w.textContent.length); }); };
+    u.onend = () => { words.forEach(w => w.classList.remove("now")); speaking = false; $("#readme").textContent = "Read to me"; if (store.setting("kidsauto", false) && i < N) { clearTimeout(storyTimer); storyTimer = setTimeout(() => go(i + 1, true), 900); } };
+    speaking = true; $("#readme").textContent = "Stop reading"; synth.speak(u);
+  };
+  const wrapWords = t => { let o = 0; return t.split(/(\s+)/).map(p => { const html = /\s/.test(p) ? p : `<span class="sw" data-o="${o}">${esc(p)}</span>`; o += p.length; return html; }).join(""); };
+  function go(k, auto = false) {
+    i = Math.max(0, Math.min(N, k)); clearTimeout(storyTimer);
+    if (!auto) stop();
+    view.querySelectorAll("#dots button").forEach(b => b.classList.toggle("on", +b.dataset.k === i));
+    $("#sprev").disabled = i === 0; $("#snext").disabled = i === N;
+    art.style.transformOrigin = origins[i % origins.length];
+    art.classList.remove("kb"); void art.offsetWidth; art.classList.add("kb");
+    if (i < N) {
+      const [text, ref] = s.scenes[i];
+      card.innerHTML = `<p class="pt">${wrapWords(text)}</p><div class="pmeta"><span>Page ${i + 1} of ${N}</span><a href="${readUrl("kjv", fromOsis(ref).book, fromOsis(ref).chapter, fromOsis(ref).verse)}">Read it in the Bible: ${labelOf(ref)}</a></div>`;
+      card.classList.remove("flip"); void card.offsetWidth; card.classList.add("flip");
+      if (auto || speaking) say(text);
+    } else {
+      let score = 0, answered = 0;
+      card.innerHTML = `<h2 class="qh">Quiz time!</h2>${s.quiz.map(([q, opts, a], qi) => { const order = opts.map((o, oi) => [o, oi]).sort((x, y) => ((x[1] * 7 + qi * 3) % 5) - ((y[1] * 7 + qi * 3) % 5)); return `<div class="q"><p>${esc(q)}</p><div class="opts">${order.map(([o, oi]) => `<button type="button" data-q="${qi}" data-ok="${oi === a}">${esc(o)}</button>`).join("")}</div></div>`; }).join("")}
+        <p class="think"><b>Think about it:</b> ${esc(s.think)}</p><p id="score" class="small"></p>`;
+      card.querySelectorAll(".opts button").forEach(b => b.addEventListener("click", () => {
+        const q = b.closest(".q"); if (q.dataset.done) return; q.dataset.done = 1; answered++;
+        const ok = b.dataset.ok === "true"; if (ok) score++;
+        b.classList.add(ok ? "right" : "wrong"); if (!ok) q.querySelector('[data-ok="true"]').classList.add("right");
+        if (ok) burst(b);
+        if (answered === s.quiz.length) { $("#score").textContent = score === s.quiz.length ? `All ${score} right. Well done!` : `${score} out of ${s.quiz.length}. Try the story again to find the answers.`; if (score === s.quiz.length) store.completeLesson?.("kids", s.id); }
+      }));
+    }
+  }
+  function burst(el) {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const r = el.getBoundingClientRect(), box = document.createElement("div"); box.className = "burst"; box.style.left = r.left + r.width / 2 + "px"; box.style.top = r.top + r.height / 2 + "px";
+    box.innerHTML = Array.from({ length: 18 }, (_, k) => `<i style="--a:${k * 20}deg;--h:${(k * 47) % 360}"></i>`).join(""); document.body.appendChild(box); setTimeout(() => box.remove(), 900);
+  }
+  $("#sprev").addEventListener("click", () => go(i - 1)); $("#snext").addEventListener("click", () => go(i + 1));
+  $("#dots").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) go(+b.dataset.k); });
+  $("#readme").addEventListener("click", () => { if (speaking) return stop(); if (i < N) say(s.scenes[i][0]); });
+  const keys = e => { if (!document.contains($("#stage"))) return removeEventListener("keydown", keys); if (e.key === "ArrowRight") go(i + 1); if (e.key === "ArrowLeft") go(i - 1); };
+  addEventListener("keydown", keys);
+  let sx = null; $("#stage").addEventListener("touchstart", e => (sx = e.touches[0].clientX), { passive: true });
+  $("#stage").addEventListener("touchend", e => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) go(i + (dx < 0 ? 1 : -1)); sx = null; });
+  addEventListener("hashchange", stop, { once: true });
+  go(0);
+}
+
 /* ---------- router ---------- */
 async function route() {
   await imagesReady;
   const h = decodeURIComponent(location.hash.replace(/^#\/?/, "").split("#")[0]);
   const [head, ...rest] = h.split("/");
-  document.body.classList.remove("focus"); document.querySelector(".exitfocus")?.remove();
+  document.body.classList.remove("focus", "kidsmode"); window.speechSynthesis?.cancel(); document.querySelector(".exitfocus")?.remove();
   try {
     if (head === "read") await renderRead(rest[0], rest[1]);
     else if (head === "search") await renderSearch(rest.join("/"));
@@ -1437,6 +1657,8 @@ async function route() {
     else if (head === "study") await renderStudy();
     else if (head === "library") { await getIndex(); renderLibrary(); }
     else if (head === "research") await renderResearch(rest);
+    else if (head === "sermon") await renderSermon(rest[0]);
+    else if (head === "kids") await (rest[0] ? renderStory(rest[0]) : renderKids());
     else if (head === "soon") renderSoon(rest[0]);
     else await renderHome();
   } catch (e) {
