@@ -760,3 +760,5 @@ body.kidsmode main { max-width: 1180px; }
 .lensgrid > * { min-width: 0; }
 .lenshead > * { min-width: 0; }
 @media (max-width: 900px) { .lenshead { padding: 18px; } .modes { width: auto; } .modes a { padding: 8px 12px; } }
+.hit.coll { gap: 6px; } .cref { display: block; text-decoration: none; color: var(--ink); padding: 6px 10px; border-radius: 8px; background: var(--soft); }
+.cref b { color: var(--rubric); }

@@ -710,22 +710,24 @@ async function renderSearch(q) {
 async function renderStudy(tab = "notes") {
   setNav("study"); setTitle("My study");
   await getIndex();
-  const lists = { notes: store.notes(), bookmarks: store.bookmarks(), highlights: store.highlights(), history: store.history() };
-  const sorted = (tab === "history" ? lists.history : lists[tab].slice().sort((a, b) => orderOf(a.osis) - orderOf(b.osis)));
+  const lists = { notes: store.notes(), bookmarks: store.bookmarks(), highlights: store.highlights(), history: store.history(), collections: collLoad() };
+  const sorted = tab === "history" || tab === "collections" ? lists[tab] : lists[tab].slice().sort((a, b) => orderOf(a.osis) - orderOf(b.osis));
   view.innerHTML = `<div class="pagehead"><span class="eyebrow">My study</span><h1>Your notes and saved verses</h1>
     <p class="small">Kept in this browser on this device. Export them to keep a copy; accounts that sync across devices arrive in Phase 3.</p>
     <div class="actions"><span class="chip">Study streak: ${store.streak()} day${store.streak() === 1 ? "" : "s"}</span><span class="chip ext">${store.studyDays()} days studied</span><a class="small" href="#/learn">Courses</a></div></div>
-    <div class="tabsrow">${[["notes", "Notes"], ["bookmarks", "Bookmarks"], ["highlights", "Highlights"], ["history", "Reading history"]].map(([k, l]) => `<button type="button" class="btn ${k === tab ? "on" : ""}" data-st="${k}">${l} (${lists[k].length})</button>`).join("")}
+    <div class="tabsrow">${[["notes", "Notes"], ["bookmarks", "Bookmarks"], ["highlights", "Highlights"], ["collections", "Collections"], ["history", "Reading history"]].map(([k, l]) => `<button type="button" class="btn ${k === tab ? "on" : ""}" data-st="${k}">${l} (${lists[k].length})</button>`).join("")}
       <span style="flex:1"></span><button class="btn" type="button" id="exp">Download as Markdown</button><button class="btn" type="button" id="cpyall">Copy all</button></div>
     <div class="card"><div class="results" id="slist"><p class="loading">Loading…</p></div></div>
     <p style="margin-top:20px"><button class="btn" type="button" id="clear">Delete all study data on this device</button></p><div id="confirm"></div>`;
   view.querySelectorAll("[data-st]").forEach(b => b.addEventListener("click", () => renderStudy(b.dataset.st)));
-  const rows = await Promise.all(sorted.map(async it => {
+  const rows = await Promise.all(sorted.map(async (it, ci) => {
+    if (tab === "collections") return `<div class="hit coll"><span class="meta"><b>${esc(it.name)}</b><span class="small">${it.items.length} verse${it.items.length === 1 ? "" : "s"}</span><button class="linkbtn small" type="button" data-delc="${ci}">Delete</button></span>${(await Promise.all(it.items.map(async o => `<a class="cref" href="#/lens/${o}"><b>${labelOf(o)}</b> <span class="small">${esc(await anyText(o))}</span></a>`))).join("")}</div>`;
     if (tab === "history") { const r = fromOsis(it.osis); return `<a class="hit" href="${readUrl(it.translation || "kjv", r.book, r.chapter)}"><span class="meta"><span class="ref">${formatRef(r.book, r.chapter)}</span><span class="small">${TR[it.translation] || ""} · ${new Date(it.at).toLocaleString()}</span></span></a>`; }
     const r = fromOsis(it.osis); const txt = await anyText(it.osis);
     return `<a class="hit" href="${readUrl("kjv", r.book, r.chapter, r.verse)}"><span class="meta"><span class="ref">${labelOf(it.osis)}</span>${it.color ? `<span class="chip">${it.color}</span>` : ""}</span><span class="tx">${esc(txt)}</span>${it.text ? `<span>${esc(it.text).replace(/\n/g, "<br>")}</span>` : ""}</a>`;
   }));
-  $("#slist").innerHTML = rows.length ? rows.join("") : `<p class="empty">${{ notes: "No notes yet. In the reader, tap a verse and write in the note box.", bookmarks: "No bookmarks yet. Tap a verse and choose Bookmark.", highlights: "No highlights yet. Tap a verse and pick a colour.", history: "Chapters you open will be listed here." }[tab]}</p>`;
+  $("#slist").innerHTML = rows.length ? rows.join("") : `<p class="empty">${{ notes: "No notes yet. In the reader, tap a verse and write in the note box.", bookmarks: "No bookmarks yet. Tap a verse and choose Bookmark.", highlights: "No highlights yet. Tap a verse and pick a colour.", history: "Chapters you open will be listed here.", collections: "No collections yet. In Scripture Lens, choose “Add to a collection” to group verses for a study or a sermon." }[tab]}</p>`;
+  view.querySelectorAll("[data-delc]").forEach(b => b.addEventListener("click", () => { const l = collLoad(); l.splice(+b.dataset.delc, 1); collSave(l); renderStudy("collections"); }));
   const md = async () => {
     const texts = new Map();
     for (const it of [...store.notes(), ...store.bookmarks(), ...store.highlights()]) texts.set(it.osis, await anyText(it.osis));
