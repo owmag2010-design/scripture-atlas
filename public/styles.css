@@ -51,9 +51,9 @@ header.site { background: var(--lapis-deep); color: #fff; position: sticky; top:
 header.site .bar { max-width: 1240px; height: auto; margin: 0 auto; display: flex; align-items: center; gap: 14px; padding-block: 10px; background: none; border-radius: 0; overflow: visible; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; white-space: nowrap; }
 .brand .logo-full { height: 40px; width: auto; display: block; }
-.footlogo { height: 42px; width: auto; display: block; margin-bottom: 10px; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .footlogo { content: url("brand/ereunia-horizontal-for-dark-bg.svg"); } }
-:root[data-theme="dark"] .footlogo { content: url("brand/ereunia-horizontal-for-dark-bg.svg"); }
+.footlogo { height: 60px; width: auto; display: block; margin-bottom: 10px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .footlogo { content: url("brand/ereunia-logo-tagline-for-dark-bg.svg"); } }
+:root[data-theme="dark"] .footlogo { content: url("brand/ereunia-logo-tagline-for-dark-bg.svg"); }
 .brand .wm { font: 700 1.28rem/1 var(--sans); letter-spacing: -.02em; }
 .brand .wm small { display: block; font: 500 .7rem/1.3 var(--sans); letter-spacing: 0; color: color-mix(in srgb, var(--gold) 80%, #fff); margin-top: 3px; }
 .gsearch { flex: 1; display: flex; min-width: 0; max-width: 560px; margin-left: auto; }

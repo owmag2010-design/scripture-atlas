@@ -268,7 +268,7 @@ function closeMore() { const s = document.querySelector("#moresheet"); if (s && 
   sheet.addEventListener("click", e => { if (e.target === sheet || e.target.closest("a, .sheetclose")) closeMore(); });
   addEventListener("keydown", e => { if (e.key === "Escape") closeMore(); });
 })();
-function setTitle(s) { document.title = s ? `${s} · Ereunia` : "Ereunia · Bible research"; }
+function setTitle(s) { document.title = s ? `${s} · Ereunia` : "Ereunia · Search the Scriptures"; }
 const readUrl = (t, book, chapter, verse) => `#/read/${t}/${toOsis(book, chapter, verse)}`;
 const inLink = (title, desc, target, tab = false) => `<li><a href="${tab ? "#" : target}" ${tab ? `data-gotab="${target}"` : ""}><span><span class="t">${title}</span><span class="d">${desc}</span></span><span class="arr" aria-hidden="true">›</span></a></li>`;
 async function copyText(s) {
