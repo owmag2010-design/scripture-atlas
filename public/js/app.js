@@ -20,6 +20,7 @@ import { SECTIONS } from "./ai-core.js";
 import { HISTORY, NOT_HOSTED } from "./translations-info.js";
 import { KID_STORIES } from "./kids.js";
 import { sermonRefs, sermonMarkdown } from "./sermon.js";
+import { wordDiff, variantsFor, editionDifferences, lessonMarkdown } from "./lens.js";
 import { stem, glossStems, distribution, sharedStrongs, radialLayout, NODE_TYPES, clip } from "./research.js";
 import { repeatedWords, keyLemmas, mergeCrossRefs, interpretQuestions, guideMarkdown, OBSERVE, APPLY } from "./guide.js";
 import { describeMorph, languageOf, normaliseStrong, shardOf, displayStrong, isGrammaticalStrong, editionNote } from "./lang.js";
@@ -328,7 +329,7 @@ async function versePane() {
       ${inLink("People and places", "Who and where this verse mentions", "people", true)}
     </ul>
     <p class="small">Strong's numbers are an index to words, not full definitions. Use the Hebrew-Greek tab for the words of this verse.</p></div>
-    <div class="actions"><a class="btn" href="#/research/${osis}">Explore connections</a><a class="btn" href="#/ai/${osis}">Ask the research assistant</a><a class="btn" href="#/guide/${BOOKS[R.book].osis}.${c}">Study guide for this chapter</a></div>
+    <div class="actions"><a class="btn pri" href="#/lens/${osis}">Open in Scripture Lens</a><a class="btn" href="#/research/${osis}">Explore connections</a><a class="btn" href="#/ai/${osis}">Ask the research assistant</a><a class="btn" href="#/guide/${BOOKS[R.book].osis}.${c}">Study guide for this chapter</a></div>
     <details><summary>Study questions</summary><ol>${QUESTIONS.map(q => `<li>${q}</li>`).join("")}</ol></details>
   </div>`;
 }
@@ -1416,6 +1417,154 @@ function renderSoon(key) {
     <section class="card"><h2 style="font-size:1.4rem">Available now</h2><p class="small">Open any verse in the reader for background, other translations, the Hebrew or Greek, cross references and connections.</p><a class="btn pri" href="#/read">Open the reader</a></section></div>`;
 }
 
+/* ---------- Scripture Lens: one research workspace per verse ---------- */
+const LENS_MODES = [["discover", "Discover", "Simple explanations for anyone"], ["study", "Study", "Context, connections and key words"], ["scholar", "Scholar", "Original language, manuscripts, translations"], ["teach", "Teach", "Build a lesson or study"]];
+const COLL_KEY = "scripture-atlas:collections";
+const collLoad = () => { try { return JSON.parse(localStorage.getItem(COLL_KEY) || "[]"); } catch { return []; } };
+const collSave = c => { try { localStorage.setItem(COLL_KEY, JSON.stringify(c)); return true; } catch { return false; } };
+const bookIndex = code => BOOKS.findIndex(b => b.osis === code);
+async function renderLens(osis, modeArg) {
+  await getIndex();
+  const r = fromOsis(osis || "") || fromOsis("John.1.1"); const v = r.verse || 1;
+  const o = toOsis(r.book, r.chapter, v), label = formatRef(r.book, r.chapter, v);
+  const mode = LENS_MODES.some(m => m[0] === modeArg) ? modeArg : store.setting("lensmode", "study");
+  store.setSetting("lensmode", mode);
+  R.book = r.book; R.chapter = r.chapter; R.verse = v; R.t = "kjv";
+  setNav("read"); setTitle(`${label} · Scripture Lens`);
+  const heb = r.book < 39, nV = INDEX.books[r.book].verses[r.chapter - 1] || 0;
+  const [kt, orig, vx, xref, pm, lm, em] = await Promise.all([loadKjvs(r.book, r.chapter).catch(() => null), loadOrig(r.book, r.chapter).catch(() => null), H.vx(r.book), loadXref(r.book), H.peopleMap(), H.placeMap(), H.eventMap()]);
+  const toks = kt?.verses[v - 1] || [], words = orig?.verses[v - 1] || [];
+  const kjvText = toks.map(t => t[0]).join("");
+  const key = r.book * 1e6 + r.chapter * 1e3 + v, tags = vx[key] || [[], [], []];
+  const P = tags[0].filter(x => !NO_GRAPH_PEOPLE.has(x)).map(x => pm.get(x)).filter(Boolean), L = tags[1].map(x => lm.get(x)).filter(Boolean), E = tags[2].map(x => em.get(x)).filter(Boolean);
+  const lex = await lexMapOf([...new Set(words.map(w => w[3]).filter(k => k && !isGrammaticalStrong(k)))]);
+  const keys = keyLemmas(words, lex, 6);
+  const X = (xref[key] || []).slice(0, 6);
+  const english = allTranslations().filter(t => t.languageEn === "English");
+  const par = store.setting("lenspar", ["web", "engBBE"]).filter(id => META[id]);
+  const variants = variantsFor(r.book, r.chapter, v, bookIndex), edDiff = heb ? [] : editionDifferences(words), margin = kt?.notes?.[v] || [];
+  const ctx = CONTEXT[r.book];
+  const chips = `${P.map(p => `<a class="chip" href="#/person/${p[0]}">${esc(p[1])}</a>`).join(" ")} ${L.map(p => `<a class="chip ext" href="#/place/${p[0]}">${esc(p[1])}</a>`).join(" ")}`;
+  const renderingsOf = async k => { const rd = await loadRenderings(baseStrong(k)); return rd ? rd.top.slice(0, 5).map(([w, n]) => `${esc(w)} <span class="n">${n}</span>`).join(", ") : ""; };
+  const keyRows = await Promise.all(keys.map(async k => `<li><a href="#/word/${k.strong}"><b lang="${heb ? "hbo" : "grc"}" dir="${heb ? "rtl" : "ltr"}">${esc(k.form)}</b></a> <span class="small">${esc(k.translit)}</span>, “${esc(k.gloss)}”<span class="small"> · ${k.total.toLocaleString()} uses</span>${mode !== "discover" ? `<div class="small rendline">KJV: ${await renderingsOf(k.strong)}</div>` : ""}</li>`));
+  const xrows = await Promise.all(X.map(async ([to, votes]) => { const u = unpackRef(to); return `<li><a href="#/lens/${toOsis(u.book, u.chapter, u.verse)}/${mode}"><b>${formatRef(u.book, u.chapter, u.verse)}</b></a> <span class="small">${esc(await verseText("kjv", toOsis(u.book, u.chapter, u.verse)).catch(() => ""))}</span></li>`; }));
+
+  let main = "";
+  if (mode === "discover") {
+    const bbe = await verseText("engBBE", o).catch(() => ""), web = await verseText("web", o).catch(() => "");
+    main = `<section class="lcard"><h2>In plain English</h2>${bbe ? `<p class="plain">${esc(bbe)}</p><p class="small">Bible in Basic English, written with a vocabulary of about 1,000 words.</p>` : ""}${web ? `<p class="plain alt">${esc(web)}</p><p class="small">World English Bible.</p>` : ""}</section>
+      <section class="lcard"><h2>Where this fits</h2><p>${esc(ctx[4])}</p><p class="small"><b>${NAMES[r.book]}</b> is in the ${groupOf(r.book)}. ${esc(ctx[0])}</p>${P.length || L.length ? `<p>${chips}</p>` : ""}</section>
+      ${keys[0] ? `<section class="lcard"><h2>One word to know</h2><ul class="keyw">${keyRows[0]}</ul><p class="small">Tap any underlined word in the verse to see where it comes from.</p></section>` : ""}
+      <section class="lcard"><h2>Think about it</h2><ol>${QUESTIONS.slice(0, 3).map(q => `<li>${esc(q.replace(/^[A-Za-z]+: /, ""))}</li>`).join("")}</ol></section>`;
+  } else if (mode === "study") {
+    const around = await Promise.all([v - 2, v - 1, v + 1, v + 2].filter(n => n >= 1 && n <= nV).map(async n => [n, await verseText("kjv", toOsis(r.book, r.chapter, n)).catch(() => "")]));
+    main = `<section class="lcard"><h2>Context</h2><div class="ctxv">${around.filter(([n]) => n < v).map(([n, t]) => `<p class="dim"><sup>${n}</sup>${esc(t)}</p>`).join("")}<p class="focusv"><sup>${v}</sup>${esc(kjvText)}</p>${around.filter(([n]) => n > v).map(([n, t]) => `<p class="dim"><sup>${n}</sup>${esc(t)}</p>`).join("")}</div>
+        <p class="small">${esc(ctx[4])}</p></section>
+      <section class="lcard"><h2>Key words</h2>${keyRows.length ? `<ul class="keyw">${keyRows.join("")}</ul>` : `<p class="small">No key words found.</p>`}</section>
+      <section class="lcard"><h2>Connected passages</h2>${xrows.length ? `<ul class="xl">${xrows.join("")}</ul>` : `<p class="small">None recorded.</p>`}<p class="small">Ranked by reader votes, OpenBible.info. <a href="#/research/${o}">See them as a graph</a>.</p></section>
+      ${P.length || L.length || E.length ? `<section class="lcard"><h2>People, places and events</h2><p>${chips}</p>${E.length ? `<ul class="evlist">${E.map(e => `<li><span class="yr">${yearText(e.year)}</span> ${certChip(e.year)} <a href="#/history/timeline#e${e.id}">${esc(e.title)}</a></li>`).join("")}</ul>` : ""}</section>` : ""}
+      <section class="lcard"><h2>Questions for study</h2><ol>${interpretQuestions(groupOf(r.book)).map(q => `<li>${esc(q)}</li>`).join("")}</ol><a class="btn" href="#/guide/${BOOKS[r.book].osis}.${r.chapter}">Full study guide for ${formatRef(r.book, r.chapter)}</a></section>`;
+  } else if (mode === "scholar") {
+    const morph = await loadMorph();
+    const comps = await Promise.all(english.map(async t => [t, await verseText(t.id, o).catch(() => "")]));
+    main = `<section class="lcard"><h2>${heb ? "Hebrew" : "Greek"} text, word by word</h2>
+        <div class="parse" dir="${heb ? "rtl" : "ltr"}">${words.map(w => `<a class="pw ${w[6] ? "flag" : ""}" href="#/word/${w[3]}" dir="ltr"><b lang="${heb ? "hbo" : "grc"}" dir="${heb ? "rtl" : "ltr"}">${esc(w[0])}</b><span>${esc(w[1])}</span><span class="g">${esc(w[2])}</span><span class="m">${esc(describeMorph(w[5], morph).map(x => x.summary).join(" + "))}</span><span class="s">${displayStrong(w[3])}</span></a>`).join("") || `<p class="small">No ${heb ? "Hebrew" : "Greek"} words recorded for this verse.</p>`}</div>
+        <p class="small">${heb ? "Leningrad Codex (AD 1008), as tagged by STEPBible TAHOT" : "STEPBible TAGNT: the Greek of the Nestle–Aland and Textus Receptus editions together"}, CC BY 4.0.</p></section>
+      <section class="lcard"><h2>Manuscripts and variants</h2>
+        ${variants.map(n => `<div class="textnote"><b>Textual question</b><br>${esc(n)}</div>`).join("")}
+        ${edDiff.length ? `<div class="textnote"><b>Greek editions differ here</b><ul>${edDiff.map(d => `<li><b lang="grc">${esc(d.form)}</b> “${esc(d.gloss)}”: ${d.flag === "K" ? "in the Textus Receptus (behind the KJV) but not in the NA28 critical text" : "in the NA28 critical text but not in the Textus Receptus"}</li>`).join("")}</ul></div>` : ""}
+        ${margin.length ? `<div class="textnote margnote"><b>KJV translators' margin</b><br>${margin.map(esc).join("<br>")}</div>` : ""}
+        ${!variants.length && !edDiff.length && !margin.length ? `<p class="small">No significant textual variant is recorded for this verse in the sources used here.</p>` : ""}
+        <p class="small">Base text: ${heb ? "the Leningrad Codex, the oldest complete Hebrew Bible" : "printed editions compared from the manuscript tradition"}. <a href="#/library">About the manuscripts</a>.</p></section>
+      <section class="lcard"><h2>${english.length} English translations compared</h2><p class="small">Words not in the KJV are highlighted. The percentage is how much of the KJV's wording each keeps.</p>
+        <div class="cmpl">${comps.filter(([t, x]) => x && t.id !== "kjv").map(([t, x]) => { const d = wordDiff(kjvText, x); return `<div class="cmpr"><div class="cmph"><a href="#/translation/${t.id}">${esc(t.name)}</a><span class="sim"><i style="width:${Math.round(d.similarity * 100)}%"></i></span><span class="small">${Math.round(d.similarity * 100)}%</span></div><p>${d.parts.map(p => p.same ? esc(p.w) : `<mark>${esc(p.w)}</mark>`).join(" ")}</p></div>`; }).join("")}</div></section>
+      <section class="lcard"><h2>Lexicon</h2>${keys.map(k => { const e = lex.get(k.strong); return `<details><summary><b lang="${heb ? "hbo" : "grc"}">${esc(e.lemma)}</b> ${esc(k.translit)}, ${esc(e.gloss)} <span class="small">${displayStrong(k.strong)}</span></summary><div class="lexdef">${e.def || ""}</div></details>`; }).join("") || `<p class="small">No key words.</p>`}<p class="small">STEPBible brief lexicons (${heb ? "TBESH, based on BDB" : "TBESG, based on Abbott-Smith"}), CC BY 4.0.</p></section>`;
+  } else {
+    const disc = interpretQuestions(groupOf(r.book));
+    const xl = await Promise.all(X.slice(0, 4).map(async ([to]) => { const u = unpackRef(to); return `${formatRef(u.book, u.chapter, u.verse)}: ${await verseText("kjv", toOsis(u.book, u.chapter, u.verse)).catch(() => "")}`; }));
+    const pick = (name, items) => items.map((x, i) => `<label class="pick"><input type="checkbox" data-sec="${name}" data-i="${i}" checked> <span>${esc(x)}</span></label>`).join("");
+    const kw = keys.map(k => `${k.form} (${k.translit}), “${k.gloss}”`);
+    main = `<section class="lcard teach"><h2>Lesson builder</h2>
+        <label class="fld">Title<input id="ltitle" value="${esc(label)}"></label>
+        <label class="fld">Big idea, in one sentence<textarea id="lbig" rows="2" placeholder="What should people remember from this passage?"></textarea></label>
+        <h3>Observe</h3>${pick("observe", OBSERVE)}
+        <h3>Key words</h3>${pick("words", kw) || `<p class="small">None for this verse.</p>`}
+        <h3>Connect</h3>${pick("refs", xl) || `<p class="small">No cross references.</p>`}
+        <h3>Discuss</h3>${pick("discuss", disc)}
+        <h3>Apply</h3>${pick("apply", APPLY)}
+        <label class="fld">Your notes<textarea id="lnotes" rows="4"></textarea></label>
+        <div class="actions"><button class="btn pri" type="button" id="ldl">Download the lesson</button><button class="btn" type="button" id="lcp">Copy</button><button class="btn" type="button" id="lpr">Print</button><a class="btn" href="#/guide/${BOOKS[r.book].osis}.${r.chapter}">Chapter study guide</a></div>
+        <p class="small">Untick anything you don't need. Use AI below for a draft outline; it is labelled as AI and its claims are checked against the sources.</p></section>`;
+  }
+
+  const colls = collLoad();
+  view.innerHTML = `<div class="lens" data-mode="${mode}">
+    <header class="lenshead">
+      <div><span class="eyebrow">Scripture Lens</span><h1>${esc(label)}</h1></div>
+      <nav class="lensnav"><a class="btn" href="#/lens/${v > 1 ? toOsis(r.book, r.chapter, v - 1) : toOsis(r.book, r.chapter, 1)}/${mode}" ${v > 1 ? "" : 'aria-disabled="true"'}>‹</a><a class="btn" href="${readUrl("kjv", r.book, r.chapter, v)}">Reader</a><a class="btn" href="#/lens/${v < nV ? toOsis(r.book, r.chapter, v + 1) : o}/${mode}">›</a></nav>
+      <div class="modes" role="tablist">${LENS_MODES.map(([k, l, d]) => `<a role="tab" aria-selected="${k === mode}" href="#/lens/${o}/${k}" title="${d}">${l}</a>`).join("")}</div>
+    </header>
+    <div class="lensgrid">
+      <aside class="lensside">
+        <div class="lverse text origins" id="lverse"><span class="v sel" data-v="${v}" data-t="kjv">${tokensHtml(toks) || esc(kjvText)}</span></div>
+        <p class="small">King James Version. Tap an underlined word for its ${heb ? "Hebrew" : "Greek"} source.</p>
+        <div id="lorigin"></div>
+        <div class="lpar">${par.map(id => `<figure><figcaption>${esc(META[id].name)}</figcaption><p dir="${dirOf(id)}" lang="${langOf(id)}" data-par="${id}">…</p></figure>`).join("")}
+          <label class="small">Add a translation <select id="lparsel"><option value="">Choose…</option>${allTranslations().filter(t => t.id !== "kjv" && !par.includes(t.id)).map(t => `<option value="${t.id}">${esc(t.name)}${t.languageEn !== "English" ? ` (${esc(t.languageEn)})` : ""}</option>`).join("")}</select></label>
+          ${par.length ? `<button class="linkbtn small" type="button" id="lparclr">Reset translations</button>` : ""}</div>
+        <div class="lnote"><label for="lnote"><b>Your note</b></label><textarea id="lnote" rows="4" placeholder="What do you notice?">${esc(store.note(o))}</textarea>
+          <div class="actions"><button class="btn ${store.isBookmarked(o) ? "on" : ""}" id="lbm" type="button">${store.isBookmarked(o) ? "Bookmarked" : "Bookmark"}</button>
+          <select id="lcoll" aria-label="Add to a collection"><option value="">Add to a collection…</option>${colls.map((c, i) => `<option value="${i}">${esc(c.name)} (${c.items.length})</option>`).join("")}<option value="new">New collection…</option></select></div></div>
+      </aside>
+      <div class="lensmain">${main}
+        <section class="lcard lask"><h2>Ask about ${esc(label)}</h2><form id="lask"><textarea id="lq" rows="2" maxlength="600" placeholder="${mode === "discover" ? "What does this verse mean?" : mode === "scholar" ? "How do the manuscripts and translations differ here?" : mode === "teach" ? "Suggest an outline for teaching this passage" : "How does this verse fit its context?"}"></textarea><button class="btn pri">Ask</button><span class="small" id="lst"></span></form>
+          <p class="small">Answers use only numbered sources (this verse, other translations, cross references, background) and every statement must cite one. Level: ${mode === "discover" ? "beginner" : mode === "scholar" ? "academic" : "intermediate"}.</p><div id="lout"></div></section>
+      </div>
+    </div></div>`;
+
+  // parallel translations
+  view.querySelectorAll("[data-par]").forEach(async el => { const t = await verseText(el.dataset.par, o).catch(() => ""); el.textContent = t || "Not in this translation at this reference."; });
+  $("#lparsel").addEventListener("change", e => { if (!e.target.value) return; store.setSetting("lenspar", [...par, e.target.value].slice(-4)); renderLens(o, mode); });
+  $("#lparclr")?.addEventListener("click", () => { store.setSetting("lenspar", ["web", "engBBE"]); renderLens(o, mode); });
+  // word origins
+  $("#lverse").addEventListener("click", async e => {
+    const ew = e.target.closest(".ew"); if (!ew) return;
+    view.querySelectorAll("#lverse .ew.on").forEach(x => x.classList.remove("on")); ew.classList.add("on");
+    $("#lorigin").innerHTML = `<p class="loading small">Tracing the word…</p>`;
+    $("#lorigin").innerHTML = await originCard(v, +ew.dataset.k, words);
+  });
+  // notes, bookmarks, collections
+  let nt; $("#lnote").addEventListener("input", e => { clearTimeout(nt); nt = setTimeout(() => store.setNote(o, e.target.value), 300); });
+  $("#lbm").addEventListener("click", e => { const on = store.toggleBookmark(o); e.currentTarget.textContent = on ? "Bookmarked" : "Bookmark"; e.currentTarget.classList.toggle("on", on); toast(on ? "Bookmarked" : "Bookmark removed"); });
+  $("#lcoll").addEventListener("change", e => {
+    const val = e.target.value; if (!val) return;
+    const list = collLoad(); let c;
+    if (val === "new") { const name = (prompt("Name the collection", "My study") || "").trim(); if (!name) { e.target.value = ""; return; } c = { name, items: [] }; list.push(c); } else c = list[+val];
+    if (!c.items.includes(o)) c.items.push(o);
+    toast(collSave(list) ? `Added to ${c.name}` : "This browser blocked saving"); renderLens(o, mode);
+  });
+  // AI
+  $("#lask").addEventListener("submit", async e => {
+    e.preventDefault(); const q = $("#lq").value.trim() || $("#lq").placeholder;
+    $("#lst").textContent = "Gathering sources and checking the answer…";
+    try {
+      const res = await (await fetch("api/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q, ref: label, level: mode === "discover" ? "beginner" : mode === "scholar" ? "academic" : "intermediate" }) })).json();
+      $("#lout").innerHTML = res.error ? `<p class="empty">${esc(res.error)}</p>` : renderAnswer(res); if (!res.error) { wireAnswer($("#lout")); store.saveAnswer({ question: q, ref: label, result: res }); }
+    } catch { $("#lout").innerHTML = `<p class="empty">Could not reach the assistant. Check your connection and try again.</p>`; }
+    $("#lst").textContent = "";
+  });
+  // teach mode
+  if (mode === "teach") {
+    const lesson = () => {
+      const sel = name => [...view.querySelectorAll(`[data-sec="${name}"]`)].filter(x => x.checked).map(x => x.nextElementSibling.textContent);
+      return lessonMarkdown({ title: $("#ltitle").value.trim() || label, ref: label, translation: "King James Version", text: kjvText, bigIdea: $("#lbig").value.trim(), observe: sel("observe"), words: sel("words"), refs: sel("refs"), discuss: sel("discuss"), apply: sel("apply"), notes: $("#lnotes").value.trim() });
+    };
+    $("#ldl").addEventListener("click", () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([lesson()], { type: "text/markdown" })); a.download = `lesson-${o.toLowerCase()}.md`; document.body.appendChild(a); a.click(); a.remove(); });
+    $("#lcp").addEventListener("click", () => copyText(lesson()));
+    $("#lpr").addEventListener("click", () => print());
+  }
+}
+
 /* ---------- sermon studio: transcribe, find scriptures, outline ---------- */
 const SERMON_KEY = "scripture-atlas:sermons";
 const sermonsLoad = () => { try { return JSON.parse(localStorage.getItem(SERMON_KEY) || "[]"); } catch { return []; } };
@@ -1657,6 +1806,7 @@ async function route() {
     else if (head === "study") await renderStudy();
     else if (head === "library") { await getIndex(); renderLibrary(); }
     else if (head === "research") await renderResearch(rest);
+    else if (head === "lens") await renderLens(rest[0], rest[1]);
     else if (head === "sermon") await renderSermon(rest[0]);
     else if (head === "kids") await (rest[0] ? renderStory(rest[0]) : renderKids());
     else if (head === "soon") renderSoon(rest[0]);

@@ -698,3 +698,65 @@ body.kidsmode main { max-width: 1180px; }
 .chip.ai { background: #F1E8FF; color: #5B3BB0; }
 .spoints { padding-left: 20px; display: grid; gap: 10px; margin: 0; }
 .spoints blockquote { margin: 6px 0 0; padding-left: 10px; border-left: 2px solid var(--gilt); font: italic 1rem var(--serif); color: var(--muted); }
+
+/* ---------- Scripture Lens ---------- */
+.lenshead { display: grid; grid-template-columns: 1fr auto; gap: 12px 18px; align-items: end; padding: 22px 26px; margin-bottom: 18px; border-radius: var(--r); color: #fff; background: radial-gradient(120% 140% at 100% 0%, #22377E, var(--lapis-deep) 50%, var(--lapis-ink)); }
+.lenshead .eyebrow { color: var(--gold); }
+.lenshead h1 { font-size: clamp(2rem, 4.5vw, 3rem); letter-spacing: -.03em; }
+.lensnav { display: flex; gap: 6px; }
+.lensnav .btn { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.22); color: #fff; }
+.lensnav .btn[aria-disabled="true"] { opacity: .4; pointer-events: none; }
+.modes { grid-column: 1 / -1; display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(0,0,0,.22); width: max-content; max-width: 100%; overflow-x: auto; }
+.modes a { padding: 8px 16px; border-radius: 999px; color: rgba(255,255,255,.8); text-decoration: none; font-weight: 600; white-space: nowrap; }
+.modes a[aria-selected="true"] { background: var(--gold); color: var(--lapis-ink); }
+.lensgrid { display: grid; grid-template-columns: minmax(300px, 400px) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .lensgrid { grid-template-columns: minmax(0, 1fr); } .lenshead { grid-template-columns: 1fr; } }
+.lensside { position: sticky; top: 124px; display: grid; gap: 14px; background: var(--page); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; box-shadow: var(--shadow); max-height: calc(100vh - 140px); overflow: auto; }
+@media (max-width: 900px) { .lensside { position: static; max-height: none; } }
+.lverse { font: 400 1.45rem/1.6 var(--serif); }
+.lverse .v { cursor: default; padding: 0; } .lverse .v.sel { background: none; box-shadow: none; }
+.lpar { display: grid; gap: 10px; }
+.lpar figure { margin: 0; padding: 10px 12px; border-radius: var(--r-sm); background: var(--soft); }
+.lpar figcaption { font: 600 .78rem var(--sans); color: var(--gilt); margin-bottom: 2px; }
+.lpar p { margin: 0; font: 400 1.02rem/1.5 var(--serif); }
+.lpar select, .lnote select { border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; background: var(--page); max-width: 100%; }
+.lnote textarea { width: 100%; border: 1px solid var(--line); border-radius: var(--r-sm); padding: 10px; background: var(--page); font: 400 1rem/1.5 var(--serif); margin-top: 6px; }
+.lensmain { display: grid; gap: 16px; min-width: 0; }
+.lcard { background: var(--page); border: 1px solid var(--line); border-radius: var(--r); padding: 20px 22px; }
+.lcard h2 { font-size: 1.25rem; margin-bottom: 10px; }
+.lcard h3 { font-size: 1rem; margin: 14px 0 6px; }
+.plain { font: 400 1.3rem/1.55 var(--serif); margin: 0 0 4px; } .plain.alt { font-size: 1.1rem; color: var(--muted); margin-top: 12px; }
+.keyw { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.keyw b { font: 500 1.35rem var(--serif); } .keyw a { text-decoration: none; color: var(--gilt); }
+.rendline { margin-top: 2px; } .rendline .n { color: var(--gilt); font-size: .8em; }
+.ctxv p { margin: 0 0 8px; font: 400 1.08rem/1.6 var(--serif); } .ctxv .dim { color: var(--muted); }
+.ctxv .focusv { padding: 8px 12px; border-left: 3px solid var(--gold); background: var(--sel); border-radius: 0 8px 8px 0; }
+.ctxv sup { font: 700 .62em var(--sans); color: var(--rubric); margin-right: 3px; }
+.xl { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; } .xl a { color: var(--rubric); text-decoration: none; }
+.parse { display: flex; flex-wrap: wrap; gap: 8px; }
+.pw { display: grid; gap: 1px; padding: 8px 10px; min-width: 92px; border-radius: 10px; border: 1px solid var(--line); text-decoration: none; color: var(--ink); background: var(--bg); text-align: left; }
+.pw b { font: 500 1.45rem var(--serif); color: var(--gilt); text-align: start; }
+.pw b[lang="hbo"] { font-family: "Noto Serif Hebrew", var(--serif); }
+.pw span { font-size: .78rem; color: var(--muted); } .pw .g { color: var(--ink); font-size: .85rem; } .pw .m { max-width: 150px; } .pw .s { color: var(--lapis); font-weight: 600; }
+.pw.flag { border-color: var(--rubric); }
+.pw:hover { border-color: var(--gilt); }
+.cmpl { display: grid; gap: 10px; }
+.cmpr p { margin: 4px 0 0; font: 400 1.02rem/1.55 var(--serif); }
+.cmpr mark { background: color-mix(in srgb, var(--gold) 35%, transparent); color: inherit; border-radius: 3px; padding: 0 2px; }
+.cmph { display: grid; grid-template-columns: minmax(0, 1fr) 90px 40px; gap: 8px; align-items: center; }
+.cmph a { font-weight: 600; text-decoration: none; }
+.sim { height: 6px; border-radius: 99px; background: var(--soft); overflow: hidden; } .sim i { display: block; height: 100%; background: var(--lapis); }
+.teach .fld { display: grid; gap: 4px; font-weight: 600; margin-bottom: 10px; }
+.teach .fld input, .teach .fld textarea { border: 1px solid var(--line); border-radius: var(--r-sm); padding: 9px 11px; background: var(--page); font: 400 1rem var(--sans); }
+.pick { display: flex; gap: 8px; align-items: flex-start; padding: 4px 0; }
+.pick input { margin-top: 4px; accent-color: var(--lapis); }
+.lask form { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; }
+.lask textarea { border: 1px solid var(--line); border-radius: var(--r-sm); padding: 10px; background: var(--page); font: 400 1rem var(--sans); resize: vertical; }
+.lask #lst { grid-column: 1 / -1; }
+@media print { header.site, footer.site, .lenshead .modes, .lensnav, .lensside, .lask, .teach .actions { display: none !important; } .lensgrid { display: block; } }
+.lensside > *, .lpar > *, .lnote, .lnote .actions > * { min-width: 0; }
+.lpar select { width: 100%; }
+.lnote .actions select { flex: 1; min-width: 0; width: 100%; }
+.lensgrid > * { min-width: 0; }
+.lenshead > * { min-width: 0; }
+@media (max-width: 900px) { .lenshead { padding: 18px; } .modes { width: auto; } .modes a { padding: 8px 12px; } }
