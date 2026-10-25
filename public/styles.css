@@ -81,7 +81,7 @@ header.site :focus-visible { outline-color: var(--gold); }
 }
 
 
-main { max-width: 1240px; margin: 0 auto; padding-block: 24px 56px; display: block; }
+main { max-width: 1240px; margin: 0 auto; padding-block: 24px 56px; display: block; overflow-wrap: break-word; }
 main:focus { outline: none; }
 .loading { color: var(--muted); font-style: italic; }
 footer.site { max-width: 1240px; margin: 0 auto; padding-block: 28px 44px; border-top: 1px solid var(--line); color: var(--muted); font-size: .88rem; }
@@ -325,8 +325,8 @@ ol.tl li:target { background: var(--sel); }
 .tlmeta .chip { text-decoration: none; }
 .evlist { list-style: none; padding: 0; margin: 6px 0 0; display: grid; gap: 8px; }
 .plist { display: grid; gap: 6px; }
-.plist.wide { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-.plist a { display: grid; gap: 1px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; text-decoration: none; color: var(--ink); background: var(--page); }
+.plist.wide { grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); }
+.plist a { display: grid; gap: 1px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; text-decoration: none; color: var(--ink); background: var(--page); min-width: 0; overflow-wrap: anywhere; }
 .plist a:hover { border-color: var(--lapis); }
 .tree { display: grid; gap: 10px; margin: 10px 0; }
 .trow { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; padding-left: 0; }

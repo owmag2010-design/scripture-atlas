@@ -1037,7 +1037,7 @@ async function renderPeopleList(box) {
   const draw = q => {
     q = q.trim().toLowerCase();
     const hits = (q ? people.filter(r => r[1].toLowerCase().includes(q) || r[2].toLowerCase().includes(q)) : people).slice(0, 120);
-    $("#pres").innerHTML = hits.map(r => `<a href="#/person/${r[0]}"><b>${esc(r[1])}</b><span class="small">${esc(r[3] || (r[2] ? "also called " + r[2] : ""))}${r[3] || r[2] ? " · " : ""}${r[5]} verse${r[5] === 1 ? "" : "s"}</span></a>`).join("") || `<p class="empty">No one by that name.</p>`;
+    $("#pres").innerHTML = hits.map(r => `<a href="#/person/${r[0]}"><b>${esc(r[1])}</b><span class="small">${esc(r[3] || (r[2] ? "also called " + String(r[2]).replace(/,\s*/g, ", ") : ""))}${r[3] || r[2] ? " · " : ""}${r[5]} verse${r[5] === 1 ? "" : "s"}</span></a>`).join("") || `<p class="empty">No one by that name.</p>`;
   };
   draw("");
   $("#ppq").addEventListener("input", e => draw(e.target.value));
@@ -1063,7 +1063,7 @@ async function renderPerson(slug) {
   const born = p.born != null ? `${yearText(p.born)} ${certChip(p.born)}` : "", died = p.died != null ? `${yearText(p.died)}` : "";
   const portrait = personArt(slug, { cls: "headart", sizes: "(max-width: 720px) 100vw, 62vw", eager: true });
   view.innerHTML = `<div class="pagehead ${portrait ? "art" : ""}">${portrait}<span class="eyebrow">History · Person</span><h1>${esc(p.name)}</h1>
-    <p style="margin:0;font-size:1.1rem">${esc(p.desc || "")}${p.also ? ` <span class="small">also called ${esc(p.also)}</span>` : ""}</p>
+    <p style="margin:0;font-size:1.1rem">${esc(p.desc || "")}${p.also ? ` <span class="small">also called ${esc(String(p.also).replace(/,\s*/g, ", "))}</span>` : ""}</p>
     <div class="actions">${p.groups.map(g => `<span class="chip ext">${esc(g)}</span>`).join("")}<span class="small">Mentioned in ${p.verses.length.toLocaleString()} verse${p.verses.length === 1 ? "" : "s"}</span><a class="btn" href="#/research/person/${slug}">See connections</a></div></div>
   ${p.note ? `<div class="textnote" style="margin-bottom:16px"><b>Two accounts</b><br>${esc(p.note)}</div>` : ""}
   ${(() => { const dl = discForPerson(DISCOVERIES, slug); return dl.length ? `<section class="shelf" style="margin:0 0 20px"><div class="ribbon-head"><h2>Outside the Bible</h2><p class="small">Inscriptions, records and finds that relate to ${esc(p.name)}.</p></div><div class="dgrid">${dl.map(d => discCard(d)).join("")}</div></section>` : ""; })()}
@@ -1928,7 +1928,7 @@ function renderStory(id) {
   </div>`;
   const art = $(".st-art"), card = $("#pagecard");
   const synth = window.speechSynthesis;
-  const stop = () => { if (synth) synth.cancel(); speaking = false; $("#readme").textContent = "Read to me"; };
+  const stop = () => { if (synth) synth.cancel(); speaking = false; const b = $("#readme"); if (b) b.textContent = "Read to me"; };
   const say = text => {
     if (!synth) { toast("Reading aloud is not available in this browser"); return; }
     stop(); const u = new SpeechSynthesisUtterance(text); u.rate = .92; u.pitch = 1.05;
