@@ -1,4 +1,4 @@
-# Scripture Atlas (Phase 1) — static site, no build step.
+# Ereunia — static site; data is built on Netlify from open sources. Primary domain: ereunia.com (ereunia.org redirects to it).
 [build]
   publish = "public"
   # Every dataset is downloaded from its original open source and built here (see README).
@@ -26,3 +26,28 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'"
+
+# ereunia.org (and www) is an alias of the site; send every visitor to the same page on ereunia.com.
+[[redirects]]
+  from = "https://ereunia.org/*"
+  to = "https://ereunia.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.ereunia.org/*"
+  to = "https://ereunia.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://ereunia.org/*"
+  to = "https://ereunia.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.ereunia.org/*"
+  to = "https://ereunia.com/:splat"
+  status = 301
+  force = true
