@@ -754,7 +754,7 @@ async function renderStudy(tab = "notes") {
   await getIndex();
   const lists = { notes: store.notes(), bookmarks: store.bookmarks(), highlights: store.highlights(), history: store.history(), collections: collLoad() };
   const sorted = tab === "history" || tab === "collections" ? lists[tab] : lists[tab].slice().sort((a, b) => orderOf(a.osis) - orderOf(b.osis));
-  view.innerHTML = `<div class="pagehead"><span class="eyebrow">My study</span><h1>Your notes and saved verses</h1>
+  view.innerHTML = `${artHead("aleppo")}<span class="eyebrow">My study</span><h1>Your notes and saved verses</h1>
     <p class="small">Kept in this browser on this device. Export them to keep a copy; accounts that sync across devices arrive in Phase 3.</p>
     <div class="actions"><span class="chip">Study streak: ${store.streak()} day${store.streak() === 1 ? "" : "s"}</span><span class="chip ext">${store.studyDays()} days studied</span><a class="small" href="#/learn">Courses</a></div></div>
     <div class="tabsrow">${[["notes", "Notes"], ["bookmarks", "Bookmarks"], ["highlights", "Highlights"], ["collections", "Collections"], ["history", "Reading history"]].map(([k, l]) => `<button type="button" class="btn ${k === tab ? "on" : ""}" data-st="${k}">${l} (${lists[k].length})</button>`).join("")}
@@ -1506,7 +1506,7 @@ async function renderLens(osis, modeArg) {
   const mode = LENS_MODES.some(m => m[0] === modeArg) ? modeArg : store.setting("lensmode", "study");
   store.setSetting("lensmode", mode);
   R.book = r.book; R.chapter = r.chapter; R.verse = v; R.t = "kjv";
-  setNav("read"); setTitle(`${label} · Scripture Lens`);
+  setTitle(`${label} · Scripture Lens`);
   const heb = r.book < 39, nV = INDEX.books[r.book].verses[r.chapter - 1] || 0;
   const [kt, orig, vx, xref, pm, lm, em] = await Promise.all([loadKjvs(r.book, r.chapter).catch(() => null), loadOrig(r.book, r.chapter).catch(() => null), H.vx(r.book), loadXref(r.book), H.peopleMap(), H.placeMap(), H.eventMap()]);
   const toks = kt?.verses[v - 1] || [], words = orig?.verses[v - 1] || [];

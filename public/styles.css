@@ -885,3 +885,5 @@ body.kidsmode main { max-width: 1180px; }
   .jchip .jart { height: 96px; }
 }
 .era b, .era a { overflow-wrap: anywhere; }
+.pagehead { grid-template-columns: minmax(0, 1fr); } .pagehead > * { min-width: 0; }
+.pagehead.art .btn.pri { background: var(--gold); border-color: var(--gold); color: var(--ink); }
