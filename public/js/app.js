@@ -19,6 +19,7 @@ import { COURSES, PLANNED, STATUS } from "./courses.js";
 import { SECTIONS } from "./ai-core.js";
 import { HISTORY, NOT_HOSTED } from "./translations-info.js";
 import { KID_STORIES } from "./kids.js";
+import { JOURNEYS } from "./journeys.js";
 import { sermonRefs, sermonMarkdown } from "./sermon.js";
 import { wordDiff, variantsFor, editionDifferences, lessonMarkdown } from "./lens.js";
 import { stem, glossStems, distribution, sharedStrongs, radialLayout, NODE_TYPES, clip } from "./research.js";
@@ -803,13 +804,14 @@ const ERAS = [
   ["Conquest and judges", -1450, -1100], ["The united kingdom", -1100, -975], ["The divided kingdom", -975, -586],
   ["Exile and return", -586, -300], ["The life of Jesus", -300, 30.44], ["The early church", 30.44, Infinity]
 ];
-async function renderHistory(tab = "map") {
+async function renderHistory(tab = "map", sub = "") {
   setNav("history"); setTitle("History");
   view.innerHTML = `${artHead(tab === "timeline" ? "era-exodus" : tab === "people" ? "era-patriarchs" : "map-holyland")}<span class="eyebrow">History</span><h1>Where and when the story happened, and how sure we are.</h1>
-    <div class="tabsrow">${[["map", "Map"], ["timeline", "Timeline"], ["people", "People"]].map(([k, l]) => `<a class="btn ${k === tab ? "on" : ""}" href="#/history/${k}">${l}</a>`).join("")}</div></div><div id="hist"><p class="loading">Loading…</p></div>`;
+    <div class="tabsrow">${[["map", "Map"], ["journeys", "Journeys"], ["timeline", "Timeline"], ["people", "People"]].map(([k, l]) => `<a class="btn ${k === tab ? "on" : ""}" href="#/history/${k}">${l}</a>`).join("")}</div></div><div id="hist"><p class="loading">Loading…</p></div>`;
   const box = $("#hist");
   if (tab === "timeline") return renderTimeline(box);
   if (tab === "people") return renderPeopleList(box);
+  if (tab === "journeys") return renderJourneys(box, sub);
   const [base, places] = await Promise.all([H.base(), H.places()]);
   const off = places.filter(p => p[2] != null && !inMapBox(p[3], p[2])).map(p => p[1]);
   box.innerHTML = `<div class="maplayout"><div class="card mapcard"><div id="map"></div></div>
@@ -829,6 +831,32 @@ async function renderHistory(tab = "map") {
   }
   $("#pf").addEventListener("submit", e => { e.preventDefault(); const q = $("#pq").value.trim().toLowerCase(); const hit = places.find(p => p[2] != null && p[1].toLowerCase() === q) || places.find(p => p[2] != null && p[1].toLowerCase().startsWith(q)); if (hit) showPlace(hit[0]); else toast("No plotted place by that name"); });
   $("#appx").addEventListener("change", e => map.setFilter(e.target.checked));
+}
+
+let journeyTimer = null;
+async function renderJourneys(box, id) {
+  const j = JOURNEYS.find(x => x.id === id) || JOURNEYS[0];
+  const [base, places, lm] = await Promise.all([H.base(), H.places(), H.placeMap()]);
+  const slugs = j.stops.map(s => s[0]);
+  box.innerHTML = `<div class="jpick">${JOURNEYS.map(x => `<a class="jchip ${x.id === j.id ? "on" : ""}" href="#/history/journeys/${x.id}" style="--c:${x.colour}"><b>${esc(x.title)}</b><span>${esc(x.range)}</span></a>`).join("")}</div>
+    <div class="maplayout journey" style="--c:${j.colour}"><div class="card mapcard"><div id="jmap"></div></div>
+      <aside class="card mapside"><h2 style="font-size:1.35rem">${esc(j.title)}</h2><p class="small">${esc(j.range)} · ${esc(j.when)}</p>
+        ${j.note ? `<div class="textnote"><b>How sure is this?</b><br>${esc(j.note)}</div>` : ""}
+        <div class="actions"><button class="btn pri" type="button" id="jplay">Play the journey</button><span class="small" id="jstep"></span></div>
+        <ol class="jstops" id="jstops">${j.stops.map(([sl, o, what], i) => { const r = fromOsis(o); return `<li data-i="${i}"><button type="button" class="jstop" data-i="${i}"><b>${esc(lm.get(sl)?.[1] || sl)}</b><span>${esc(what)}</span></button><a class="small" href="#/lens/${o}">${labelOf(o)}</a></li>`; }).join("")}</ol>
+        <p class="small">Places: Theographic Bible Metadata (CC BY-SA 4.0); lines join the stops in order and do not show the exact road or sea lane.</p></aside></div>`;
+  const map = mountMap($("#jmap"), { base, places, only: new Set(slugs), onPick: s => { const i = slugs.indexOf(s); if (i >= 0) show(i); } });
+  map.fit(new Set(slugs)); map.route(slugs);
+  const items = [...box.querySelectorAll("#jstops li")];
+  function show(i) { items.forEach((li, k) => li.classList.toggle("on", k === i)); items[i]?.scrollIntoView({ block: "nearest", behavior: "smooth" }); map.mark(slugs[i]); $("#jstep").textContent = `Stop ${i + 1} of ${slugs.length}`; }
+  box.querySelectorAll(".jstop").forEach(b => b.addEventListener("click", () => { stop(); show(+b.dataset.i); }));
+  const stop = () => { clearInterval(journeyTimer); journeyTimer = null; const b = $("#jplay"); if (b) b.textContent = "Play the journey"; };
+  $("#jplay").addEventListener("click", () => {
+    if (journeyTimer) return stop();
+    let i = 0; show(0); $("#jplay").textContent = "Pause";
+    journeyTimer = setInterval(() => { i++; if (i >= slugs.length || !document.contains($("#jmap"))) return stop(); show(i); }, 2200);
+  });
+  addEventListener("hashchange", stop, { once: true });
 }
 
 async function renderTimeline(box) {
@@ -1801,7 +1829,7 @@ async function route() {
     else if (head === "guide") await renderGuide(rest[0]);
     else if (head === "translation") await renderTranslation(rest[0]);
     else if (head === "compare") await renderCompare(rest[0]);
-    else if (head === "history") await renderHistory(rest[0] || "map");
+    else if (head === "history") await renderHistory(rest[0] || "map", rest[1]);
     else if (head === "learn") { if (rest[1]) await renderLesson(rest[0], rest[1]); else if (rest[0]) renderCourse(rest[0]); else renderLearn(); }
     else if (head === "person") await renderPerson(rest[0]);
     else if (head === "place") await renderPlace(rest[0]);

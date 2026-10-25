@@ -16,7 +16,7 @@ export function mountMap(el, { base, places, focus = null, onPick = () => {}, sh
     <g class="land"><path d="${base.land.map(r => ringPath(r) + "Z").join("")}"/></g>
     <g class="lakes"><path d="${base.lakes.map(r => ringPath(r) + "Z").join("")}"/></g>
     <g class="rivers"><path d="${base.rivers.map(ringPath).join("")}"/></g>
-    <g class="marks"></g><g class="labels"></g></svg>
+    <g class="route"></g><g class="marks"></g><g class="labels"></g></svg>
     <div class="mapctl"><button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out">−</button><button type="button" data-z="reset" aria-label="Show the whole map">⤢</button></div>
     <p class="mapcredit">Base map: Natural Earth. Places: Theographic / OpenBible.info.</p></div>`;
   const svg = el.querySelector("svg"), marks = el.querySelector(".marks"), labels = el.querySelector(".labels");
@@ -102,6 +102,23 @@ export function mountMap(el, { base, places, focus = null, onPick = () => {}, sh
       visible = places.filter(p => p[2] != null && (showA || p[5] === "located") && (!onlySet || onlySet.has(p[0])));
       visible.forEach(p => { if (!pts.has(p[0])) pts.set(p[0], project(p[3], p[2])); });
       draw();
+    },
+    /** Draw a journey through the given places in order; returns the stops' map points. */
+    route(slugs, { animate = true } = {}) {
+      const g = el.querySelector(".route");
+      const P = slugs.map(s => pts.get(s)).filter(Boolean);
+      if (P.length < 2) { g.innerHTML = ""; return P; }
+      // gently curved legs: each a quadratic bend to one side, proportional to its length
+      const d = P.map((p, i) => { if (!i) return `M${p[0].toFixed(1)} ${p[1].toFixed(1)}`; const q = P[i - 1], mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2, dx = p[0] - q[0], dy = p[1] - q[1]; return `Q${(mx - dy * 0.12).toFixed(1)} ${(my + dx * 0.12).toFixed(1)} ${p[0].toFixed(1)} ${p[1].toFixed(1)}`; }).join(" ");
+      g.innerHTML = `<path class="routeline${animate ? " anim" : ""}" d="${d}" vector-effect="non-scaling-stroke"/>`;
+      const path = g.querySelector("path"); const L = path.getTotalLength(); path.style.setProperty("--len", L);
+      return P;
+    },
+    /** Highlight one stop of a route. */
+    mark(slug) {
+      const g = el.querySelector(".route"); g.querySelector(".here")?.remove();
+      const p = pts.get(slug); if (!p) return;
+      const c = document.createElementNS(NS, "circle"); c.setAttribute("class", "here"); c.setAttribute("cx", p[0]); c.setAttribute("cy", p[1]); c.setAttribute("r", (5.5 / scale()).toFixed(2)); c.setAttribute("vector-effect", "non-scaling-stroke"); g.appendChild(c);
     },
     fit(slugsSet) {
       const xs = [], ys = [];

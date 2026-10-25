@@ -762,3 +762,20 @@ body.kidsmode main { max-width: 1180px; }
 @media (max-width: 900px) { .lenshead { padding: 18px; } .modes { width: auto; } .modes a { padding: 8px 12px; } }
 .hit.coll { gap: 6px; } .cref { display: block; text-decoration: none; color: var(--ink); padding: 6px 10px; border-radius: 8px; background: var(--soft); }
 .cref b { color: var(--rubric); }
+
+/* ---------- journeys ---------- */
+.jpick { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.jchip { display: grid; gap: 2px; padding: 12px 14px; border-radius: var(--r-sm); text-decoration: none; color: var(--ink); background: var(--page); border: 1px solid var(--line); border-left: 5px solid var(--c); }
+.jchip span { font-size: .82rem; color: var(--muted); }
+.jchip.on { background: color-mix(in srgb, var(--c) 12%, var(--page)); border-color: var(--c); }
+.atlas .routeline { fill: none; stroke: var(--c, var(--rubric)); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: .9; }
+@media (prefers-reduced-motion: no-preference) { .atlas .routeline.anim { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); animation: thread 3.2s cubic-bezier(.4, .1, .2, 1) .2s forwards; } }
+.atlas .here { fill: var(--c, var(--rubric)); stroke: #fff; stroke-width: 3; }
+@media (prefers-reduced-motion: no-preference) { .atlas .here { animation: herepulse 1.4s ease-in-out infinite; } }
+@keyframes herepulse { 50% { stroke-width: 7; } }
+.jstops { list-style: none; counter-reset: s; padding: 0; margin: 12px 0; display: grid; gap: 4px; max-height: 420px; overflow: auto; }
+.jstops li { counter-increment: s; display: grid; grid-template-columns: 28px 1fr; gap: 0 8px; padding: 8px; border-radius: 10px; }
+.jstops li::before { content: counter(s); grid-row: span 2; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--soft); font: 700 .75rem var(--sans); color: var(--muted); }
+.jstops li.on { background: color-mix(in srgb, var(--c) 12%, transparent); } .jstops li.on::before { background: var(--c); color: #fff; }
+.jstop { all: unset; cursor: pointer; display: grid; gap: 1px; } .jstop b { font-weight: 600; } .jstop span { font-size: .88rem; color: var(--muted); }
+.jstops li > a { grid-column: 2; color: var(--rubric); text-decoration: none; }
