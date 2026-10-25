@@ -13,8 +13,9 @@ import { parseQuery, searchCorpus, highlightTerms, escapeHtml as esc } from "./s
 import { createStore, exportMarkdown } from "./store.js";
 import { CONTEXT } from "./context.js";
 import { DAILY, QUESTIONS, TEXT_NOTES, SOURCES, MANUSCRIPTS, SOON } from "./content.js";
-import { yearText, dateCertainty, PRECISION, inMapBox } from "./history.js";
+import { yearText, dateCertainty, PRECISION, inMapBox, project, MAP_SIZE } from "./history.js";
 import { mountMap } from "./atlas-map.js";
+import { renderAtlas } from "./atlas-app.js";
 import { COURSES, PLANNED, STATUS } from "./courses.js";
 import { SECTIONS } from "./ai-core.js";
 import { HISTORY, NOT_HOSTED } from "./translations-info.js";
@@ -73,7 +74,7 @@ const discCard = (d, sizes = "(max-width: 520px) 100vw, 300px") => `<a class="dc
   <span class="dbody"><span class="dmeta">${dChip(d)}<span>${esc(KINDS[d.kind] || "")}</span>${d.objectDate?.text ? `<span>${esc(d.objectDate.text)}</span>` : ""}</span><b>${esc(d.name)}</b><span class="dsum">${esc(d.summary)}</span>
   ${(d.passages || []).length ? `<span class="dpass">${d.passages.slice(0, 2).map(rangeLabel).join(" · ")}${d.passages.length > 2 ? ` +${d.passages.length - 2}` : ""}</span>` : ""}</span></a>`;
 /** A compact list of discoveries for side panels (Lens, reader, person, place). */
-const discMini = (list, title = "Archaeology and discoveries") => list.length ? `<section class="dmini"><h3>${title}</h3>${list.slice(0, 6).map(d => `<a href="#/discoveries/${d.id}"><span class="dthumb">${discImg(d, { sizes: "64px" }) || `<span class="dfall k-${d.kind}"></span>`}</span><span><b>${esc(d.name)}</b> ${dChip(d)}<span class="small">${esc(d.summary)}</span></span></a>`).join("")}${list.length > 6 ? `<a class="small" href="#/discoveries">${list.length - 6} more in Discoveries ›</a>` : ""}</section>` : "";
+const discMini = (list, title = "Archaeology and discoveries") => list.length ? `<section class="dmini">${title ? `<h3>${title}</h3>` : ""}${list.slice(0, 6).map(d => `<a href="#/discoveries/${d.id}"><span class="dthumb">${discImg(d, { sizes: "64px" }) || `<span class="dfall k-${d.kind}"></span>`}</span><span><b>${esc(d.name)}</b> ${dChip(d)}<span class="small">${esc(d.summary)}</span></span></a>`).join("")}${list.length > 6 ? `<a class="small" href="#/discoveries">${list.length - 6} more in Discoveries ›</a>` : ""}</section>` : "";
 
 async function renderDiscoveries(id) {
   setNav("discoveries");
@@ -957,7 +958,7 @@ const ERAS = [
   ["Exile and return", -586, -300], ["The life of Jesus", -300, 30.44], ["The early church", 30.44, Infinity]
 ];
 const ERA_ART = ["creation-light", "era-patriarchs", "era-exodus", "map-holyland", "era-kingdom", "isaiah-scroll", "era-exile", "era-gospels", "map-paul"];
-const JOURNEY_ART = { abraham: "era-patriarchs", exodus: "era-exodus", paul1: "map-paul", paul2: "map-paul", paul3: "map-paul", rome: "map-paul" };
+const JOURNEY_ART = { jesus: "era-gospels", exile: "era-exile", return: "era-exile", philip: "map-paul", peter: "map-paul", abraham: "era-patriarchs", exodus: "era-exodus", paul1: "map-paul", paul2: "map-paul", paul3: "map-paul", rome: "map-paul" };
 const COURSE_ART = { foundations: "gutenberg", genesis: "creation-light", jesus: "era-gospels", hebrew: "leningrad" };
 async function renderHistory(tab = "map", sub = "") {
   setNav("history"); setTitle("History");
@@ -2008,6 +2009,7 @@ async function route() {
     else if (head === "kids") await (rest[0] ? renderStory(rest[0]) : renderKids());
     else if (head === "soon") renderSoon(rest[0]);
     else if (head === "books") { await getIndex(); renderBooks(); }
+    else if (head === "atlas") { await getIndex(); setNav("atlas"); setTitle("Atlas"); await renderAtlas({ view, H, esc, DISCOVERIES, JOURNEYS, NAMES, BOOKS, ERAS, unpackRef, readUrl, formatRef, PRECISION, toOsis, fromOsis, labelOf, discImg, discCredit, discMini, yearText, verseText, rangeHref, rangeLabel, project, MAP_SIZE, SECTIONS, parseRef: q => parseReference(q, chapterCount) }, rest); }
     else if (head === "discoveries") { await getIndex(); await renderDiscoveries(rest[0]); }
     else await renderHome();
   } catch (e) {

@@ -1,0 +1,1406 @@
+[
+ {
+  "id": "hezekiah-royal-bulla",
+  "name": "Bulla of King Hezekiah (Ophel)",
+  "kind": "seal",
+  "summary": "A small clay seal impression reading 'Belonging to Hezekiah [son of] Ahaz king of Judah', recovered in the Ophel excavations south of the Temple Mount.",
+  "objectDate": {
+   "text": "Late 8th century BC (Hezekiah's reign)",
+   "sort": -705
+  },
+  "found": {
+   "year": null,
+   "by": "Ophel excavation of the Hebrew University's Institute of Archaeology, directed by Eilat Mazar; recovered by wet-sifting (sources give the 2009 or 2010 season; announced 2015)",
+   "where": "Ophel, at the foot of the southern wall of the Temple Mount, Jerusalem"
+  },
+  "location": {
+   "lat": 31.7755,
+   "lon": 35.2362,
+   "placeSlug": "ophel_910"
+  },
+  "heldAt": {
+   "institution": "",
+   "ref": ""
+  },
+  "language": "Hebrew (Old Hebrew script)",
+  "description": "An oval impression about 9.7 x 8.6 mm, pressed into a clay bulla 13 x 12 mm. It reads 'Belonging to Hezekiah [son of] Ahaz king of Judah' and shows a two-winged sun flanked by two ankh symbols. Cord marks on the back show it once sealed a papyrus document. It came from a refuse dump of Hezekiah's time or shortly after, with 33 other bullae.",
+  "connection": "The Bible names Hezekiah son of Ahaz as king of Judah and describes his reign in 2 Kings 18–20, 2 Chronicles 29–32 and Isaiah 36–39. The bulla is an administrative object from his court, found in a refuse dump probably fed from a nearby royal building.",
+  "establishes": "A seal of a Judean king named Hezekiah, son of Ahaz, was in use in Jerusalem. The excavators describe it as the first seal impression of an Israelite or Judean king found in a scientific excavation.",
+  "limits": "It confirms the king's name, father and title, not any particular event of his reign. The excavators' suggestion that the winged-sun imagery dates it late in his reign is an interpretation. Similar impressions had earlier been known only from the antiquities market.",
+  "status": "corroborates",
+  "passages": [
+   "2Kgs.18.1-18.8",
+   "2Chr.29.1-29.2",
+   "Isa.38.1-38.8"
+  ],
+  "people": [
+   "hezekiah_1512",
+   "ahaz_118"
+  ],
+  "dating": [
+   "stratigraphy",
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "Impression of King Hezekiah's royal seal discovered (2 Dec 2015)",
+    "publisher": "Israel Ministry of Foreign Affairs (Hebrew University press release)",
+    "url": "https://embassies.gov.il/MFA/IsraelExperience/history/Pages/Impression-of-King-Hezekiah-royal-seal-discovered-2-Dec-2015.aspx"
+   },
+   {
+    "title": "King Hezekiah in the Bible: Royal Seal of Hezekiah Comes to Light",
+    "publisher": "Biblical Archaeology Society",
+    "url": "https://www.biblicalarchaeology.org/daily/news/king-hezekiah-in-the-bible-royal-seal-of-hezekiah-comes-to-light/"
+   },
+   {
+    "title": "Impression of King Hezekiah's royal seal discovered in excavations in Jerusalem (Hebrew University release)",
+    "publisher": "ScienceDaily",
+    "url": "https://www.sciencedaily.com/releases/2015/12/151202132519.htm"
+   },
+   {
+    "title": "Seal Impression of King Hezekiah found with the Assistance of the Sifting Project",
+    "publisher": "Temple Mount Sifting Project",
+    "url": "https://tmsifting.org/en/2015/12/02/seal-impression-of-king-hezekiah-found-with-the-assistance-of-the-sifting-project/"
+   }
+  ]
+ },
+ {
+  "id": "isaiah-bulla",
+  "name": "'Isaiah' bulla (Ophel)",
+  "kind": "seal",
+  "summary": "A damaged clay seal impression bearing the name Yesha'yah[u] (Isaiah) and the letters nvy, found near Hezekiah's bulla; whether it names the prophet is disputed.",
+  "objectDate": {
+   "text": "8th century BC",
+   "sort": -700
+  },
+  "found": {
+   "year": 2009,
+   "by": "Ophel excavation directed by Eilat Mazar; recovered by wet-sifting",
+   "where": "Ophel, south of the Temple Mount, Jerusalem"
+  },
+  "location": {
+   "lat": 31.7755,
+   "lon": 35.2362,
+   "placeSlug": "ophel_910"
+  },
+  "heldAt": {
+   "institution": "",
+   "ref": ""
+  },
+  "language": "Hebrew (Old Hebrew script)",
+  "description": "A bulla about half an inch across, in three registers: a grazing doe at the top, the name Yesha'yah[u] in the middle, and the letters nvy below. The top is missing and the left side is damaged. It came from Iron Age debris outside a royal building, less than 10 feet from the Hezekiah bulla.",
+  "connection": "Eilat Mazar proposed the reading 'belonging to Isaiah the prophet', linking it to Isaiah son of Amoz, who the Bible says advised King Hezekiah (2 Kings 19–20; Isaiah 37–39). That reading needs a letter (aleph) that is not preserved.",
+  "establishes": "A person named Isaiah (Yesha'yahu) sealed documents in Jerusalem's royal quarter in the 8th century BC.",
+  "limits": "The word nvy may be incomplete; without an aleph it could be a personal name (Navi) rather than 'prophet'. Christopher Rollston notes the definite article expected in 'the prophet' is also absent, and that the name was common. Mazar herself acknowledged 'major obstacles' to the reading.",
+  "status": "debated",
+  "passages": [
+   "Isa.1.1-1.1",
+   "2Kgs.20.1-20.11",
+   "Isa.37.21-37.21"
+  ],
+  "people": [
+   "isaiah_617",
+   "hezekiah_1512"
+  ],
+  "dating": [
+   "stratigraphy",
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "Prophet Isaiah's signature in Jerusalem? (Bible History Daily)",
+    "publisher": "Biblical Archaeology Society (Bible History Daily)",
+    "url": "https://www.biblicalarchaeology.org/daily/news/prophet-isaiah-signature-jerusalem/"
+   },
+   {
+    "title": "Prophet Isaiah seal impression report (February 2018)",
+    "publisher": "National Geographic",
+    "url": "https://www.nationalgeographic.com/history/article/prophet-isaiah-jerusalem-seal-archaeology-bible"
+   }
+  ]
+ },
+ {
+  "id": "gemaryahu-son-of-shaphan-bulla",
+  "name": "Bulla of Gemaryahu son of Shaphan",
+  "kind": "seal",
+  "summary": "A clay bulla reading 'Belonging to Gemaryahu son of Shaphan', one of 51 bullae found in a house in the City of David destroyed in 586 BC.",
+  "objectDate": {
+   "text": "Late 7th – early 6th century BC (before 586 BC)",
+   "sort": -600
+  },
+  "found": {
+   "year": 1982,
+   "by": "City of David excavations directed by Yigal Shiloh",
+   "where": "House near the Stepped-Stone Structure, City of David, Jerusalem"
+  },
+  "location": {
+   "lat": 31.7737,
+   "lon": 35.2358,
+   "placeSlug": "jerusalem_636"
+  },
+  "heldAt": {
+   "institution": "",
+   "ref": ""
+  },
+  "language": "Hebrew (Old Hebrew script)",
+  "description": "A seal impression reading 'Belonging to Gemaryahu / son of Shaphan'. It was part of a hoard of 51 bullae, 41 of them legible, from a building burnt in the Babylonian conquest of 586 BC. The inscribed finds of Shiloh's excavations, including the Hebrew bullae, were published in the Hebrew University's Qedem 41 (2000).",
+  "connection": "Jeremiah 36 names 'Gemariah the son of Shaphan the scribe', a court official under King Jehoiakim, in whose chamber Baruch read Jeremiah's scroll (Jer 36:10–12, 25).",
+  "establishes": "An official named Gemaryahu son of Shaphan sealed documents in Jerusalem shortly before 586 BC. Unlike some unprovenanced bullae, this one comes from a controlled excavation.",
+  "limits": "The name and father match the biblical official, and the date fits, but the bulla does not say he was a scribe or courtier. Identity with the man in Jeremiah 36 is likely but cannot be proved.",
+  "status": "consistent",
+  "passages": [
+   "Jer.36.10-36.12",
+   "Jer.36.25-36.25"
+  ],
+  "people": [
+   "gemariah_1296",
+   "shaphan_2550",
+   "jehoiakim_1085"
+  ],
+  "dating": [
+   "stratigraphy",
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "Gemaryahu Son of Shaphan Bulla, 586 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/gemaryahu_son_of_shaphan_bulla-_586_bce/"
+   },
+   {
+    "title": "Image details: Gemariah son of Shaphan bulla",
+    "publisher": "Biblical Archaeology Society Library",
+    "url": "https://library.biblicalarchaeology.org/images/bsba230403700ljpg/"
+   },
+   {
+    "title": "Qedem 41: Excavations in the City of David 1978–1985, Vol. VI (Inscriptions)",
+    "publisher": "Institute of Archaeology, Hebrew University of Jerusalem",
+    "url": "https://archaeology.huji.ac.il/publications/qedem-41"
+   }
+  ]
+ },
+ {
+  "id": "hazor",
+  "name": "Tel Hazor",
+  "kind": "site",
+  "summary": "The largest Bronze Age city in the land of Israel, destroyed by fire at the end of the Late Bronze Age and later rebuilt as an Israelite administrative centre.",
+  "objectDate": {
+   "text": "2nd millennium BC to 732 BC",
+   "sort": -1300
+  },
+  "found": {
+   "year": null,
+   "by": "Yigael Yadin (Hebrew University) in the 1950s and 1960s; renewed by Amnon Ben-Tor from 1990",
+   "where": "Upper Galilee, north of the Sea of Galilee"
+  },
+  "location": {
+   "lat": 33.0175,
+   "lon": 35.568,
+   "placeSlug": "hazor_545"
+  },
+  "heldAt": {
+   "institution": "Site (Tel Hazor National Park)",
+   "ref": ""
+  },
+  "language": "",
+  "description": "In the 2nd millennium BC Hazor covered about 200 acres, with an upper and a lower city, palaces and temples. Much of the Late Bronze Age city was consumed by fire. In the Iron Age it was a fortified centre of the northern kingdom, with a six-chambered gate uncovered by Yadin, and an underground water system. It is part of the UNESCO 'Biblical Tels' World Heritage property.",
+  "connection": "Joshua 11:10–13 says Joshua took and burned Hazor, 'the head of all those kingdoms'; Judges 4:2 names Jabin king of Hazor. 1 Kings 9:15 lists Hazor among Solomon's building works, and 2 Kings 15:29 records its capture by Tiglath-pileser III.",
+  "establishes": "Hazor was a major Canaanite city destroyed by fire at the end of the Late Bronze Age, and an important Israelite city in the 9th–8th centuries BC.",
+  "limits": "Who destroyed Canaanite Hazor is disputed. Ben-Tor and Yadin linked it to Israel, while Sharon Zuckerman argued for internal social and ideological collapse. The date of the six-chambered gate, and so its link to Solomon, is part of a wider debate on 10th-century chronology.",
+  "status": "consistent",
+  "passages": [
+   "Josh.11.10-11.13",
+   "Judg.4.2-4.2",
+   "1Kgs.9.15-9.15",
+   "2Kgs.15.29-15.29"
+  ],
+  "people": [
+   "solomon_2762",
+   "joshua_1727"
+  ],
+  "dating": [
+   "stratigraphy",
+   "ceramic-typology"
+  ],
+  "sources": [
+   {
+    "title": "Tel Hazor",
+    "publisher": "Institute of Archaeology, Hebrew University of Jerusalem",
+    "url": "https://archaeology.huji.ac.il/tel-hazor"
+   },
+   {
+    "title": "Biblical Tels – Megiddo, Hazor, Beer Sheba",
+    "publisher": "UNESCO World Heritage Centre",
+    "url": "https://whc.unesco.org/en/list/1108"
+   },
+   {
+    "title": "Tel Hazor Excavations: Highlights from Recent Seasons (Jennie R. Ebeling)",
+    "publisher": "The Bible and Interpretation",
+    "url": "https://bibleinterp.arizona.edu/node/2485"
+   },
+   {
+    "title": "Anatomy of a Destruction: Crisis Architecture, Termination Rituals and the Fall of Canaanite Hazor (S. Zuckerman, JMA 20.1, 2007)",
+    "publisher": "Journal of Mediterranean Archaeology (Equinox)",
+    "url": "https://journal.equinoxpub.com/JMA/article/view/22950"
+   }
+  ]
+ },
+ {
+  "id": "megiddo",
+  "name": "Tel Megiddo",
+  "kind": "site",
+  "summary": "A strategic city mound in the Jezreel Valley with remains spanning the Bronze and Iron Ages, including a six-chambered gate long linked to Solomon.",
+  "objectDate": {
+   "text": "Early Bronze Age to Iron Age II",
+   "sort": -1000
+  },
+  "found": {
+   "year": null,
+   "by": "Several expeditions; recent work by the Tel Aviv University Megiddo Expedition",
+   "where": "Jezreel Valley, northern Israel"
+  },
+  "location": {
+   "lat": 32.585,
+   "lon": 35.1845,
+   "placeSlug": "megiddo_777"
+  },
+  "heldAt": {
+   "institution": "Site (Megiddo National Park)",
+   "ref": ""
+  },
+  "language": "",
+  "description": "Megiddo has an Early Bronze Age temple compound, Iron Age fortifications and gates, and an underground water system. It is one of the three tels in the UNESCO 'Biblical Tels' property. A six-chambered city gate has been at the centre of debate over the archaeology of the 10th century BC.",
+  "connection": "1 Kings 9:15 lists Megiddo with Hazor and Gezer among Solomon's building works. 2 Kings 23:29 says King Josiah was killed at Megiddo by Pharaoh Necho.",
+  "establishes": "Megiddo was a major fortified city through the Iron Age, as its gates, walls and water system show.",
+  "limits": "Yigael Yadin dated the six-chambered gate to Solomon by comparing it with Hazor and Gezer and 1 Kings 9:15. David Ussishkin assigns it to Stratum IVA, probably the 8th century BC; Israel Finkelstein and Matthew Adams, who re-excavated the gate in 2018, dispute his reconstruction. The gate's date is unresolved.",
+  "status": "debated",
+  "passages": [
+   "1Kgs.9.15-9.15",
+   "2Kgs.23.29-23.30"
+  ],
+  "people": [
+   "solomon_2762"
+  ],
+  "dating": [
+   "stratigraphy",
+   "ceramic-typology",
+   "radiocarbon"
+  ],
+  "sources": [
+   {
+    "title": "Biblical Tels – Megiddo, Hazor, Beer Sheba",
+    "publisher": "UNESCO World Heritage Centre",
+    "url": "https://whc.unesco.org/en/list/1108"
+   },
+   {
+    "title": "The So-Called 'Solomonic' City-gate at Megiddo (David Ussishkin)",
+    "publisher": "ASOR Blog, American Society of Overseas Research",
+    "url": "https://www.asorblog.org/2013/08/16/the-so-called-solomonic-city-gate-at-megiddo.html"
+   },
+   {
+    "title": "The Megiddo Gates: Outdated Views Versus New Data (Finkelstein and Adams, Tel Aviv 48, 2021)",
+    "publisher": "University of Haifa research portal",
+    "url": "https://cris.haifa.ac.il/en/publications/the-megiddo-gates-outdated-views-versus-new-data/"
+   }
+  ]
+ },
+ {
+  "id": "gezer",
+  "name": "Tel Gezer",
+  "kind": "site",
+  "summary": "A city mound in the Shephelah whose Iron Age six-chambered gate and casemate wall are central to the debate on 10th-century Israel.",
+  "objectDate": {
+   "text": "Iron Age gate: 10th century BC (disputed)",
+   "sort": -950
+  },
+  "found": {
+   "year": 1902,
+   "by": "R. A. S. Macalister for the Palestine Exploration Fund (1902–1909); later Hebrew Union College and Harvard Semitic Museum (1964–1974); renewed by Steven Ortiz and Samuel Wolff",
+   "where": "Inner coastal plain / Shephelah, west of Jerusalem"
+  },
+  "location": {
+   "lat": 31.8596,
+   "lon": 34.9205,
+   "placeSlug": "gezer_463"
+  },
+  "heldAt": {
+   "institution": "Site (Tel Gezer National Park)",
+   "ref": ""
+  },
+  "language": "",
+  "description": "Excavations have exposed a six-chambered Iron Age gate, often called the 'Solomonic Gate', a casemate wall and a monumental administrative building. Ortiz and Wolff assign the gate to Stratum 8, which they date to the 10th century BC and link to a destruction around 925 BC, probably by Shoshenq (Shishak).",
+  "connection": "1 Kings 9:15–17 says Solomon built Gezer with Hazor and Megiddo, and that Pharaoh had taken and burned Gezer and given it to his daughter, Solomon's wife.",
+  "establishes": "Gezer had monumental fortifications and public buildings in the Iron Age, and radiocarbon dates place a later stratum (7) in the late 10th or early 9th century BC.",
+  "limits": "Ortiz and Wolff's 10th-century date supports Yadin and others but is opposed by Israel Finkelstein's lower chronology. Linking the gate to Solomon by name rests on 1 Kings 9:15, not on an inscription.",
+  "status": "debated",
+  "passages": [
+   "1Kgs.9.15-9.17"
+  ],
+  "people": [
+   "solomon_2762"
+  ],
+  "dating": [
+   "stratigraphy",
+   "radiocarbon",
+   "ceramic-typology"
+  ],
+  "sources": [
+   {
+    "title": "New Evidence for the 10th Century BCE at Tel Gezer (Ortiz and Wolff, Jerusalem Journal of Archaeology 1, 2021)",
+    "publisher": "Jerusalem Journal of Archaeology, Hebrew University",
+    "url": "https://jjar.huji.ac.il/publications/new-evidence-10th-century-bce-tel-gezer"
+   },
+   {
+    "title": "The Solomonic Gate at Gezer",
+    "publisher": "Biblical Archaeology Society (Bible History Daily)",
+    "url": "https://www.biblicalarchaeology.org/daily/ancient-cultures/ancient-israel/the-solomonic-gate-at-gezer/"
+   }
+  ]
+ },
+ {
+  "id": "lachish",
+  "name": "Tel Lachish",
+  "kind": "site",
+  "summary": "A major Judean fortress city besieged by Sennacherib in 701 BC; its Assyrian siege ramp survives and the siege is shown in reliefs from Nineveh.",
+  "objectDate": {
+   "text": "Level III destroyed 701 BC; Level II destroyed 586 BC",
+   "sort": -701
+  },
+  "found": {
+   "year": 1932,
+   "by": "Wellcome-Marston expedition under James Leslie Starkey (1932–1938); later Yohanan Aharoni and David Ussishkin (Tel Aviv University, 1973–1987)",
+   "where": "Judean Shephelah, southwest of Jerusalem"
+  },
+  "location": {
+   "lat": 31.5652,
+   "lon": 34.8491,
+   "placeSlug": "lachish_711"
+  },
+  "heldAt": {
+   "institution": "Site (Tel Lachish National Park); siege reliefs in the British Museum",
+   "ref": ""
+  },
+  "language": "",
+  "description": "Starkey's team set up the Level I–VIII sequence. The Assyrian siege ramp built in 701 BC is associated with Level III, and arrows and slingstones from the battle have been excavated. Level II was destroyed by the Babylonians in 586 BC; the Lachish Letters ostraca come from that level. Sennacherib had the siege carved on the walls of a room in his palace at Nineveh; those reliefs are now in the British Museum.",
+  "connection": "2 Kings 18:13–17 and 2 Chronicles 32:9 say Sennacherib was at Lachish, besieging it, when he sent envoys to Hezekiah in Jerusalem (also Isaiah 36:2). Jeremiah 34:7 names Lachish and Azekah as the last fortified cities of Judah holding out against Babylon.",
+  "establishes": "Lachish was besieged and taken by an Assyrian army using a ramp, matching the Assyrian royal reliefs, and was destroyed again in the Babylonian period.",
+  "limits": "The site and reliefs confirm an Assyrian siege of Lachish; they do not settle questions about other episodes in the biblical narrative of 701 BC. The attribution of strata to specific events rests on excavators' stratigraphic analysis.",
+  "status": "corroborates",
+  "passages": [
+   "2Kgs.18.13-18.17",
+   "2Chr.32.9-32.9",
+   "Isa.36.2-36.2",
+   "Jer.34.7-34.7"
+  ],
+  "people": [
+   "hezekiah_1512",
+   "sennacherib_2489"
+  ],
+  "dating": [
+   "stratigraphy",
+   "historical-synchronism",
+   "ceramic-typology"
+  ],
+  "sources": [
+   {
+    "title": "Lachish: History of Research",
+    "publisher": "Southern Adventist University, Institute of Archaeology",
+    "url": "https://www.southern.edu/administration/archaeology/lachish/project-overview/history-of-research.html"
+   },
+   {
+    "title": "The Lachish Reliefs",
+    "publisher": "Tyndale House, Cambridge",
+    "url": "https://tyndale.cam.ac.uk/explore/articles/the-lachish-reliefs/"
+   },
+   {
+    "title": "Wall panel relief, museum number 1856,0909.14",
+    "publisher": "British Museum",
+    "url": "https://www.britishmuseum.org/collection/object/W_1856-0909-14"
+   }
+  ]
+ },
+ {
+  "id": "jericho-tell-es-sultan",
+  "name": "Jericho (Tell es-Sultan)",
+  "kind": "site",
+  "summary": "An ancient city mound with remains from the Neolithic onwards; the date of its Bronze Age destruction, and any link to Joshua 6, remains disputed.",
+  "objectDate": {
+   "text": "Bronze Age destruction of City IV: c. 1550 BC or c. 1400 BC (disputed)",
+   "sort": -1550
+  },
+  "found": {
+   "year": 1930,
+   "by": "John Garstang (1930–1936); Kathleen Kenyon (1952–1958); Italian–Palestinian expedition with Sapienza University of Rome (from 1997)",
+   "where": "Jordan Valley, near modern Jericho"
+  },
+  "location": {
+   "lat": 31.8711,
+   "lon": 35.4441,
+   "placeSlug": "jericho_634"
+  },
+  "heldAt": {
+   "institution": "Site (Tell es-Sultan, inscribed on the UNESCO World Heritage List in 2023)",
+   "ref": ""
+  },
+  "language": "",
+  "description": "Tell es-Sultan has occupation from the Pre-Pottery Neolithic through the Bronze Age. Its last Bronze Age city (City IV) was destroyed by fire, with burnt stores of grain. Garstang linked that destruction to about 1400 BC. Kenyon dated it to about 1550 BC, at the end of the Middle Bronze Age.",
+  "connection": "Joshua 6 describes the walls of Jericho falling and the city being burned by the Israelites. The archaeological question is whether the City IV destruction can be dated to a time that fits that account.",
+  "establishes": "A walled Bronze Age city at Jericho was destroyed by fire.",
+  "limits": "The evidence does not settle a conquest date. Kenyon's c. 1550 BC date is supported by Piotr Bienkowski and many others, while Bryant Wood and Titus Kennedy argue for c. 1400 BC from pottery and scarabs. Kennedy himself notes that radiocarbon cannot decide between the two; Bruins and van der Plicht's 1995 dates fall in the 16th century BC.",
+  "status": "debated",
+  "passages": [
+   "Josh.6.1-6.27"
+  ],
+  "people": [
+   "joshua_1727"
+  ],
+  "dating": [
+   "stratigraphy",
+   "ceramic-typology",
+   "radiocarbon"
+  ],
+  "sources": [
+   {
+    "title": "Jericho Was Destroyed in the Middle Bronze Age, Not the Late Bronze Age (Piotr Bienkowski, BAR 16:5, 1990)",
+    "publisher": "Biblical Archaeology Society Library",
+    "url": "https://library.biblicalarchaeology.org/article/jericho-was-destroyed-in-the-middle-bronze-age-not-the-late-bronze-age/"
+   },
+   {
+    "title": "The Bronze Age Destruction of Jericho, Archaeology, and the Book of Joshua (Titus Kennedy, Religions 14:6, 2023)",
+    "publisher": "MDPI, Religions (peer-reviewed)",
+    "url": "https://mdpi.com/2343846"
+   },
+   {
+    "title": "Jericho (Tell es-Sultan) inscribed on the World Heritage List: Italian–Palestinian mission",
+    "publisher": "Sapienza University of Rome",
+    "url": "https://www.uniroma1.it/en/node/459051"
+   }
+  ]
+ },
+ {
+  "id": "khirbet-qeiyafa",
+  "name": "Khirbet Qeiyafa and its ostracon",
+  "kind": "site",
+  "summary": "A fortified Iron Age town above the Elah Valley, radiocarbon-dated to about 1000 BC, where a five-line ink inscription was found in 2008.",
+  "objectDate": {
+   "text": "Around 1000 BC (radiocarbon)",
+   "sort": -1000
+  },
+  "found": {
+   "year": 2008,
+   "by": "Excavation directed by Yosef Garfinkel (Hebrew University) and Saar Ganor; ostracon found by volunteer Oded Yair",
+   "where": "Khirbet Qeiyafa, above the Elah Valley, Judean Shephelah"
+  },
+  "location": {
+   "lat": 31.6962,
+   "lon": 34.9575
+  },
+  "heldAt": {
+   "institution": "",
+   "ref": ""
+  },
+  "language": "Ostracon: early alphabetic script; language disputed",
+  "description": "Seventeen burnt olive pits from the destruction layer were dated by AMS radiocarbon to about 1000 BC. The excavators call it the earliest known fortified city in the kingdom of Judah. The ostracon, found on 8 July 2008, has five lines of faded ink writing in an archaic Proto-Canaanite style.",
+  "connection": "The site overlooks the Elah Valley, where 1 Samuel 17 sets the battle between Israel and the Philistines. The excavators argue it shows that fortified centres existed in the kingdom of David.",
+  "establishes": "A planned, fortified settlement stood here around 1000 BC, and someone there wrote an alphabetic text in ink.",
+  "limits": "Who built the town, Judah or another group, is disputed, and so is the excavators' link to David. Haggai Misgav read the ostracon as Hebrew; Christopher Rollston and others question whether its script and language are Hebrew, its reading direction and its meaning.",
+  "status": "debated",
+  "passages": [
+   "1Sam.17.1-17.2"
+  ],
+  "people": [
+   "david_994"
+  ],
+  "dating": [
+   "radiocarbon",
+   "stratigraphy",
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "Qeiyafa Ostracon Chronicle: 8 July 2008",
+    "publisher": "Khirbet Qeiyafa Excavations, Hebrew University of Jerusalem",
+    "url": "https://khirbet-qeiyafa.huji.ac.il/node/3139452"
+   },
+   {
+    "title": "King David's city at Khirbet Qeiyafa: Results of the second radiocarbon dating project (Radiocarbon 57:5, 2015)",
+    "publisher": "Israeli research portal (IUCC CRIS)",
+    "url": "https://cris.iucc.ac.il/en/publications/king-davids-city-at-khirbet-qeiyafa-results-of-the-second-radioca/"
+   },
+   {
+    "title": "Three Takes on the Oldest Hebrew Inscription",
+    "publisher": "Biblical Archaeology Society",
+    "url": "https://www.biblicalarchaeology.org/scholars-study/three-takes-on-the-oldest-hebrew-inscription/"
+   }
+  ]
+ },
+ {
+  "id": "arad-shrine",
+  "name": "Judahite shrine at Tel Arad",
+  "kind": "site",
+  "summary": "A small Judahite shrine inside the Iron Age fortress of Arad, with two limestone altars whose residues contained frankincense and cannabis.",
+  "objectDate": {
+   "text": "8th century BC",
+   "sort": -750
+  },
+  "found": {
+   "year": null,
+   "by": "Excavated in the 1960s; residues analysed by Eran Arie, Baruch Rosen and Dvory Namdar (published 2020)",
+   "where": "Tel Arad, northern Negev"
+  },
+  "location": {
+   "lat": 31.281,
+   "lon": 35.1264,
+   "placeSlug": "arad_81"
+  },
+  "heldAt": {
+   "institution": "",
+   "ref": ""
+  },
+  "language": "",
+  "description": "The shrine stood within a Judahite fortress in the Negev. Two limestone monoliths thought to be incense altars had dark residue on their tops. Laboratory analysis found frankincense mixed with animal fat on the larger altar and cannabis mixed with dung on the smaller.",
+  "connection": "The Bible describes incense offerings and condemns worship at sanctuaries outside Jerusalem; Hezekiah and Josiah are said to have removed such 'high places' and altars (2 Kings 18:4, 22; 23:8). Arad shows a Judahite sanctuary of this period outside the capital.",
+  "establishes": "A Judahite shrine with incense altars operated at Arad in the 8th century BC, and frankincense and cannabis were burned on them.",
+  "limits": "The finds do not show who ended the shrine's use or whether this followed a royal reform. The residues show what was burned, not the meaning of the rituals.",
+  "status": "consistent",
+  "passages": [
+   "2Kgs.18.4-18.4",
+   "2Kgs.18.22-18.22",
+   "2Kgs.23.8-23.8"
+  ],
+  "people": [
+   "hezekiah_1512"
+  ],
+  "dating": [
+   "stratigraphy",
+   "ceramic-typology"
+  ],
+  "sources": [
+   {
+    "title": "Cannabis and Frankincense at the Judahite Shrine of Arad (Arie, Rosen and Namdar, Tel Aviv 47:1, 2020)",
+    "publisher": "University of Haifa research portal",
+    "url": "https://cris.haifa.ac.il/en/publications/cannabis-and-frankincense-at-the-judahite-shrine-of-arad/"
+   },
+   {
+    "title": "Marijuana Found at Ancient Temple in Israel",
+    "publisher": "Biblical Archaeology Society (Bible History Daily)",
+    "url": "https://www.biblicalarchaeology.org/daily/marijuana-found-at-ancient-temple-in-israel/"
+   }
+  ]
+ },
+ {
+  "id": "samaria-ivories",
+  "name": "Samaria ivories",
+  "kind": "artefact",
+  "summary": "Carved ivory plaques and fragments, many once furniture inlays, excavated near the royal palace at Samaria, capital of the northern kingdom of Israel.",
+  "objectDate": {
+   "text": "9th–8th century BC",
+   "sort": -850
+  },
+  "found": {
+   "year": null,
+   "by": "Excavations at Samaria between 1908 and 1935, including the Joint Expedition to Samaria",
+   "where": "Samaria (Sebastia), near the Iron Age palace"
+  },
+  "location": {
+   "lat": 32.2763,
+   "lon": 35.1952
+  },
+  "heldAt": {
+   "institution": "Israel Antiquities Authority; fragments in Harvard Art Museums",
+   "ref": "Harvard Art Museums 1933.164.C-U"
+  },
+  "language": "",
+  "description": "The assemblage is large: the 1938 final report described about 200 items, and a University of Bern project is cataloguing over 12,000 pieces. Most were found in later debris. Earlier scholars attributed them to Phoenician workmanship.",
+  "connection": "1 Kings 22:39 mentions 'the ivory house' that Ahab built, and Amos condemns 'houses of ivory' and 'beds of ivory' (Amos 3:15; 6:4). Samaria was the capital founded by Omri (1 Kings 16:24).",
+  "establishes": "Ivory furnishings were used at the royal centre of Samaria in the 9th–8th centuries BC.",
+  "limits": "Because most pieces came from later debris, they cannot be tied to a specific building or king, and do not identify Ahab's 'ivory house'. Their workshop origin is still discussed.",
+  "status": "consistent",
+  "passages": [
+   "1Kgs.22.39-22.39",
+   "Amos.3.15-3.15",
+   "Amos.6.4-6.4",
+   "1Kgs.16.24-16.24"
+  ],
+  "people": [
+   "ahab_113",
+   "omri_2243"
+  ],
+  "dating": [
+   "stratigraphy"
+  ],
+  "sources": [
+   {
+    "title": "The Ivory Carvings from Samaria",
+    "publisher": "Institute of Archaeological Sciences, University of Bern",
+    "url": "https://www.iaw.unibe.ch/forschung/vorderasiatische_archaeologie/the_ivory_carvings_from_samaria/index_ger.html"
+   },
+   {
+    "title": "Fragments of Ivory, Lapis, etc. from Samaria (1933.164.C-U)",
+    "publisher": "Harvard Art Museums",
+    "url": "https://harvardartmuseums.org/collections/object/11325"
+   }
+  ]
+ },
+ {
+  "id": "beersheba-horned-altar",
+  "name": "Beersheba horned altar",
+  "kind": "artefact",
+  "summary": "A large altar with horns at its corners, reconstructed from dressed stones that had been reused in the walls of a later building at Tel Beersheba.",
+  "objectDate": {
+   "text": "Iron Age II, before the late 8th century BC",
+   "sort": -750
+  },
+  "found": {
+   "year": null,
+   "by": "Tel Aviv University expedition led by Yohanan Aharoni (1969–1976)",
+   "where": "Tel Sheva (Tell es-Sab'a), northern Negev"
+  },
+  "location": {
+   "lat": 31.245,
+   "lon": 34.8405,
+   "placeSlug": "beersheba_170"
+  },
+  "heldAt": {
+   "institution": "",
+   "ref": ""
+  },
+  "language": "",
+  "description": "Tel Sheva was a planned, walled Judahite town with a gate and water system; Sennacherib destroyed it in 701 BC. Well-dressed stones from a horned altar were found reused in the walls of a later building, and the altar was reconstructed from them. The site is part of the UNESCO 'Biblical Tels' property.",
+  "connection": "Exodus 27:2 describes an altar with horns on its four corners. The excavators suggested the Beersheba cult place was dismantled in Hezekiah's reforms, when he removed high places and altars (2 Kings 18:4, 22); 2 Kings 23:8 mentions high places 'from Geba to Beer-sheba'.",
+  "establishes": "A horned altar for sacrifice existed at a Judahite town in the Negev and was later taken apart and its stones reused.",
+  "limits": "The altar's original location is not known, and the link to Hezekiah's reform is an interpretation ('probably'), not a written record.",
+  "status": "consistent",
+  "passages": [
+   "Exod.27.2-27.2",
+   "2Kgs.18.4-18.4",
+   "2Kgs.18.22-18.22",
+   "2Kgs.23.8-23.8"
+  ],
+  "people": [
+   "hezekiah_1512"
+  ],
+  "dating": [
+   "stratigraphy"
+  ],
+  "sources": [
+   {
+    "title": "Archaeological Sites in Israel: Beersheba",
+    "publisher": "Israel Ministry of Foreign Affairs",
+    "url": "https://embassies.gov.il/MFA/IsraelExperience/history/Pages/Archaeological%20Sites%20in%20Israel%20-%20Beersheba.aspx"
+   },
+   {
+    "title": "Biblical Tels – Megiddo, Hazor, Beer Sheba",
+    "publisher": "UNESCO World Heritage Centre",
+    "url": "https://whc.unesco.org/en/list/1108"
+   }
+  ]
+ },
+ {
+  "id": "pilate-stone",
+  "name": "Pilate inscription (Caesarea)",
+  "kind": "inscription",
+  "summary": "A limestone block from Caesarea with a Latin dedication naming Pontius Pilate as prefect of Judaea, probably for a building honouring Emperor Tiberius.",
+  "objectDate": {
+   "text": "AD 26–36",
+   "sort": 30
+  },
+  "found": {
+   "year": 1961,
+   "by": "Italian expedition led by Antonio Frova",
+   "where": "Theatre at Caesarea Maritima, reused in a later rebuilding"
+  },
+  "location": {
+   "lat": 32.4955,
+   "lon": 34.8911,
+   "placeSlug": "caesarea_266"
+  },
+  "heldAt": {
+   "institution": "Israel Museum, Jerusalem (replica at Caesarea)",
+   "ref": ""
+  },
+  "language": "Latin",
+  "description": "The surviving text reads '[...]S TIBERIEUM / [PO]NTIUS PILATUS / [PRAEF]ECTUS IUDAE[A]E / [...]', naming Pilate and a 'Tiberieum'. The left side was chiselled away when the stone was reused; it was built into the theatre in a 4th-century expansion.",
+  "connection": "The Gospels name Pontius Pilate as governor of Judaea who tried Jesus (Matt 27:2; Luke 3:1). The stone gives his official title as prefect.",
+  "establishes": "Pontius Pilate held office in Judaea under Tiberius, with the title praefectus.",
+  "limits": "Several words are restored. Some ancient writers call Pilate 'procurator', a later title. The building it dedicated is uncertain.",
+  "status": "corroborates",
+  "passages": [
+   "Matt.27.2-27.2",
+   "Luke.3.1-3.1"
+  ],
+  "people": [
+   "pilate_2365"
+  ],
+  "dating": [
+   "historical-synchronism",
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "The Portrayals of Pilate",
+    "publisher": "Inscriptions of Israel/Palestine project, Brown University",
+    "url": "https://inscriptionsisraelpalestine.org/story/the-portrayals-of-pilate"
+   },
+   {
+    "title": "Caesarea, Replica of a dedication by Pontius Pilate",
+    "publisher": "Livius.org",
+    "url": "https://www.livius.org/pictures/israel/caesarea/governor-s-palace/caesarea-replica-of-a-dedication-by-pontius-pilate/"
+   },
+   {
+    "title": "Image details: Pilate inscription (photo Israel Museum)",
+    "publisher": "Biblical Archaeology Society Library",
+    "url": "https://library.biblicalarchaeology.org/?p=108630"
+   }
+  ]
+ },
+ {
+  "id": "caiaphas-ossuary",
+  "name": "Caiaphas ossuary",
+  "kind": "artefact",
+  "summary": "An ornate limestone bone box from a Jerusalem family tomb, inscribed 'Yehosef bar Qayafa' (Joseph son of / of the family of Caiaphas).",
+  "objectDate": {
+   "text": "1st century AD",
+   "sort": 30
+  },
+  "found": {
+   "year": 1990,
+   "by": "Israel Antiquities Authority, led by Zvi Greenhut, after construction work",
+   "where": "Peace Forest, near Abu Tor, south of the Old City of Jerusalem"
+  },
+  "location": {
+   "lat": 31.7635,
+   "lon": 35.2335,
+   "placeSlug": "jerusalem_636"
+  },
+  "heldAt": {
+   "institution": "Israel Museum, Jerusalem",
+   "ref": ""
+  },
+  "language": "Aramaic",
+  "description": "The tomb held about a dozen ossuaries, five of them inscribed. On the decorated ossuary the name reads 'Yehosef bar Qayafa' on a narrow side and 'Qayafa' on a long side. It contained the bones of six people, including a man of about 60.",
+  "connection": "The Gospels name Caiaphas as high priest at the trial of Jesus (Matt 26:3, 57; John 11:49; 18:13, 24). Many scholars identify the man in this ossuary with that high priest.",
+  "establishes": "A wealthy Jerusalem family using the name Caiaphas buried its dead here in the 1st century AD.",
+  "limits": "The ossuary does not call Yehosef a high priest, and the link to the biblical Caiaphas is not certain. The reading and form of the name have been questioned (e.g. William Horbury, 1994).",
+  "status": "debated",
+  "passages": [
+   "Matt.26.3-26.3",
+   "Matt.26.57-26.57",
+   "John.11.49-11.49",
+   "John.18.13-18.13",
+   "John.18.24-18.24"
+  ],
+  "people": [
+   "caiaphas_532"
+  ],
+  "dating": [
+   "palaeography",
+   "stratigraphy"
+  ],
+  "sources": [
+   {
+    "title": "Ossuary of the High Priest Caiaphas, 18-36 CE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/ossuary_of_the_high_priest_caiaphas-_18-36_ce/"
+   },
+   {
+    "title": "The Tomb of Caiaphas",
+    "publisher": "Biblical Archaeology Society Library",
+    "url": "https://library.biblicalarchaeology.org/sidebar/the-tomb-of-caiaphas/"
+   },
+   {
+    "title": "Artifact Analysis: Caiaphas Ossuary",
+    "publisher": "Religious Studies Department, Santa Clara University",
+    "url": "https://webpages.scu.edu/ftp/cmurphy/courses/sctr027/artifacts/caiaphas-ossuary.htm"
+   }
+  ]
+ },
+ {
+  "id": "pool-of-siloam",
+  "name": "Pool of Siloam (Second Temple period)",
+  "kind": "site",
+  "summary": "A large stepped pool at the south end of the City of David, uncovered in 2004 and dated to the late Second Temple period.",
+  "objectDate": {
+   "text": "1st century BC – 1st century AD",
+   "sort": 0
+  },
+  "found": {
+   "year": 2004,
+   "by": "Eli Shukron (Israel Antiquities Authority) and Ronny Reich (University of Haifa)",
+   "where": "Silwan, south end of the City of David, Jerusalem"
+  },
+  "location": {
+   "lat": 31.7706,
+   "lon": 35.2354,
+   "placeSlug": "siloam_1096"
+  },
+  "heldAt": {
+   "institution": "Site",
+   "ref": ""
+  },
+  "language": "",
+  "description": "The excavators exposed steps leading into a pool about 50 metres long, dated by coins and pottery. A stepped street ran from the pool area towards the Temple Mount; over 100 coins of AD 17–31 under its paving date its construction to the time of Pontius Pilate.",
+  "connection": "John 9:7–11 says Jesus told a blind man to wash in the pool of Siloam. The pool uncovered is the Siloam pool of the late Second Temple period.",
+  "establishes": "A monumental stepped pool called Siloam existed in Jerusalem in the 1st century AD, connected by a paved street to the Temple Mount.",
+  "limits": "The pool's original use (ritual bathing, water supply, or both) is discussed, and only part of it has been excavated. It cannot show that the event in John 9 happened.",
+  "status": "consistent",
+  "passages": [
+   "John.9.7-9.11"
+  ],
+  "people": [
+   "jesus_905"
+  ],
+  "dating": [
+   "numismatics",
+   "ceramic-typology",
+   "stratigraphy"
+  ],
+  "sources": [
+   {
+    "title": "Archaeologists identify traces of 'miracle' pool",
+    "publisher": "NBC News / Associated Press",
+    "url": "https://www.nbcnews.com/id/wbna6750670"
+   },
+   {
+    "title": "Ancient 'Stepped Street' in Jerusalem Commissioned by Pontius Pilate (reporting Szanton et al., Tel Aviv 46:2, 2019)",
+    "publisher": "Sci.News",
+    "url": "https://www.sci.news/archaeology/stepped-street-jerusalem-07721.html"
+   },
+   {
+    "title": "Ritual Purification and Bathing: The Location and Function of Siloam Pool and Solomon's Pool (N. Szanton, 'Atiqot 113, 2023)",
+    "publisher": "Orion Bibliography, Hebrew University",
+    "url": "https://orion-bibliography.huji.ac.il/orion_editor/node/112612"
+   }
+  ]
+ },
+ {
+  "id": "theodotus-inscription",
+  "name": "Theodotus synagogue inscription",
+  "kind": "inscription",
+  "summary": "A Greek building inscription recording that Theodotus son of Vettenus, priest and synagogue leader, built a synagogue with guest rooms in Jerusalem.",
+  "objectDate": {
+   "text": "Before AD 70",
+   "sort": 30
+  },
+  "found": {
+   "year": 1913,
+   "by": "Excavations in Jerusalem",
+   "where": "A partly excavated cistern in Jerusalem"
+  },
+  "location": {
+   "lat": 31.7745,
+   "lon": 35.2358,
+   "placeSlug": "jerusalem_636"
+  },
+  "heldAt": {
+   "institution": "",
+   "ref": ""
+  },
+  "language": "Greek",
+  "description": "A limestone slab for mounting on a wall. It says Theodotus, priest and archisynagogos, son and grandson of synagogue leaders, built the synagogue 'for the reading of the Law and the teaching of the commandments', with a guest house, rooms and water fittings for visitors from abroad.",
+  "connection": "The Gospels and Acts describe synagogues as places of reading and teaching (e.g. Luke 4:15). Some scholars link this synagogue of Greek-speaking Jews to the 'synagogue of the Libertines' in Acts 6:9, though this cannot be shown.",
+  "establishes": "A synagogue with facilities for pilgrims stood in Jerusalem while the Second Temple was still in use.",
+  "limits": "Howard Kee argued for a much later date, but that view has been largely rejected on palaeographic and contextual grounds (see Kloppenborg, JJS 51, 2000). Any link to Acts 6:9 is speculative.",
+  "status": "consistent",
+  "passages": [
+   "Acts.6.9-6.9",
+   "Luke.4.15-4.15"
+  ],
+  "people": [],
+  "dating": [
+   "palaeography",
+   "stratigraphy"
+  ],
+  "sources": [
+   {
+    "title": "Dedication of a synagogue by Theodotos (AGRW 270 / CIJ 1404)",
+    "publisher": "Associations in the Greco-Roman World (Philip A. Harland)",
+    "url": "https://philipharland.com/greco-roman-associations/270-dedication-of-a-synagogue-by-theodotos/"
+   },
+   {
+    "title": "Theodotus Dialogue",
+    "publisher": "Inscriptions of Israel/Palestine project",
+    "url": "https://www.inscriptionsisraelpalestine.org/?p=73"
+   },
+   {
+    "title": "The Theodotus Inscription in Jerusalem: The Functions of the Synagogue",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/the_theodotus_inscription_in_jerusalem-_the_functions_of_the_synagogue/"
+   }
+  ]
+ },
+ {
+  "id": "temple-warning-inscription",
+  "name": "Temple warning inscription",
+  "kind": "inscription",
+  "summary": "Greek notices from Herod's Temple forbidding non-Jews to pass the barrier around the sanctuary, on pain of death.",
+  "objectDate": {
+   "text": "23 BC – AD 70",
+   "sort": 0
+  },
+  "found": {
+   "year": 1871,
+   "by": "Complete stone found in Jerusalem in 1871; a fragment later entered the Israel Museum",
+   "where": "Jerusalem, Temple Mount area"
+  },
+  "location": {
+   "lat": 31.778,
+   "lon": 35.2354,
+   "placeSlug": "jerusalem_636"
+  },
+  "heldAt": {
+   "institution": "Istanbul Archaeology Museums (complete stone); Israel Museum, Jerusalem (fragment)",
+   "ref": "Israel Museum fragment inv. no. 1936-989"
+  },
+  "language": "Greek",
+  "description": "The text says no foreigner (allogenes) may enter inside the barrier and enclosure around the sanctuary, and that whoever is caught will be responsible for his own death. The complete stone is in Istanbul; a partial marble slab is in the Israel Museum.",
+  "connection": "Acts 21:28–30 says a crowd seized Paul in the Temple, accusing him of bringing Greeks inside and defiling the holy place. The inscription shows the rule they were invoking.",
+  "establishes": "Herod's Temple had posted notices barring non-Jews from its inner areas on pain of death.",
+  "limits": "The notices state the rule; they do not show how often, or by whom, the death penalty was carried out. Links to Ephesians 2:14 ('middle wall of partition') are interpretive.",
+  "status": "corroborates",
+  "passages": [
+   "Acts.21.28-21.30"
+  ],
+  "people": [
+   "paul_2479"
+  ],
+  "dating": [
+   "palaeography",
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "JERU0599: Greek warning inscription from Herod's Temple",
+    "publisher": "Inscriptions of Israel/Palestine database",
+    "url": "https://search.inscriptionsisraelpalestine.org/inscriptions/jeru0599"
+   },
+   {
+    "title": "The Temple Warning Inscription",
+    "publisher": "Loyola University Chicago (Jerusalem sources)",
+    "url": "https://avande1.sites.luc.edu/jerusalem/sources/temple-warning.htm"
+   }
+  ]
+ },
+ {
+  "id": "herodium-tomb",
+  "name": "Herodium and the proposed tomb of Herod",
+  "kind": "site",
+  "summary": "Herod the Great's palace-fortress south of Jerusalem, where Ehud Netzer identified a mausoleum and smashed sarcophagus as Herod's tomb in 2007.",
+  "objectDate": {
+   "text": "Late 1st century BC (Herod died 4 BC)",
+   "sort": -4
+  },
+  "found": {
+   "year": 2007,
+   "by": "Ehud Netzer, Yaakov Kalman and Roi Porath, Hebrew University Institute of Archaeology",
+   "where": "Northeastern slope of Herodium, about 15 km south of Jerusalem"
+  },
+  "location": {
+   "lat": 31.6659,
+   "lon": 35.2414
+  },
+  "heldAt": {
+   "institution": "Site",
+   "ref": ""
+  },
+  "language": "",
+  "description": "Excavation of the slope began in 2006. The team found a mausoleum reached by a 6.5 m wide staircase, and a reddish limestone sarcophagus about 2.5 m long decorated with rosettes, deliberately smashed into hundreds of pieces, probably during the First Jewish Revolt.",
+  "connection": "Matthew 2 sets Jesus' birth 'in the days of Herod the king' and mentions his death (Matt 2:1, 19). Josephus describes Herod's funeral procession to Herodium.",
+  "establishes": "Herod built a monumental complex at Herodium that included a mausoleum with elaborate sarcophagi.",
+  "limits": "No inscription names the occupants. Joseph Patrich and Benny Arubas (Hebrew University) argue the mausoleum is too modest and poorly placed to be Herod's and that his tomb has not been found; other scholars share their doubts.",
+  "status": "debated",
+  "passages": [
+   "Matt.2.1-2.1",
+   "Matt.2.19-2.19"
+  ],
+  "people": [
+   "herod_1504"
+  ],
+  "dating": [
+   "stratigraphy",
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "Tomb of King Herod discovered at Herodium",
+    "publisher": "Israel Ministry of Foreign Affairs",
+    "url": "https://embassies.gov.il/MFA/IsraelExperience/history/Pages/Tomb%20of%20King%20Herod%20discovered%2008-May-2007.aspx"
+   },
+   {
+    "title": "Was Herod's Tomb Indeed Uncovered in Herodium? (Patrich and Arubas, 2014)",
+    "publisher": "The Bible and Interpretation",
+    "url": "https://bibleinterp.arizona.edu/articles/was-herods-tomb-indeed-uncovered-herodium"
+   }
+  ]
+ },
+ {
+  "id": "galilee-boat",
+  "name": "Sea of Galilee boat (Ginosar boat)",
+  "kind": "artefact",
+  "summary": "A wooden fishing boat about 8 metres long, exposed by drought in the lake bed in 1986 and dated to the 1st century BC – 1st century AD.",
+  "objectDate": {
+   "text": "1st century BC – 1st century AD",
+   "sort": 0
+  },
+  "found": {
+   "year": 1986,
+   "by": "Excavated by S. Wachsmann for the Israel Antiquities Authority",
+   "where": "Lake bed about 1.5 km north of ancient Migdal, Sea of Galilee"
+  },
+  "location": {
+   "lat": 32.846,
+   "lon": 35.522,
+   "placeSlug": "gennesaret_458"
+  },
+  "heldAt": {
+   "institution": "Yigal Allon Centre, Ginosar",
+   "ref": "IAA No. 87-1582"
+  },
+  "language": "",
+  "description": "The hull, built with mortise-and-tenon joints, was preserved because it was buried in mud. It was lifted in eight days, encased in foam, and conserved in a polyethylene glycol bath until 1995. Radiocarbon tests and pottery and coins from the site date it to the 1st century BC – 1st century AD.",
+  "connection": "The Gospels describe Jesus and his disciples, several of them fishermen, using boats on the Sea of Galilee (e.g. Luke 5:1–11; Mark 4:35–41). The boat illustrates the kind of vessel used on the lake in that period.",
+  "establishes": "Fishing boats of this size and construction were in use on the Sea of Galilee around the 1st century.",
+  "limits": "There is no evidence connecting this boat to Jesus or any disciple; the popular name 'Jesus boat' is not a scholarly identification.",
+  "status": "consistent",
+  "passages": [
+   "Luke.5.1-5.11",
+   "Mark.4.35-4.41"
+  ],
+  "people": [],
+  "dating": [
+   "radiocarbon",
+   "ceramic-typology",
+   "numismatics"
+  ],
+  "sources": [
+   {
+    "title": "Sea of Galilee Boat",
+    "publisher": "Israel Antiquities Authority",
+    "url": "https://antiquities.org.il/site_Item_eng.aspx?id=133"
+   },
+   {
+    "title": "Newsbrief: Galilee boat on permanent display (Kristin M. Romey, May/June 2000)",
+    "publisher": "Archaeology magazine, Archaeological Institute of America",
+    "url": "https://archive.archaeology.org/0005/newsbriefs/ship.html"
+   }
+  ]
+ },
+ {
+  "id": "capernaum",
+  "name": "Capernaum: synagogue and 'house of Peter'",
+  "kind": "site",
+  "summary": "A lakeside village with a later limestone synagogue and a house that was venerated as Peter's and enclosed by an octagonal church.",
+  "objectDate": {
+   "text": "House 1st century BC – AD; church and synagogue c. 4th–5th century AD",
+   "sort": 400
+  },
+  "found": {
+   "year": 1968,
+   "by": "Franciscan excavations: Orfali (1921), Virgilio Corbo and Stanislao Loffreda (from 1968)",
+   "where": "North shore of the Sea of Galilee"
+  },
+  "location": {
+   "lat": 32.8806,
+   "lon": 35.5753,
+   "placeSlug": "capernaum_274"
+  },
+  "heldAt": {
+   "institution": "Site",
+   "ref": ""
+  },
+  "language": "",
+  "description": "A house built around the 1st century BC had one room plastered and used for gatherings by the late 1st or 2nd century AD. By the 4th century it was a house church, replaced in the 5th century by an octagonal church; plaster fragments carry Greek, Syriac, Hebrew and Latin graffiti. The white limestone synagogue nearby is dated to about the 5th century by coins and pottery under its floors.",
+  "connection": "The Gospels say Jesus lived in Capernaum, taught in its synagogue and healed Peter's mother-in-law in Peter's house (Matt 4:13; Mark 1:21, 29; Matt 8:14). The pilgrim Egeria in the 4th century saw a church made from 'the house of the prince of the apostles'.",
+  "establishes": "Christians venerated this house as Peter's by the 4th century, and Capernaum was a Jewish village in the 1st century.",
+  "limits": "Matthew Grey and others judge the identification plausible but impossible to prove; it depends on whether an early Jewish-Christian community kept the memory. The visible synagogue is centuries later than Jesus, and whether its basalt foundations belong to a 1st-century synagogue is disputed.",
+  "status": "debated",
+  "passages": [
+   "Matt.4.13-4.13",
+   "Mark.1.21-1.29",
+   "Matt.8.14-8.14"
+  ],
+  "people": [
+   "peter_2745",
+   "andrew_264",
+   "jesus_905"
+  ],
+  "dating": [
+   "stratigraphy",
+   "numismatics",
+   "ceramic-typology"
+  ],
+  "sources": [
+   {
+    "title": "Capernaum – House of St. Peter, Domus Ecclesiae",
+    "publisher": "Corpus of Christian Monuments of the Holy Land, Hebrew University",
+    "url": "https://dig.corps-cmhl.huji.ac.il/rep_church_full/15904"
+   },
+   {
+    "title": "Arch of Titus pilot study: menorah relief colour (YU News, 24 October 2012)",
+    "publisher": "Religious Studies Center, Brigham Young University",
+    "url": "https://rsc.byu.edu/ministry-peter-chief-apostle/simon-peter-capernaum-archaeological-survey-first-century-village"
+   }
+  ]
+ },
+ {
+  "id": "magdala-synagogue",
+  "name": "Magdala synagogue and the Magdala stone",
+  "kind": "site",
+  "summary": "A Second Temple period synagogue at Migdal on the Sea of Galilee, with a carved stone block showing a seven-branched menorah.",
+  "objectDate": {
+   "text": "c. 50 BC – AD 100",
+   "sort": 30
+  },
+  "found": {
+   "year": 2009,
+   "by": "Israel Antiquities Authority, directed by Dina Avshalom-Gorni",
+   "where": "Migdal beach, west shore of the Sea of Galilee"
+  },
+  "location": {
+   "lat": 32.8247,
+   "lon": 35.5156
+  },
+  "heldAt": {
+   "institution": "Site",
+   "ref": ""
+  },
+  "language": "",
+  "description": "A salvage excavation before hotel construction uncovered a synagogue with a main hall of about 120 square metres. In the hall was a square stone with reliefs on its top and four sides; one side shows a seven-branched menorah on a pedestal flanked by amphorae.",
+  "connection": "The Gospels say Jesus taught in synagogues throughout Galilee (Mark 1:39). Migdal is generally identified with Magdala, home of Mary Magdalene (Luke 8:2); Matthew 15:39 in the KJV mentions 'Magdala'.",
+  "establishes": "A synagogue was in use at Migdal in the late Second Temple period, the time of Jesus' ministry in Galilee.",
+  "limits": "There is no evidence that Jesus visited this building. The identification of Migdal with Magdala rests on the name and literary sources, and some manuscripts of Matthew 15:39 read 'Magadan'.",
+  "status": "consistent",
+  "passages": [
+   "Mark.1.39-1.39",
+   "Luke.8.2-8.2",
+   "Matt.15.39-15.39"
+  ],
+  "people": [
+   "mary_1943"
+  ],
+  "dating": [
+   "stratigraphy",
+   "numismatics"
+  ],
+  "sources": [
+   {
+    "title": "Unique ancient synagogue exposed at Sea of Galilee",
+    "publisher": "Israel Ministry of Foreign Affairs (IAA announcement)",
+    "url": "https://embassies.gov.il/MFA/IsraelExperience/history/Pages/Unique-ancient-synagogue-exposed-at-Sea-of-Galilee-14-SEP-2009.aspx"
+   },
+   {
+    "title": "Dig sites: Magdala",
+    "publisher": "Religious Studies Department, Santa Clara University",
+    "url": "https://webpages.scu.edu/ftp/cmurphy/courses/sctr027/dig-sites/07a-magdala.htm"
+   }
+  ]
+ },
+ {
+  "id": "gallio-inscription",
+  "name": "Gallio inscription (Delphi)",
+  "kind": "inscription",
+  "summary": "Fragments of a letter of Emperor Claudius to Delphi naming Gallio as proconsul of Achaia, which help date Paul's stay in Corinth.",
+  "objectDate": {
+   "text": "AD 52",
+   "sort": 52
+  },
+  "found": {
+   "year": 1905,
+   "by": "Excavations at Delphi (fragments uncovered from 1905)",
+   "where": "Delphi, Greece"
+  },
+  "location": {
+   "lat": 38.4824,
+   "lon": 22.501
+  },
+  "heldAt": {
+   "institution": "",
+   "ref": ""
+  },
+  "language": "Greek",
+  "description": "The letter responds to a report on Delphi's decline. It calls Gallio Claudius's 'friend and proconsul' and dates itself by the emperor's 12th year of tribunician power and 26th acclamation as imperator, which falls in the first half of AD 52.",
+  "connection": "Acts 18:12–17 says Paul was brought before Gallio, 'deputy' (proconsul) of Achaia, in Corinth. Since proconsuls usually served a year, Gallio's term is placed around AD 51–52, giving a fixed point for Paul's 18-month stay (Acts 18:11).",
+  "establishes": "Gallio was proconsul of Achaia in about AD 51–52.",
+  "limits": "The exact start of Gallio's term, and when in Paul's stay the hearing took place, depend on reconstruction. The text is fragmentary.",
+  "status": "corroborates",
+  "passages": [
+   "Acts.18.11-18.17"
+  ],
+  "people": [
+   "gallio_1275",
+   "claudius_947",
+   "paul_2479"
+  ],
+  "dating": [
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "Rehabilitating Gallio and his Judgement in Acts 18:14-15 (Bruce Winter, Tyndale Bulletin 57.2, 2006)",
+    "publisher": "Tyndale Bulletin",
+    "url": "https://tyndalebulletin.org/article/29221-rehabilitating-gallio-and-his-judgement-in-acts-18-14-15.pdf"
+   },
+   {
+    "title": "Bible study on Acts, section VI",
+    "publisher": "Yale Divinity School",
+    "url": "https://divinity.yale.edu/sites/default/files/section-6_0.pdf"
+   }
+  ]
+ },
+ {
+  "id": "erastus-inscription",
+  "name": "Erastus inscription (Corinth)",
+  "kind": "inscription",
+  "summary": "A Latin pavement inscription at Corinth recording that Erastus, in connection with his aedileship, laid the pavement at his own expense.",
+  "objectDate": {
+   "text": "Probably mid-1st century AD",
+   "sort": 50
+  },
+  "found": {
+   "year": 1929,
+   "by": "Excavations at Corinth (one slab found in situ in 1929; other parts in 1928 and 1947)",
+   "where": "Paved square east of the theatre, ancient Corinth"
+  },
+  "location": {
+   "lat": 37.9066,
+   "lon": 22.8781,
+   "placeSlug": "corinth_306"
+  },
+  "heldAt": {
+   "institution": "In situ, ancient Corinth",
+   "ref": ""
+  },
+  "language": "Latin",
+  "description": "The bronze letters are lost but their cuttings survive in two lines. They record that Erastus, in connection with his aedileship, laid the pavement at his own expense. An aedile oversaw streets, public buildings and markets.",
+  "connection": "Paul sends greetings from 'Erastus the chamberlain [oikonomos] of the city' in Romans 16:23, written from Corinth; an Erastus also appears in Acts 19:22 and 2 Timothy 4:20.",
+  "establishes": "A man named Erastus held public office at Corinth and paid for a paved square, probably in the mid-1st century AD.",
+  "limits": "Whether he is Paul's Erastus is debated: David Gill (1989) says the evidence allows neither certain identification nor rejection, and commentators such as Cranfield and Dunn doubt it. It is also disputed whether 'oikonomos of the city' equals the office of aedile.",
+  "status": "debated",
+  "passages": [
+   "Rom.16.23-16.23",
+   "Acts.19.22-19.22",
+   "2Tim.4.20-4.20"
+  ],
+  "people": [
+   "erastus_1213"
+  ],
+  "dating": [
+   "palaeography",
+   "stratigraphy"
+  ],
+  "sources": [
+   {
+    "title": "Erastus the Aedile (David W. J. Gill, Tyndale Bulletin 40, 1989)",
+    "publisher": "Tyndale Bulletin",
+    "url": "https://tyndalebulletin.org/article/30545.pdf"
+   },
+   {
+    "title": "Another Corinthian Erastus Inscription (Andrew D. Clarke, Tyndale Bulletin 42.1, 1991)",
+    "publisher": "Tyndale Bulletin",
+    "url": "https://tyndalebulletin.org/article/30502.pdf"
+   }
+  ]
+ },
+ {
+  "id": "arch-of-titus",
+  "name": "Arch of Titus (Rome)",
+  "kind": "artefact",
+  "summary": "A triumphal arch on the Via Sacra in Rome whose reliefs show Roman soldiers carrying spoils from the Jerusalem Temple, including the menorah.",
+  "objectDate": {
+   "text": "c. AD 82",
+   "sort": 82
+  },
+  "found": {
+   "year": null,
+   "by": "Standing monument; studied by the Yeshiva University Arch of Titus Project (2012 onwards)",
+   "where": "Via Sacra, Roman Forum, Rome"
+  },
+  "location": {
+   "lat": 41.8906,
+   "lon": 12.4884,
+   "placeSlug": "rome_1013"
+  },
+  "heldAt": {
+   "institution": "In situ, Roman Forum",
+   "ref": ""
+  },
+  "language": "Latin",
+  "description": "The arch was dedicated after Titus's death in AD 81 to celebrate his victory in the Jewish War. One relief shows the triumphal procession of AD 71 carrying the Temple vessels, with the seven-branched menorah at the centre. In 2012 a Yeshiva University team found traces of yellow ochre paint on the menorah's arms and base.",
+  "connection": "Jesus is reported to have foretold the destruction of the Temple and the siege of Jerusalem (Matt 24:1–2; Luke 19:43–44; 21:20). The arch is a Roman monument to that destruction in AD 70.",
+  "establishes": "Rome celebrated the capture of Jerusalem and displayed the Temple's vessels, including the menorah, in Titus's triumph of AD 71.",
+  "limits": "The relief is a Roman artistic depiction, not an exact record of the Temple objects. It speaks to the events of AD 70, not to the dating or interpretation of the Gospel texts.",
+  "status": "corroborates",
+  "passages": [
+   "Matt.24.1-24.2",
+   "Luke.19.43-19.44",
+   "Luke.21.20-21.20"
+  ],
+  "people": [],
+  "dating": [
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "The Arch of Titus (exhibition)",
+    "publisher": "American Numismatic Society",
+    "url": "https://numismatics.org/exhibits/26096/"
+   },
+   {
+    "title": "Arch of Titus pilot study: menorah relief colour (YU News, 24 October 2012)",
+    "publisher": "Yeshiva University",
+    "url": "https://www.yu.edu/node/25288"
+   }
+  ]
+ },
+ {
+  "id": "yehohanan-heel-bone",
+  "name": "Heel bone of Yehohanan (Givat HaMivtar)",
+  "kind": "artefact",
+  "summary": "The heel bone of a young man named Yehohanan, pierced by an iron nail with wood still attached: physical evidence of Roman-period crucifixion.",
+  "objectDate": {
+   "text": "1st century AD",
+   "sort": 20
+  },
+  "found": {
+   "year": 1968,
+   "by": "Vassilios Tzaferis",
+   "where": "Burial cave at Givat HaMivtar, north Jerusalem"
+  },
+  "location": {
+   "lat": 31.8,
+   "lon": 35.228,
+   "placeSlug": "jerusalem_636"
+  },
+  "heldAt": {
+   "institution": "",
+   "ref": ""
+  },
+  "language": "Aramaic/Hebrew (ossuary inscription)",
+  "description": "An ossuary inscribed 'Yehohanan son of Hagkol' held the bones of a man in his twenties. His right heel had been pierced by a large iron nail with fragments of wood attached; the nail had bent, so it stayed in the bone when the body was taken down. Joe Zias and Eliezer Sekeles re-examined the remains in 1985.",
+  "connection": "The Gospels say Jesus was crucified (John 19:18), and John 20:25 mentions the print of the nails. The find shows how Romans could nail a victim's feet in Judaea in this period.",
+  "establishes": "Crucifixion with nails was practised in Roman Judaea, and a crucified man could receive family burial in an ossuary.",
+  "limits": "It concerns one victim and tells us nothing directly about Jesus' crucifixion. Details of the reconstruction, such as the position of the arms, were revised in the 1985 reappraisal.",
+  "status": "consistent",
+  "passages": [
+   "John.19.17-19.18",
+   "John.20.25-20.25"
+  ],
+  "people": [],
+  "dating": [
+   "stratigraphy",
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "Ossuary of Yehohanan son of Hagkol, 1st century CE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/ossuary_of_yehohanan_son_of_hagkol-_1st_century_ce/"
+   },
+   {
+    "title": "Artifact Analysis: The Crucified Man",
+    "publisher": "Religious Studies Department, Santa Clara University",
+    "url": "https://webpages.scu.edu/ftp/cmurphy/courses/sctr027/artifacts/crucified-man.htm"
+   }
+  ]
+ }
+]

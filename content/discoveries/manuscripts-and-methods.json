@@ -1,0 +1,982 @@
+[
+ {
+  "id": "great-isaiah-scroll-discovery",
+  "name": "Great Isaiah Scroll (1QIsa-a)",
+  "kind": "manuscript",
+  "summary": "A complete scroll of Isaiah found in Qumran Cave 1 in 1947, about a thousand years older than the earliest complete medieval Hebrew Bible manuscripts.",
+  "objectDate": {
+   "text": "2nd century BC (often given as about 125 BC)",
+   "sort": -125
+  },
+  "found": {
+   "year": 1947,
+   "by": "A young Bedouin shepherd searching for a stray goat",
+   "where": "Qumran Cave 1, north-western shore of the Dead Sea"
+  },
+  "location": {
+   "lat": 31.741,
+   "lon": 35.459
+  },
+  "heldAt": {
+   "institution": "Israel Museum, Jerusalem (Shrine of the Book)",
+   "ref": ""
+  },
+  "language": "Hebrew",
+  "description": "A leather scroll of 17 stitched sheets, about 7.34 metres long, with the whole book of Isaiah in 54 columns. It was among the first scrolls found at Qumran. It is normally kept in the Shrine of the Book, where only part of it is usually shown.",
+  "connection": "It preserves all 66 chapters of Isaiah. Its wording differs from the medieval Masoretic text mainly in spelling and small grammatical details. A 2021 computer study of the handwriting found that two scribes with very similar training wrote it, with the change after column 27.",
+  "establishes": "The book of Isaiah existed in substantially its present form and order by the 2nd century BC.",
+  "limits": "It does not settle when or by whom the parts of Isaiah were first composed. The figure of about 125 BC is an estimate from handwriting and radiocarbon dating, not a date written on the scroll.",
+  "status": "corroborates",
+  "passages": [
+   "Isa.1.1-66.24"
+  ],
+  "people": [
+   "isaiah_617"
+  ],
+  "dating": [
+   "palaeography",
+   "radiocarbon"
+  ],
+  "sources": [
+   {
+    "title": "Cracking the code of the Dead Sea Scrolls (on Popović, Dhali and Schomaker, PLOS ONE, 21 April 2021)",
+    "publisher": "University of Groningen",
+    "url": "https://www.rug.nl/news/2021/04/cracking-the-code-of-the-dead-sea-scrolls?lang=en"
+   },
+   {
+    "title": "A Voice from the Desert: The Great Isaiah Scroll",
+    "publisher": "British Friends of the Art Museums of Israel",
+    "url": "https://bfami.org/museum-event/a-voice-from-the-desert-the-great-isaiah-scroll/"
+   },
+   {
+    "title": "Isaiah Scroll unrolled at Israel Museum (Sharon Altshul)",
+    "publisher": "Intermountain Jewish News",
+    "url": "https://www.ijn.com/isaiah-scroll-unrolled-israel-museum/"
+   }
+  ]
+ },
+ {
+  "id": "cairo-genizah",
+  "name": "Cairo Genizah",
+  "kind": "manuscript",
+  "summary": "A synagogue storeroom in Old Cairo that held about a thousand years of discarded Jewish writings, brought to Cambridge by Solomon Schechter in 1896–97.",
+  "objectDate": {
+   "text": "Mainly medieval; deposits from the early 11th century AD onward",
+   "sort": 1000
+  },
+  "found": {
+   "year": 1896,
+   "by": "Solomon Schechter, with funding from Charles Taylor; prompted by a leaf shown to him by Agnes Lewis and Margaret Gibson",
+   "where": "Ben Ezra Synagogue, Fustat (Old Cairo), Egypt"
+  },
+  "location": {
+   "lat": 30.0058,
+   "lon": 31.2307
+  },
+  "heldAt": {
+   "institution": "Cambridge University Library (Taylor-Schechter Genizah Collection)",
+   "ref": ""
+  },
+  "language": "Hebrew and other languages",
+  "description": "A genizah is a storeroom for worn-out texts that, under rabbinic law, could not simply be thrown away. The Ben Ezra Synagogue's genizah held Bibles, prayer books and legal works alongside letters, contracts and shopping lists. Schechter brought almost 200,000 manuscripts back to Cambridge.",
+  "connection": "On 13 May 1896 Schechter identified a scrap shown to him by Lewis and Gibson as Hebrew text of Ben Sira (Ecclesiasticus), a 2nd-century BC wisdom book known until then mainly in translation. The Genizah also yielded a copy of the Damascus Document, a work later found among the Dead Sea Scrolls. It also holds many medieval Bible manuscripts.",
+  "establishes": "A Hebrew text of Ben Sira circulated in the Middle Ages, and the Genizah preserves a large body of medieval biblical and Jewish manuscripts.",
+  "limits": "The Ben Sira fragments are medieval copies (the leaf Schechter identified was copied around the 10th century), so they do not by themselves show what the 2nd-century BC text said. Ben Sira is not part of the Hebrew Bible or the Protestant canon.",
+  "status": "consistent",
+  "passages": [],
+  "people": [],
+  "dating": [
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "Taylor-Schechter Genizah Collection: priceless",
+    "publisher": "Cambridge University Library",
+    "url": "https://www.lib.cam.ac.uk/collections/departments/taylor-schechter-genizah-research-unit/taylor-schechter-genizah-priceless"
+   },
+   {
+    "title": "Genizah Fragment of the Month 31: Solomon Schechter and the Ben Sira fragment",
+    "publisher": "Cambridge University Library",
+    "url": "https://wwwe.lib.cam.ac.uk/GF/31/"
+   }
+  ]
+ },
+ {
+  "id": "nash-papyrus",
+  "name": "Nash Papyrus",
+  "kind": "manuscript",
+  "summary": "A small Hebrew papyrus with the Ten Commandments and the Shema, bought in Egypt and given to Cambridge University Library in 1903.",
+  "objectDate": {
+   "text": "2nd century BC (Albright, 1937); first described as 1st century AD",
+   "sort": -150
+  },
+  "found": {
+   "year": 1903,
+   "by": "Bought from an Egyptian antiquities dealer by Walter Llewellyn Nash, who gave it to the Library",
+   "where": "Egypt (original find spot unknown)"
+  },
+  "heldAt": {
+   "institution": "Cambridge University Library",
+   "ref": "MS Or.233"
+  },
+  "language": "Hebrew",
+  "description": "A papyrus sheet about 140 by 60 mm, first in four pieces that have since been joined. It contains the Ten Commandments followed by the Shema (Deuteronomy 6:4). It may come from a phylactery or similar devotional use.",
+  "connection": "Its Decalogue mixes wording from Exodus 20 and Deuteronomy 5. When Cook published it in 1903 it was hailed as the oldest Hebrew manuscript of any kind then known, decades before the Dead Sea Scrolls were found.",
+  "establishes": "The Ten Commandments and the Shema were being copied together in Hebrew in Egypt in the last centuries BC.",
+  "limits": "It is a short excerpt, not a biblical scroll, and its mixed text may reflect liturgical use rather than a copy of Exodus or Deuteronomy. Its date rests on handwriting, and early estimates differed by over a century.",
+  "status": "corroborates",
+  "passages": [
+   "Exod.20.1-20.17",
+   "Deut.5.4-5.21",
+   "Deut.6.4"
+  ],
+  "people": [],
+  "dating": [
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "Nash Papyrus (MS Or.233)",
+    "publisher": "Cambridge Digital Library, Cambridge University Library",
+    "url": "https://cudl.lib.cam.ac.uk/view/MS-OR-00233/3"
+   },
+   {
+    "title": "Lines of Thought: Nash Papyrus",
+    "publisher": "Cambridge University Library exhibitions",
+    "url": "https://exhibitions.lib.cam.ac.uk/linesofthought/?p=104"
+   }
+  ]
+ },
+ {
+  "id": "chester-beatty-biblical-papyri",
+  "name": "Chester Beatty Biblical Papyri (P45, P46, P47)",
+  "kind": "manuscript",
+  "summary": "Early papyrus codices of the Gospels and Acts, Paul's letters and Revelation, bought on the Egyptian market around 1930 and announced in 1931.",
+  "objectDate": {
+   "text": "3rd century AD; P46 often placed about AD 200",
+   "sort": 225
+  },
+  "found": {
+   "year": 1931,
+   "by": "Bought from dealers by Alfred Chester Beatty; the University of Michigan bought 30 leaves of P46 (1931 and 1933)",
+   "where": "Egypt (original find spot unknown)"
+  },
+  "heldAt": {
+   "institution": "Chester Beatty, Dublin; University of Michigan Library, Ann Arbor (part of P46)",
+   "ref": "P46: Chester Beatty Papyrus II (56 leaves); Michigan inv. 6238 (30 leaves)"
+  },
+  "language": "Greek",
+  "description": "A group of eleven biblical papyrus codices, of which three are New Testament: P45 (Gospels and Acts), P46 (Paul's letters) and P47 (Revelation). Dealers had split P46; its 86 surviving leaves, from a codex of about 104, were reunited in publication by Frederic Kenyon of the British Museum and Henry Sanders of Michigan.",
+  "connection": "P46 preserves most of Paul's letters, from Romans 5 to 1 Thessalonians 5 with gaps. P47 is the earliest surviving text of Revelation.",
+  "establishes": "Collected editions of Paul's letters and codices of the Gospels and Acts were in circulation in Egypt by the 3rd century.",
+  "limits": "The papyri came from the antiquities market, so their find context is unknown. Their dates rest on handwriting and are given as ranges; scholars differ on how early P46 should be placed.",
+  "status": "corroborates",
+  "passages": [],
+  "people": [],
+  "dating": [
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "The Discovery of P46",
+    "publisher": "University of Michigan Library",
+    "url": "https://apps.lib.umich.edu/files/collections/papyrus/k12/reading/Paul/discovery.html"
+   },
+   {
+    "title": "Chester Beatty Papyri",
+    "publisher": "BiblicalTraining (Zondervan encyclopedia)",
+    "url": "https://www.biblicaltraining.org/library/chester-beatty-papyri"
+   },
+   {
+    "title": "The New Facsimiles of the Beatty Biblical Papyri (Brent Nongbri)",
+    "publisher": "Brent Nongbri",
+    "url": "https://brentnongbri.com/2022/01/23/the-new-facsimiles-of-the-beatty-biblical-papyri/"
+   }
+  ]
+ },
+ {
+  "id": "bodmer-papyri-p66-p75",
+  "name": "Bodmer Papyri P66 and P75",
+  "kind": "manuscript",
+  "summary": "Two early papyrus codices of John (P66) and of Luke and John (P75), bought by Martin Bodmer in the mid-1950s.",
+  "objectDate": {
+   "text": "P66 late 2nd or early 3rd century AD; P75 early 3rd century AD",
+   "sort": 200
+  },
+  "found": {
+   "year": 1955,
+   "by": "Appeared on the antiquities market and bought by the collector Martin Bodmer (1955–56)",
+   "where": "Egypt (original find spot unknown)"
+  },
+  "heldAt": {
+   "institution": "Fondation Martin Bodmer, Cologny (P66); Vatican Apostolic Library (P75, since 2007)",
+   "ref": "P66: P. Bodmer II; P75: formerly P. Bodmer XIV–XV, now Hanna Papyrus 1 (Mater Verbi)"
+  },
+  "language": "Greek",
+  "description": "P66 survives as 75 identifiable leaves and many fragments of the Gospel of John. P75 originally held Luke and John in that order; about half of each survives. P75 was bought from the Bodmer collection in 2006 and given to the Vatican Library in January 2007.",
+  "connection": "P75 contains Luke's form of the Lord's Prayer and is the oldest surviving witness for John 6:12–16. It is the earliest manuscript to show the end of one Gospel and the start of the next on the same page, giving direct evidence of Gospel order.",
+  "establishes": "The Gospels of John and Luke were being copied as books in Egypt by around AD 200.",
+  "limits": "Both came through the antiquities trade, so their find context is uncertain. Their dates rest on comparison of handwriting, which gives a range, and scholars do not all agree on how early they should be placed.",
+  "status": "corroborates",
+  "passages": [
+   "Luke.11.1-11.4",
+   "John.6.12-6.16"
+  ],
+  "people": [],
+  "dating": [
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "The Hanna Papyrus 1 (Mater Verbi)",
+    "publisher": "Vatican Apostolic Library",
+    "url": "https://bav.vatican.va/en/multimedia/papiro-hanna-1.html"
+   },
+   {
+    "title": "GA P66 (P. Bodmer II)",
+    "publisher": "Center for the Study of New Testament Manuscripts",
+    "url": "https://manuscripts.csntm.org/manuscript/Group/GA_P66_Bodmer"
+   },
+   {
+    "title": "Bishop presents University with facsimile of ancient papyrus",
+    "publisher": "University of Aberdeen",
+    "url": "https://abdn.ac.uk/news/3438"
+   }
+  ]
+ },
+ {
+  "id": "en-gedi-scroll",
+  "name": "En-Gedi Scroll (Leviticus)",
+  "kind": "manuscript",
+  "summary": "A charred scroll from the En-Gedi synagogue, excavated in 1970 and read in 2015–16 by 'virtual unwrapping'; it contains the opening of Leviticus.",
+  "objectDate": {
+   "text": "3rd–4th century AD by radiocarbon; handwriting suggests 1st–2nd century AD",
+   "sort": 300
+  },
+  "found": {
+   "year": 1970,
+   "by": "Excavation of the En-Gedi synagogue led by Dan Barag, Ehud Netzer and Yosef Porath",
+   "where": "Holy Ark of the ancient synagogue at En-Gedi, western shore of the Dead Sea"
+  },
+  "location": {
+   "lat": 31.46017,
+   "lon": 35.38899,
+   "placeSlug": "engedi_389"
+  },
+  "heldAt": {
+   "institution": "Israel Antiquities Authority",
+   "ref": ""
+  },
+  "language": "Hebrew",
+  "description": "The scroll survived a fire that destroyed the synagogue and was a lump too brittle to open. A team led by Brent Seales made high-resolution tomographic scans of it, then used software to trace, texture and flatten the layers so the ink could be read. The result shows two columns, 35 lines on the master image (18 preserved, 17 reconstructed).",
+  "connection": "The text is from the opening chapters of Leviticus. Emanuel Tov and Michael Segal found it identical in its consonants to the medieval Masoretic text. It is the oldest Pentateuch scroll in Hebrew found outside the Dead Sea Scrolls, and the earliest copy of a Pentateuch book found in a Holy Ark.",
+  "establishes": "By late antiquity, a Leviticus scroll in a Judean synagogue had the same consonantal text as the later Masoretic text.",
+  "limits": "Only a small part of Leviticus survives. The radiocarbon range (most likely AD 235–340) and the earlier date suggested by the script do not agree, so the copy's exact age is uncertain.",
+  "status": "corroborates",
+  "passages": [
+   "Lev.1.1-1.17",
+   "Lev.2.1-2.16"
+  ],
+  "people": [],
+  "dating": [
+   "radiocarbon",
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "From Damage to Discovery via Virtual Unwrapping: Reading the Scroll from En-Gedi (Seales et al., Science Advances 2:9, 2016)",
+    "publisher": "University of Kentucky UKnowledge",
+    "url": "https://uknowledge.uky.edu/cs_facpub/11"
+   },
+   {
+    "title": "Virtually unwrapping the En-Gedi scroll",
+    "publisher": "University of Kentucky Research",
+    "url": "https://research.uky.edu/news/virtually-unwrapping-en-gedi-scroll"
+   },
+   {
+    "title": "The Scroll from En-Gedi",
+    "publisher": "University of Kentucky Digital Restoration Initiative",
+    "url": "https://www2.cs.uky.edu/dri/the-scroll-from-en-gedi"
+   },
+   {
+    "title": "En-Gedi Scroll Finally Deciphered",
+    "publisher": "Sci.News",
+    "url": "https://www.sci.news/archaeology/en-gedi-scroll-deciphered-04216.html"
+   }
+  ]
+ },
+ {
+  "id": "masada-scroll-fragments",
+  "name": "Masada scroll fragments",
+  "kind": "manuscript",
+  "summary": "Biblical and other scroll fragments found during Yigael Yadin's excavations at Masada (1963–65), all earlier than the fortress's fall in about AD 73.",
+  "objectDate": {
+   "text": "Before about AD 73 (1st century BC – 1st century AD)",
+   "sort": 0
+  },
+  "found": {
+   "year": 1963,
+   "by": "Excavation team led by Yigael Yadin (1963–1965)",
+   "where": "Masada, Judean Desert"
+  },
+  "location": {
+   "lat": 31.3156,
+   "lon": 35.3536
+  },
+  "language": "Hebrew",
+  "description": "The excavations recovered fragments of Leviticus, Deuteronomy, Psalms and Ezekiel, a Hebrew copy of Ben Sira, and a copy of the Songs of the Sabbath Sacrifice. The Hebrew fragments were published in the final report Masada VI (1999).",
+  "connection": "The biblical fragments match the Masoretic text closely, differing mainly in small details of spelling. The Ben Sira scroll gave an ancient Hebrew witness to a book whose Hebrew text had previously been known from medieval Cairo Genizah copies.",
+  "establishes": "Because Masada fell in about AD 73, the fragments must be older than that; they show biblical texts close to the later Masoretic text in use there before then.",
+  "limits": "The fragments are small and cover only parts of a few books. The fall of Masada gives a latest possible date, not the date each scroll was copied.",
+  "status": "corroborates",
+  "passages": [],
+  "people": [],
+  "dating": [
+   "stratigraphy",
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "The Masada Fragments, the Qumran Scrolls, and the New Testament (David Rolph Seely)",
+    "publisher": "BYU Studies Quarterly",
+    "url": "https://byustudies.byu.edu/article/the-masada-fragments-the-qumran-scrolls-and-the-new-testament"
+   },
+   {
+    "title": "Masada VI: The Yigael Yadin Excavations 1963–1965, Final Reports: Hebrew Fragments from Masada (Israel Exploration Society, 1999)",
+    "publisher": "Orion Center Bibliography, Hebrew University of Jerusalem",
+    "url": "https://orion-bibliography.huji.ac.il/orion_editor/node/112537"
+   },
+   {
+    "title": "Ben Sira Scroll from Masada",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/?p=4911"
+   }
+  ]
+ },
+ {
+  "id": "greek-minor-prophets-scroll-nahal-hever",
+  "name": "Greek Minor Prophets Scroll from Nahal Hever (8HevXIIgr)",
+  "kind": "manuscript",
+  "summary": "A Greek scroll of the Twelve Prophets from a Bar Kokhba refuge cave; new pieces of Zechariah and Nahum were excavated and announced in 2021.",
+  "objectDate": {
+   "text": "Copied late 1st century BC – 1st century AD; left in the cave around AD 132–136",
+   "sort": 0
+  },
+  "found": {
+   "year": 1952,
+   "by": "Bedouin (bought by the authorities in 1952); source cave later traced to Nahal Hever; further pieces from Israeli excavations in the 1960s and the Israel Antiquities Authority survey (announced 2021)",
+   "where": "'Cave of Horror', Nahal Hever, Judean Desert"
+  },
+  "location": {
+   "lat": 31.44,
+   "lon": 35.36
+  },
+  "heldAt": {
+   "institution": "Israel Antiquities Authority (2021 fragments)",
+   "ref": ""
+  },
+  "language": "Greek (divine name written in Palaeo-Hebrew script)",
+  "description": "The scroll originally had perhaps 60–95 columns; 24 survive with parts of Jonah, Micah, Nahum, Habakkuk, Zephaniah and Zechariah. In 2021 the IAA announced new fragments, conserved by its Dead Sea Scrolls Unit, with Zechariah 8:16–17 and Nahum 1:5–6. Two scribes wrote the scroll, and God's name appears in the old Hebrew script.",
+  "connection": "Dominique Barthélemy (1963) argued that the Greek text is a revision of the older Septuagint to bring it closer to the Hebrew, part of the 'kaige' group. The scroll is evidence that Jewish scribes were revising Greek translations of the prophets around the 1st century AD.",
+  "establishes": "A Greek scroll of the Twelve Prophets was in Jewish hands in the Judean Desert by the Bar Kokhba revolt, and Jewish scribes were revising the Greek text towards the Hebrew.",
+  "limits": "The fragments are small, and how systematic the revision was is still debated. The IAA reports that the new fragments differ in places from the Masoretic text, so they do not show a single fixed wording. Radiocarbon results reported for the new pieces fall in the 2nd century AD, later than the date suggested by the script.",
+  "status": "corroborates",
+  "passages": [
+   "Zech.8.16-8.17",
+   "Nah.1.5-1.6"
+  ],
+  "people": [],
+  "dating": [
+   "palaeography",
+   "radiocarbon",
+   "stratigraphy"
+  ],
+  "sources": [
+   {
+    "title": "New scroll fragments uncovered in the Judean Desert Nature Reserve",
+    "publisher": "Embassy of Israel, London (Israel Antiquities Authority release)",
+    "url": "https://embassies.gov.il/london/NewsAndEvents/Pages/New-scroll-fragments-uncovered-in-the-Judean-Desert-Nature-Reserve-.aspx"
+   },
+   {
+    "title": "These Are the Things You Are to Do (Riestra, Ableman, Bitler, Sion; Textus 31, 2022)",
+    "publisher": "Hebrew University of Jerusalem research portal",
+    "url": "https://cris.huji.ac.il/en/publications/these-are-the-things-you-are-to-do/"
+   },
+   {
+    "title": "Review of D. Barthélemy, Les devanciers d'Aquila (Robert A. Kraft, Gnomon 37, 1965)",
+    "publisher": "University of Pennsylvania",
+    "url": "https://ccat.sas.upenn.edu/rak/publics/judaism/Barthelemy-review.html"
+   },
+   {
+    "title": "New Scrolls Hidden During Bar Kokhba Revolt Discovered",
+    "publisher": "Biblical Archaeology Society",
+    "url": "https://www.biblicalarchaeology.org/daily/new-scrolls-hidden-during-bar-kokhba-revolt-discovered/"
+   }
+  ]
+ },
+ {
+  "id": "oxyrhynchus-new-testament-papyri",
+  "name": "Oxyrhynchus New Testament papyri (P1)",
+  "kind": "manuscript",
+  "summary": "Rubbish mounds at Oxyrhynchus, dug by Grenfell and Hunt from 1897, yielded about half of the oldest New Testament papyri, including P1 (Matthew 1).",
+  "objectDate": {
+   "text": "P1: 3rd century AD",
+   "sort": 250
+  },
+  "found": {
+   "year": 1897,
+   "by": "Bernard P. Grenfell and Arthur S. Hunt",
+   "where": "Oxyrhynchus (el-Bahnasa), Middle Egypt"
+  },
+  "location": {
+   "lat": 28.537,
+   "lon": 30.657
+  },
+  "heldAt": {
+   "institution": "Penn Museum, Philadelphia (P1)",
+   "ref": "E2746"
+  },
+  "language": "Greek",
+  "description": "Grenfell and Hunt dug the town's ancient rubbish dumps and recovered a vast number of papyrus fragments, most of them everyday documents. P1, found in the first season, is a codex leaf written on both sides with the beginning of Matthew. Penn received it with more than 50 other Oxyrhynchus papyri.",
+  "connection": "P1 preserves Matthew 1:1–9, 12 and 14–20, the genealogy of Jesus and the start of the birth narrative. The site has produced fragments of all four Gospels and of most of Paul's letters, as well as non-canonical texts such as the Gospel of Thomas.",
+  "establishes": "Christians in a provincial Egyptian town were reading the New Testament writings in codex form by the 3rd century.",
+  "limits": "Most Oxyrhynchus fragments are small and many are still unpublished. Their dates rest on handwriting.",
+  "status": "corroborates",
+  "passages": [
+   "Matt.1.1-1.9",
+   "Matt.1.12",
+   "Matt.1.14-1.20"
+  ],
+  "people": [],
+  "dating": [
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "A Greek Fragment of the St. Matthew Gospel (Kenneth D. Matthews Jr., Expedition 5:1, 1962)",
+    "publisher": "Penn Museum",
+    "url": "https://www.penn.museum/sites/expedition/a-greek-fragment-of-the-st-matthew-gospel/"
+   },
+   {
+    "title": "Gospel of Saint Matthew: Object of the Day #99",
+    "publisher": "Penn Museum",
+    "url": "https://www.penn.museum/blog/museum/gospel-of-saint-matthew-object-of-the-day-99/"
+   },
+   {
+    "title": "Deciphering the Oxyrhynchus Papyri (Thomas A. Wayment, Religious Education Review, 2008)",
+    "publisher": "BYU Religious Studies Center",
+    "url": "https://rsc.byu.edu/sites/default/files/pub_content/pdf/Deciphering_the_Oxyrhynchus_Papyri_0.pdf"
+   }
+  ]
+ },
+ {
+  "id": "codex-alexandrinus",
+  "name": "Codex Alexandrinus",
+  "kind": "manuscript",
+  "summary": "A 5th-century Greek Bible in four volumes, sent from Constantinople and received by Charles I in 1627; now in the British Library.",
+  "objectDate": {
+   "text": "5th century AD (probably first half)",
+   "sort": 425
+  },
+  "found": {
+   "year": 1627,
+   "by": "Gift of Patriarch Cyril Lucar, conveyed by Sir Thomas Roe to King Charles I",
+   "where": "Taken from Egypt to Constantinople (1621), then to England"
+  },
+  "heldAt": {
+   "institution": "British Library, London",
+   "ref": "Royal MS 1 D V–VIII (New Testament: Royal MS 1 D VIII)"
+  },
+  "language": "Greek",
+  "description": "A parchment codex of the Greek Bible with the Old Testament, the New Testament and the letters 1 and 2 Clement; some leaves are lost. Cyril Lucar, formerly Patriarch of Alexandria, offered it as a gift for James I; it reached England only in 1627, under Charles I. It joined the British Museum with the Old Royal Library in 1757.",
+  "connection": "Its text type varies by section: in the Gospels it is an early witness to the later Byzantine text, while in Revelation it is counted among the best witnesses.",
+  "establishes": "A complete Greek Bible, with the New Testament followed by 1 and 2 Clement, was being produced in the 5th century.",
+  "limits": "There are gaps, including parts of Matthew, John and 1 Corinthians. Its date rests on handwriting, and its history before the 14th century is unknown.",
+  "status": "corroborates",
+  "passages": [],
+  "people": [],
+  "dating": [
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "Codex Alexandrinus, Royal MS 1 D VIII (catalogue record)",
+    "publisher": "British Library",
+    "url": "https://searcharchives.bl.uk/catalog/040-002353500"
+   },
+   {
+    "title": "The Codex Alexandrinus and the Alexandrian Greek Types (J. H. Bowman, British Library Journal 24:2, 1998)",
+    "publisher": "British Library",
+    "url": "https://bl.iro.bl.uk/concern/articles/7c7a5642-982e-4b3a-8cff-83743dcf3ae4?locale=zh"
+   },
+   {
+    "title": "Codex Alexandrinus",
+    "publisher": "BiblicalTraining (Zondervan encyclopedia)",
+    "url": "https://www.biblicaltraining.org/library/codex-alexandrinus"
+   }
+  ]
+ },
+ {
+  "id": "codex-washingtonianus",
+  "name": "Codex Washingtonianus (Freer Gospels)",
+  "kind": "manuscript",
+  "summary": "A late 4th or early 5th-century Gospel codex bought in Cairo by Charles Lang Freer in 1906; it contains a saying of Jesus found in no other manuscript.",
+  "objectDate": {
+   "text": "Late 4th – early 5th century AD",
+   "sort": 400
+  },
+  "found": {
+   "year": 1906,
+   "by": "Bought by Charles Lang Freer from the dealer Ali Arabi (19 December 1906)",
+   "where": "Cairo, Egypt (written in Egypt)"
+  },
+  "heldAt": {
+   "institution": "Freer Gallery of Art, Smithsonian National Museum of Asian Art, Washington DC",
+   "ref": "F1906.274"
+  },
+  "language": "Greek",
+  "description": "A parchment codex of the four Gospels, 187 leaves in a small sloping uncial hand, in painted wooden covers. Freer bought it with other biblical manuscripts, including Deuteronomy, Joshua and Psalms. It is known as Gregory-Aland 032 or W.",
+  "connection": "The Gospels are in the 'Western' order Matthew, John, Luke, Mark. It includes the longer ending of Mark and, after Mark 16:14, the 'Freer logion', an extra saying of Jesus. It lacks the account of the woman taken in adultery (John 7:53–8:11).",
+  "establishes": "By about AD 400 Gospel manuscripts in Egypt differed in order and in some passages, including the ending of Mark.",
+  "limits": "The manuscript was bought, not excavated, so its earlier history is unknown. Because the Freer logion survives only here, it cannot show what Mark's original wording was.",
+  "status": "corroborates",
+  "passages": [
+   "Mark.16.9-16.20",
+   "John.7.53-8.11"
+  ],
+  "people": [],
+  "dating": [
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "Washington Manuscript III: The Four Gospels (F1906.274)",
+    "publisher": "Smithsonian Institution",
+    "url": "https://www.si.edu/object/fsg_F1906.274"
+   },
+   {
+    "title": "Freer Purchases Ancient Biblical Manuscripts",
+    "publisher": "Smithsonian Institution Archives",
+    "url": "https://siarchives.si.edu/collections/siris_sic_14533"
+   },
+   {
+    "title": "Codex W",
+    "publisher": "Center for the Study of New Testament Manuscripts",
+    "url": "https://www.csntm.org/2008/10/19/codex-w/"
+   }
+  ]
+ },
+ {
+  "id": "sinai-new-finds-1975",
+  "name": "Sinai 'New Finds' (1975)",
+  "kind": "manuscript",
+  "summary": "In 1975 monks of St Catherine's Monastery found a store of manuscript fragments, including further leaves of Codex Sinaiticus.",
+  "objectDate": {
+   "text": "Codex Sinaiticus leaves: mid-4th century AD",
+   "sort": 350
+  },
+  "found": {
+   "year": 1975,
+   "by": "Monks of St Catherine's Monastery (the find is credited to Father Sophronios) during clearance work",
+   "where": "St Catherine's Monastery, Sinai, Egypt"
+  },
+  "location": {
+   "lat": 28.5559,
+   "lon": 33.976
+  },
+  "heldAt": {
+   "institution": "St Catherine's Monastery, Sinai",
+   "ref": ""
+  },
+  "language": "Greek (Codex Sinaiticus leaves)",
+  "description": "The monastery's manuscripts that came to light in 1975 are known as the New Finds. Among them were leaves and fragments of Codex Sinaiticus. Constantin von Tischendorf had taken 43 leaves of the codex in 1844 and the main portion in 1859; most of it was sold to the British Museum in 1933.",
+  "connection": "Codex Sinaiticus is a 4th-century Greek Bible containing the whole New Testament. The 1975 leaves, together with others recovered from bindings, add to the parts of the codex held in London, Leipzig and St Petersburg. They were included in the Codex Sinaiticus Project's digital reunion of the manuscript.",
+  "establishes": "Parts of Codex Sinaiticus remained at the monastery after Tischendorf's visits and were recovered in 1975.",
+  "limits": "The Codex Sinaiticus Project's own pages give slightly different details of the date (May or June 1975), the room, and the count (at least 12 leaves and 24 fragments, or at least 18 leaves in whole or part).",
+  "status": "corroborates",
+  "passages": [],
+  "people": [],
+  "dating": [
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "History of Codex Sinaiticus",
+    "publisher": "Codex Sinaiticus Project (British Library and partners)",
+    "url": "https://codexsinaiticus.org/en/codex/history.aspx"
+   },
+   {
+    "title": "Codex Sinaiticus Project: History",
+    "publisher": "Codex Sinaiticus Project",
+    "url": "https://www.codexsinaiticus.org/en/project/history.aspx"
+   },
+   {
+    "title": "Codex Sinaiticus",
+    "publisher": "Smithsonian National Museum of Asian Art",
+    "url": "https://asia.si.edu/?p=45226"
+   },
+   {
+    "title": "St Catherine's Monastery, its library and its palimpsests (Father Justin of Sinai)",
+    "publisher": "Sinai Palimpsests Project, UCLA Library",
+    "url": "https://sinaied.library.ucla.edu/st-catherine%e2%80%99s-monastery-its-library-and-its-palimpsests"
+   }
+  ]
+ },
+ {
+  "kind": "method",
+  "status": "method",
+  "language": "",
+  "passages": [],
+  "people": [],
+  "id": "method-radiocarbon-dating",
+  "name": "Radiocarbon dating (AMS)",
+  "summary": "Measures the decay of carbon-14 in once-living material such as parchment, linen or charcoal to estimate when the organism died.",
+  "objectDate": {
+   "text": "Method",
+   "sort": 0
+  },
+  "location": {
+   "lat": 31.741,
+   "lon": 35.459
+  },
+  "description": "Living things take in carbon-14 while alive; after death it decays at a known rate. Accelerator mass spectrometry (AMS) counts carbon-14 atoms directly, so only a few milligrams are needed. The raw result is converted to calendar years with a calibration curve built from tree rings of known age.",
+  "connection": "In the early 1990s the ETH Zurich laboratory dated 14 Dead Sea Scrolls (Bonani et al., Radiocarbon 1992), and the Arizona laboratory dated 18 more scrolls and two linen pieces from Qumran and Nahal Hever (Jull et al., Radiocarbon 1995). In both studies the calibrated dates agreed well with the dates scholars had proposed from handwriting, with one exception in the Zurich set.",
+  "establishes": "Radiocarbon gives an independent age range for organic writing materials and for burnt destruction layers. It showed that the Dead Sea Scrolls are ancient, broadly in line with palaeographic dating.",
+  "limits": "It dates when the animal or plant died, not when the text was written. Results are probability ranges, often several decades wide, and contamination (for example from modern conservation treatments) must be removed. Between about 800 and 400 BC the calibration curve is nearly flat (the 'Hallstatt plateau'), so dates in much of the Iron Age are imprecise.",
+  "dating": [
+   "radiocarbon"
+  ],
+  "sources": [
+   {
+    "title": "Radiocarbon Dating of Fourteen Dead Sea Scrolls (Bonani et al., Radiocarbon 34:3, 1992)",
+    "publisher": "Cambridge University Press",
+    "url": "https://www.cambridge.org/core/journals/radiocarbon/article/radiocarbon-dating-of-fourteen-dead-sea-scrolls/3D21205A1B209878952A8EBB31771077"
+   },
+   {
+    "title": "Radiocarbon dating of scrolls and linen fragments from the Judean Desert (Jull et al., Radiocarbon 37:1, 1995)",
+    "publisher": "University of Arizona",
+    "url": "https://experts.arizona.edu/en/publications/radiocarbon-dating-of-scrolls-and-linen-fragments-from-the-judean/"
+   },
+   {
+    "title": "Reconstructing biblical military campaigns using geomagnetic field data (Vaknin et al., PNAS 119:44, 2022)",
+    "publisher": "University of Bern repository (BORIS)",
+    "url": "https://boris.unibe.ch/174057"
+   }
+  ]
+ },
+ {
+  "kind": "method",
+  "status": "method",
+  "language": "",
+  "passages": [
+   "Josh.6.1-6.27"
+  ],
+  "people": [],
+  "id": "method-stratigraphy",
+  "name": "Stratigraphy",
+  "summary": "Reads a site's layers in the order they were laid down, so that each floor, wall and destruction can be placed in a relative sequence.",
+  "objectDate": {
+   "text": "Method",
+   "sort": 0
+  },
+  "location": {
+   "lat": 31.8700465,
+   "lon": 35.443876,
+   "placeSlug": "jericho_634"
+  },
+  "description": "A tell grows as each settlement is built on the ruins of the one before. Excavators record floors, foundation trenches, destruction debris and pits, and use the principle that lower layers are older unless later digging has cut into them. The Wheeler–Kenyon method digs in squares separated by standing baulks so the vertical sections can be read and checked.",
+  "connection": "Kathleen Kenyon excavated Jericho (Tell es-Sultan) in the 1950s using this method. She showed that the walls John Garstang had linked to Joshua's conquest belonged to the Early Bronze Age, many centuries earlier, and that Jericho was at most a minor settlement at the end of the Late Bronze Age.",
+  "establishes": "Stratigraphy gives the order of events at a site, and it is the framework into which pottery, coins, radiocarbon samples and inscriptions are fitted.",
+  "limits": "It gives relative, not calendar, dates; absolute dates must come from other methods. Layers can be disturbed by later building or robbing, and slow, small-scale digging (a criticism of Kenyon's work) can leave the wider picture unclear. Kenyon's Jericho results bear on the archaeology of the site, while how Joshua 6 should be read remains a matter of interpretation.",
+  "dating": [
+   "stratigraphy"
+  ],
+  "sources": [
+   {
+    "title": "Dame Kathleen Kenyon, 1906–1978",
+    "publisher": "Palestine Exploration Fund",
+    "url": "https://www.pef.org.uk/?p=2256"
+   },
+   {
+    "title": "Kathleen Kenyon and Jericho",
+    "publisher": "Bible Odyssey (Society of Biblical Literature)",
+    "url": "https://www.bibleodyssey.org/articles/kathleen-kenyon-and-jericho/"
+   }
+  ]
+ },
+ {
+  "kind": "method",
+  "status": "method",
+  "language": "",
+  "passages": [],
+  "people": [],
+  "id": "method-ceramic-typology",
+  "name": "Ceramic typology",
+  "summary": "Dates layers by the changing shapes, fabrics and decoration of pottery, which was common, breakable and quickly replaced.",
+  "objectDate": {
+   "text": "Method",
+   "sort": 0
+  },
+  "location": {
+   "lat": 31.559,
+   "lon": 34.729
+  },
+  "description": "Potters' styles changed over time, so sherds can be grouped into types and the types arranged in sequence. Once a sequence is tied to layers dated by other means, a new layer with the same pottery can be placed in the same period. Because almost every layer in the Levant produces many sherds, it is a basic dating tool in the region.",
+  "connection": "In 1890 Flinders Petrie, digging Tell el-Hesi for the Palestine Exploration Fund, showed that the mound was made of successive settlement layers and used the pottery in each layer to date them. His 1891 report is regarded as a starting point for stratigraphic, pottery-based dating in the archaeology of Palestine.",
+  "establishes": "Pottery allows layers at different sites to be compared and placed in the same broad period.",
+  "limits": "Pottery styles overlap and change at different speeds in different regions, so typology rarely gives a precise year. Its calendar dates depend on links to other evidence, which is why the dating of some Iron Age pottery horizons remains debated. Petrie himself wrongly identified Tell el-Hesi as biblical Lachish.",
+  "dating": [
+   "ceramic-typology",
+   "stratigraphy"
+  ],
+  "sources": [
+   {
+    "title": "Tell El Hesy (Lachish) by W. M. Flinders Petrie (1891; Cambridge Library Collection reissue)",
+    "publisher": "Cambridge University Press",
+    "url": "https://core-prod.cambridgecore.org/core/books/tell-el-hesy-lachish-hyksos-and-israelite-cities/C977A2E60D014E993FFD3499F5F0119B"
+   },
+   {
+    "title": "Petrie, Sir William Matthew Flinders (Encyclopaedia Judaica, 2nd ed.)",
+    "publisher": "Encyclopedia.com",
+    "url": "https://www.encyclopedia.com/religion/encyclopedias-almanacs-transcripts-and-maps/petrie-sir-william-matthew-flindersdeg"
+   }
+  ]
+ },
+ {
+  "kind": "method",
+  "status": "method",
+  "language": "",
+  "passages": [],
+  "people": [],
+  "id": "method-palaeography",
+  "name": "Palaeography",
+  "summary": "Dates and groups manuscripts by the development of letter shapes and writing styles.",
+  "objectDate": {
+   "text": "Method",
+   "sort": 0
+  },
+  "location": {
+   "lat": 31.741,
+   "lon": 35.459
+  },
+  "description": "Scripts change gradually, so a hand can be placed in a sequence by comparing letter forms with dated documents. Specialists also use handwriting to tell scribes apart. Recent studies measure letter shapes with computers and combine the results with radiocarbon dates.",
+  "connection": "In 2025 a team led by Mladen Popović trained a model called Enoch on 24 radiocarbon-dated Dead Sea Scroll samples, using measurements of letter angles and shapes. It predicted the radiocarbon dates with average errors of about 30 years and, for 135 undated scrolls, agreed with expert palaeographic judgement 79% of the time. The study suggests many scrolls, including fragments of Daniel (4Q114) and Ecclesiastes (4Q109), are older than previously thought.",
+  "establishes": "Palaeography gives approximate dates for undated manuscripts and can identify individual scribes, as in the 2021 study showing two scribes in the Great Isaiah Scroll.",
+  "limits": "Dates from handwriting are ranges, usually of several decades, and depend on a small number of securely dated comparison texts. Scribes could keep old-fashioned styles, so a conservative hand can look earlier than it is.",
+  "dating": [
+   "palaeography",
+   "radiocarbon"
+  ],
+  "sources": [
+   {
+    "title": "Unlocking the timecode of the Dead Sea Scrolls",
+    "publisher": "University of Groningen",
+    "url": "https://www.rug.nl/news/2025/06/unlocking-the-timecode-of-the-dead-sea-scrolls"
+   },
+   {
+    "title": "Dating ancient manuscripts using radiocarbon and AI-based writing style analysis (Popović et al., PLOS ONE 20:6, 2025)",
+    "publisher": "IDEAS/RePEc",
+    "url": "https://ideas.repec.org/a/plo/pone00/0323185.html"
+   },
+   {
+    "title": "Cracking the code of the Dead Sea Scrolls",
+    "publisher": "University of Groningen",
+    "url": "https://www.rug.nl/news/2021/04/cracking-the-code-of-the-dead-sea-scrolls?lang=en"
+   }
+  ]
+ },
+ {
+  "kind": "method",
+  "status": "method",
+  "language": "",
+  "passages": [],
+  "people": [],
+  "id": "method-dendrochronology",
+  "name": "Dendrochronology (tree-ring dating)",
+  "summary": "Dates wood by matching its pattern of wide and narrow annual rings to a master sequence, and supplies the known-age rings used to calibrate radiocarbon.",
+  "objectDate": {
+   "text": "Method",
+   "sort": 0
+  },
+  "description": "Trees in seasonal climates add one ring a year, and good and bad years leave a recognisable pattern. Matching a timber's pattern to a long master sequence can date its outer ring to the exact year. Rings of known calendar age are also measured for carbon-14 to build the curves that turn radiocarbon results into calendar dates.",
+  "connection": "Sturt Manning and colleagues (PNAS, 2018) measured carbon-14 in tree rings from southern Jordan with known dates between AD 1610 and 1940. They found an average offset of about 19 radiocarbon years from the standard Northern Hemisphere curve (IntCal13), varying over time. Re-running two published Levantine studies with this offset changed the probability ranges markedly, which bears on debates over Levantine and biblical-period chronology.",
+  "establishes": "Tree rings give exact-year dates where a matching sequence exists, and they showed that radiocarbon dates in the southern Levant may need a regional adjustment.",
+  "limits": "Wood must preserve enough rings, and a felling date needs the outermost ring; timber may also have been reused. The 2018 offsets were measured for AD 1610–1940 only, and whether the same pattern held in the Iron Age has not been tested directly.",
+  "dating": [
+   "dendrochronology",
+   "radiocarbon"
+  ],
+  "sources": [
+   {
+    "title": "Fluctuating radiocarbon offsets observed in the southern Levant and implications for archaeological chronology debates (Manning et al., PNAS 115:24, 2018)",
+    "publisher": "University of Arizona",
+    "url": "https://experts.arizona.edu/en/publications/fluctuating-radiocarbon-offsets-observed-in-the-southern-levant-a/"
+   },
+   {
+    "title": "New radiocarbon cycle research may alter history",
+    "publisher": "Cornell University",
+    "url": "https://news.cornell.edu/node/300976"
+   }
+  ]
+ },
+ {
+  "kind": "method",
+  "status": "method",
+  "language": "",
+  "passages": [
+   "1Kgs.16.29-22.40"
+  ],
+  "people": [
+   "ahab_113"
+  ],
+  "id": "method-historical-synchronism",
+  "name": "Historical synchronisms (Assyrian eponyms and the 763 BC eclipse)",
+  "summary": "Fixes biblical-period dates by linking events named in the Bible to Assyrian and Babylonian records that are anchored to astronomy.",
+  "objectDate": {
+   "text": "Method",
+   "sort": 0
+  },
+  "description": "Assyria named each year after an official, the eponym, and lists of these names survive in an unbroken run of over 250 years. The list for the year of Bur-Sagale records 'an eclipse of the Sun' in the month Simanu, identified with the eclipse of 15 June 763 BC. That fixes the whole list in calendar years, from 910 BC to the 7th century BC, and any king or battle dated by eponym can then be dated absolutely.",
+  "connection": "Shalmaneser III's Kurkh stela, in the British Museum, records the battle of Qarqar in his sixth year and names 'Ahab the Israelite' with 2,000 chariots and 10,000 soldiers. Through the eponym list this battle falls in 853 BC, giving a fixed point for the reign of Ahab, the king of 1 Kings 16–22.",
+  "establishes": "Assyrian chronology for roughly 910–650 BC is fixed to the year, so synchronisms with it give firm dates for several kings of Israel and Judah.",
+  "limits": "A synchronism dates only the event named; fitting it to biblical reign lengths still involves debated questions such as co-regencies. The Bible itself does not mention Qarqar, and Assyrian royal inscriptions are propaganda that may exaggerate.",
+  "dating": [
+   "historical-synchronism",
+   "astronomical"
+  ],
+  "sources": [
+   {
+    "title": "Stela of Shalmaneser III (the Kurkh Stela), museum number 118884",
+    "publisher": "British Museum",
+    "url": "https://www.britishmuseum.org/collection/object/W_1863-0619-2"
+   },
+   {
+    "title": "Bibliography of Babylonian astronomy: chronology (R. H. van Gent)",
+    "publisher": "Utrecht University (webspace)",
+    "url": "https://webspace.science.uu.nl/~gent0113/babylon/babybibl_chronology.htm"
+   },
+   {
+    "title": "Kurkh Stele, 853 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/?p=6525"
+   }
+  ]
+ },
+ {
+  "kind": "method",
+  "status": "method",
+  "language": "",
+  "passages": [],
+  "people": [],
+  "id": "method-multispectral-imaging",
+  "name": "Multispectral and infrared imaging",
+  "summary": "Photographs manuscripts at many wavelengths, including near-infrared, to recover writing that has faded or darkened beyond reading by eye.",
+  "objectDate": {
+   "text": "Method",
+   "sort": 0
+  },
+  "location": {
+   "lat": 31.741,
+   "lon": 35.459
+  },
+  "description": "Carbon-based ink and parchment reflect light differently at different wavelengths, so a series of images across visible and infrared wavelengths can separate ink from background. The Israel Antiquities Authority's Leon Levy Dead Sea Scrolls Digital Library uses a MegaVision system to image every fragment at high resolution, with near-infrared bands to bring out faded text. The images also allow study and condition monitoring without repeated handling.",
+  "connection": "In 2020 a team led by Joan Taylor (King's College London) imaged 51 apparently blank Qumran fragments held by the University of Manchester. Four of six fragments examined in detail had readable Hebrew or Aramaic text, and the largest showed the word 'Shabbat'.",
+  "establishes": "Imaging can reveal text that is invisible to the eye, and it makes the full set of Dead Sea Scroll fragments available for study online.",
+  "limits": "It recovers only what ink remains; it cannot restore lost material, and small fragments often yield a few letters that are hard to identify. Images still need expert reading, and suggested identifications (such as a link of the 'Shabbat' fragment to Ezekiel 46) can remain tentative.",
+  "dating": [],
+  "sources": [
+   {
+    "title": "The Digital Library",
+    "publisher": "Leon Levy Dead Sea Scrolls Digital Library, Israel Antiquities Authority",
+    "url": "https://www.deadseascrolls.org.il/about-the-project/the-digital-library"
+   },
+   {
+    "title": "Dead Sea Scroll fragments thought to be blank reveal text",
+    "publisher": "University of Manchester",
+    "url": "https://www.manchester.ac.uk/about/news/dead-sea-scroll-fragments-thought-to-be-blank-reveal-text/"
+   }
+  ]
+ },
+ {
+  "kind": "method",
+  "status": "method",
+  "language": "",
+  "passages": [
+   "2Kgs.12.17"
+  ],
+  "people": [
+   "hazael_1463"
+  ],
+  "id": "method-archaeomagnetism",
+  "name": "Archaeomagnetism",
+  "summary": "Reads the direction and strength of Earth's magnetic field locked into burnt clay and bricks, and matches it to a dated reference curve.",
+  "objectDate": {
+   "text": "Method",
+   "sort": 0
+  },
+  "location": {
+   "lat": 31.6935295,
+   "lon": 34.84388289,
+   "placeSlug": "gath_442"
+  },
+  "description": "When clay or mud brick is heated strongly, its magnetic minerals record the Earth's field at that moment. The field changes over decades, so fired material from a destruction can be compared with a regional curve and with other burnt layers. In the Levant the field changed unusually fast in the Iron Age, with spikes more than twice today's strength, which makes the method sensitive.",
+  "connection": "Vaknin and colleagues (PNAS, 2022) measured 20 destruction layers at 17 sites in Israel. The burnt layers at Gath, Tel Rehov, Horvat Tevet and Tel Zayit gave matching signals and are attributed to campaigns of Hazael of Aram-Damascus; Beth-Shean was destroyed decades earlier. They also found results consistent with Sennacherib's campaign of 701 BC at Lachish and other sites, and with the Babylonian destruction of Lachish in 586 BC.",
+  "establishes": "Archaeomagnetism can show which destruction layers are close in time and which are not, independent of pottery and radiocarbon.",
+  "limits": "Results are ranges, not exact dates, and depend on the reference curve. The method is better at showing that two layers are not contemporary than at proving they are. Linking a destruction to a named king still relies on texts and on historical judgement.",
+  "dating": [
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "Reconstructing biblical military campaigns using geomagnetic field data (Vaknin et al., PNAS 119:44, 2022)",
+    "publisher": "University of Bern repository (BORIS)",
+    "url": "https://boris.unibe.ch/174057"
+   },
+   {
+    "title": "Reconstructing biblical military campaigns using geomagnetic field data (full text PDF)",
+    "publisher": "University of Bern repository (BORIS)",
+    "url": "https://boris.unibe.ch/174057/1/pnas.2209117119.pdf"
+   },
+   {
+    "title": "Researchers reconstruct biblical military campaigns using geomagnetic field data (Tel Aviv University release)",
+    "publisher": "ScienceDaily",
+    "url": "https://sciencedaily.com/releases/2022/10/221024153631.htm"
+   }
+  ]
+ },
+ {
+  "kind": "method",
+  "status": "method",
+  "language": "",
+  "passages": [],
+  "people": [],
+  "id": "method-ancient-dna-parchment",
+  "name": "Ancient DNA of scroll parchment",
+  "summary": "Sequences the animal DNA left in parchment to tell which skins, and so which fragments, belong together.",
+  "objectDate": {
+   "text": "Method",
+   "sort": 0
+  },
+  "location": {
+   "lat": 31.741,
+   "lon": 35.459
+  },
+  "description": "Parchment is animal skin, and traces of the animal's DNA can survive. Sequencing tiny samples shows the species and whether two fragments come from the same animal or herd. Combined with study of the text, this helps sort thousands of small Dead Sea Scroll fragments.",
+  "connection": "Anava and colleagues (Cell, 2020), from Tel Aviv and Uppsala, found that most sampled scrolls were sheepskin. Two Jeremiah pieces once thought to belong together came from a sheep and a cow, so they belong to different scrolls; the cow skin suggests a copy made outside the Judean Desert. Together with textual analysis this indicates that different versions of Jeremiah circulated at the same time.",
+  "establishes": "DNA can separate or join fragments on physical grounds and show that some scrolls came to Qumran from elsewhere.",
+  "limits": "Samples are small, ancient DNA is easily contaminated, and species or herd identity says nothing directly about the text's date or author. Conclusions about where a scroll was written are inferences.",
+  "dating": [],
+  "sources": [
+   {
+    "title": "Illuminating Genetic Mysteries of the Dead Sea Scrolls (Anava et al., Cell 181:6, 2020)",
+    "publisher": "Hebrew University of Jerusalem research portal",
+    "url": "https://cris.huji.ac.il/en/publications/illuminating-genetic-mysteries-of-the-dead-sea-scrolls/"
+   },
+   {
+    "title": "Piecing together the Dead Sea Scrolls with DNA evidence (Cell Press release)",
+    "publisher": "Newswise",
+    "url": "https://www.newswise.com/articles/piecing-together-the-dead-sea-scrolls-with-dna-evidence"
+   }
+  ]
+ }
+]

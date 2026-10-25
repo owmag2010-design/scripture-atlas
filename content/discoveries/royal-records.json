@@ -1,0 +1,1175 @@
+[
+ {
+  "id": "merneptah-stele",
+  "name": "Merneptah Stele",
+  "kind": "royal-record",
+  "summary": "An Egyptian victory hymn of Pharaoh Merneptah, about 1208 BC, that contains the earliest known mention of Israel outside the Bible.",
+  "objectDate": {
+   "text": "About 1208 BC (Merneptah's fifth year)",
+   "sort": -1208
+  },
+  "found": {
+   "year": 1896,
+   "by": "Flinders Petrie",
+   "where": "Mortuary temple of Merneptah, western Thebes, Egypt"
+  },
+  "location": {
+   "lat": 25.721,
+   "lon": 32.611,
+   "placeSlug": "thebes_1156"
+  },
+  "heldAt": {
+   "institution": "Egyptian Museum, Cairo",
+   "ref": ""
+  },
+  "language": "Egyptian (hieroglyphic)",
+  "description": "A large stele that mainly celebrates Merneptah's victory over the Libyans. Near the end it lists places and peoples in Canaan he claims to have defeated. One line reads: 'Israel is wasted, its seed is not.' A duplicate copy stood at Karnak.",
+  "connection": "The stele shows that a group called Israel was present in or near Canaan by the late 13th century BC. It also names Gezer and Ashkelon, cities that appear in Joshua and Judges. This is the period the Bible assigns to Israel's early life in the land.",
+  "establishes": "By about 1208 BC Egyptians knew of a people called Israel in the Canaan region. The name is written with the sign for a people, while Ashkelon and Gezer carry the sign for a place.",
+  "limits": "It says nothing about the exodus, the conquest or Israel's origins. Scholars still debate how large or settled this 'Israel' was, and how much weight one line can bear.",
+  "status": "corroborates",
+  "passages": [
+   "Josh.16.10-16.10",
+   "Judg.1.29-1.29"
+  ],
+  "people": [],
+  "dating": [
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "Merenptah stela",
+    "publisher": "UCL Petrie Museum / Digital Egypt for Universities",
+    "url": "https://www.ucl.ac.uk/museums-static/digitalegypt/thebes/merenptah/stela.html"
+   },
+   {
+    "title": "Stela of Merneptah",
+    "publisher": "Posen Library of Jewish Culture and Civilization",
+    "url": "https://www.posenlibrary.com/node/691"
+   },
+   {
+    "title": "Stelae and Reliefs of Pharaoh Merneptah, c. 1207 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/?p=7732"
+   },
+   {
+    "title": "Merneptah's 'Israel' and the Absence of Origins in Biblical Scholarship (D. Nestor, Currents in Biblical Research 13.3, 2015)",
+    "publisher": "Australian Catholic University Research Bank",
+    "url": "https://acuresearchbank.acu.edu.au/item/86058/merneptah-s-israel-and-the-absence-of-origins-in-biblical-scholarship"
+   }
+  ]
+ },
+ {
+  "id": "shoshenq-karnak-relief",
+  "name": "Shoshenq I (Shishak) relief at Karnak",
+  "kind": "royal-record",
+  "summary": "A triumph scene and list of captured towns carved for Pharaoh Shoshenq I at Karnak, generally identified with the biblical Shishak.",
+  "objectDate": {
+   "text": "About 925 BC (Shoshenq I's 21st year)",
+   "sort": -925
+  },
+  "found": {
+   "year": null,
+   "by": "Visible in situ; a fragment of a Shoshenq I stele was found at Megiddo by the Oriental Institute excavation (R. S. Lamon and G. M. Shipton) in the 1930s",
+   "where": "Bubastite Portal, Temple of Amun, Karnak, Egypt"
+  },
+  "location": {
+   "lat": 25.719,
+   "lon": 32.657,
+   "placeSlug": "thebes_1156"
+  },
+  "heldAt": {
+   "institution": "In situ at Karnak; Megiddo stele fragment at the Oriental Institute (ISAC), Chicago",
+   "ref": ""
+  },
+  "language": "Egyptian (hieroglyphic)",
+  "description": "On the south wall of the Bubastite Portal, Shoshenq I is shown before the god Amun, who hands him rows of captives. Each captive carries a name-ring for a town. About 175 names were listed; about 127 can still be read, and fewer can be identified with confidence.",
+  "connection": "1 Kings and 2 Chronicles say that Shishak king of Egypt came against Jerusalem in Rehoboam's fifth year and took the temple and palace treasures. 1 Kings also says Jeroboam fled to Shishak. Most scholars identify Shishak with Shoshenq I.",
+  "establishes": "An Egyptian king of the late 10th century BC claimed a campaign into the southern Levant, naming places such as Megiddo, Rehov, Taanach, Gezer and Arad.",
+  "limits": "The cited sources do not show Jerusalem in the readable list. The relief is a statement of divine favour rather than a precise campaign report, and scholars disagree on the route, the scale of the campaign, and on using it to date destruction layers.",
+  "status": "corroborates",
+  "passages": [
+   "1Kgs.11.40-11.40",
+   "1Kgs.14.25-14.28",
+   "2Chr.12.2-12.9"
+  ],
+  "people": [
+   "shishak_2712",
+   "rehoboam_2412",
+   "jeroboam_872"
+  ],
+  "dating": [
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "Sheshonq (Shishak) in Palestine: Old Paradigms and New Vistas (F. Höflmayer and R. Gundacker)",
+    "publisher": "American Society of Overseas Research, The Ancient Near East Today",
+    "url": "https://anetoday.org/sheshonq-in-palestine/"
+   },
+   {
+    "title": "Relief and Stelae of Pharaoh Shoshenq I: Rehoboam's Tribute, c. 925 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/?p=7405"
+   }
+  ]
+ },
+ {
+  "id": "mesha-stele",
+  "name": "Mesha Stele (Moabite Stone)",
+  "kind": "royal-record",
+  "summary": "A basalt victory inscription of Mesha, king of Moab, describing his revolt against Israel after years of rule by Omri's dynasty.",
+  "objectDate": {
+   "text": "Late 9th century BC (about 840–820 BC)",
+   "sort": -835
+  },
+  "found": {
+   "year": 1868,
+   "by": "Reported by the missionary F. A. Klein; fragments later recovered by Charles Clermont-Ganneau",
+   "where": "Dhiban (biblical Dibon), Jordan"
+  },
+  "location": {
+   "lat": 31.501,
+   "lon": 35.778,
+   "placeSlug": "dibon_331"
+  },
+  "heldAt": {
+   "institution": "Musée du Louvre, Paris",
+   "ref": "AO 5066"
+  },
+  "language": "Moabite (in an early alphabetic script)",
+  "description": "A round-topped basalt stele with 34 lines, written in the first person by Mesha. He says Omri king of Israel humbled Moab for many years because the god Chemosh was angry. He then claims to have retaken towns such as Ataroth and Nebo, and to have taken vessels of YHWH and dragged them before Chemosh. The stone was broken soon after its discovery and later reassembled.",
+  "connection": "2 Kings 3 names Mesha king of Moab as a tributary of Israel who rebelled after Ahab's death. The stele gives the Moabite side of the same conflict. It also names Omri, the men of Gad, and Israel's God YHWH.",
+  "establishes": "A 9th-century BC Moabite king named Mesha recorded that Omri of Israel had dominated Moab and that he later threw off Israelite control.",
+  "limits": "It is royal propaganda that credits Chemosh for the victories. Its account and 2 Kings 3 differ in viewpoint and detail, and the order of events is debated. A proposed reading of 'house of David' in a damaged line is disputed.",
+  "status": "corroborates",
+  "passages": [
+   "2Kgs.1.1-1.1",
+   "2Kgs.3.4-3.27"
+  ],
+  "people": [
+   "mesha_2009",
+   "omri_2243"
+  ],
+  "dating": [
+   "palaeography",
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "Stèle de Mesha",
+    "publisher": "Musée du Louvre",
+    "url": "https://collections.louvre.fr/en/ark:/53355/cl010120339"
+   },
+   {
+    "title": "ANET pp. 320–321 (Gezer Calendar, Moabite Stone, Siloam Inscription, Lachish Ostraca), course reading",
+    "publisher": "University of Michigan (from J. B. Pritchard, Ancient Near Eastern Texts, Princeton University Press)",
+    "url": "https://courses.lsa.umich.edu/israel-palestine/wp-content/uploads/sites/142/2013/12/028.-ANET-320-321.pdf"
+   },
+   {
+    "title": "Moabite Stone [Mesha Stele] (W. Brown)",
+    "publisher": "World History Encyclopedia",
+    "url": "https://www.worldhistory.org/Moabite_Stone_%5BMesha_Stele%5D/"
+   }
+  ]
+ },
+ {
+  "id": "tel-dan-stele",
+  "name": "Tel Dan Stele",
+  "kind": "royal-record",
+  "summary": "Fragments of an Aramaic victory stele from Dan in which an Aramean king refers to a 'king of Israel' and the 'house of David'.",
+  "objectDate": {
+   "text": "Second half of the 9th century BC",
+   "sort": -840
+  },
+  "found": {
+   "year": 1993,
+   "by": "Excavation team led by Avraham Biran; further fragments found in 1994",
+   "where": "Tel Dan, northern Israel"
+  },
+  "location": {
+   "lat": 33.2486,
+   "lon": 35.6525,
+   "placeSlug": "dan_323"
+  },
+  "heldAt": {
+   "institution": "Israel Museum, Jerusalem (Israel Antiquities Authority collection)",
+   "ref": "IAA 1993-3162, 1996-125"
+  },
+  "language": "Old Aramaic",
+  "description": "Three basalt fragments, broken in antiquity and reused as building stones, preserve about 13 partial lines. The writer, whose name is lost, claims that the god Hadad made him king. He says he killed [Jeho]ram son of [Ahab], king of Israel, and the king of the 'house of David'. Most scholars think the author was Hazael of Damascus.",
+  "connection": "2 Kings 8–9 describes war between Hazael of Aram and Joram of Israel, with Ahaziah of Judah alongside Joram. 'House of David' matches the Bible's name for the royal line of Judah.",
+  "establishes": "In the 9th century BC an Aramean king called Judah's ruling dynasty the 'house of David'.",
+  "limits": "It names the dynasty, not David himself, and says nothing about his life. A minority read the letters bytdwd differently. The stele claims the Aramean king killed Joram and Ahaziah, while 2 Kings 9 says Jehu killed them; scholars explain this in different ways.",
+  "status": "corroborates",
+  "passages": [
+   "2Kgs.8.28-8.29",
+   "2Kgs.9.14-9.29",
+   "2Kgs.10.32-10.32"
+  ],
+  "people": [
+   "hazael_1463",
+   "joram_804",
+   "ahaziah_121",
+   "david_994"
+  ],
+  "dating": [
+   "stratigraphy",
+   "palaeography",
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "Tel Dan Stele",
+    "publisher": "The Jewish Museum, New York",
+    "url": "https://thejewishmuseum.org/exhibitions/tel-dan-stele/"
+   },
+   {
+    "title": "The Tel Dan Inscription",
+    "publisher": "Society of Biblical Literature, Bible Odyssey",
+    "url": "https://www.bibleodyssey.org/articles/the-tel-dan-inscription/"
+   },
+   {
+    "title": "Tel Dan Stele, c. 840 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/?p=7804"
+   }
+  ]
+ },
+ {
+  "id": "kurkh-monolith",
+  "name": "Kurkh Monolith of Shalmaneser III",
+  "kind": "royal-record",
+  "summary": "An Assyrian royal stele recording the battle of Qarqar in 853 BC, where 'Ahab of Israel' fought in a coalition against Shalmaneser III.",
+  "objectDate": {
+   "text": "About 852 BC",
+   "sort": -852
+  },
+  "found": {
+   "year": 1861,
+   "by": "John George Taylor",
+   "where": "Kurkh (Üçtepe), near Diyarbakır, south-east Turkey"
+  },
+  "location": {
+   "lat": 37.84,
+   "lon": 40.69
+  },
+  "heldAt": {
+   "institution": "British Museum, London",
+   "ref": "118884 (1863,0619.2)"
+  },
+  "language": "Akkadian (cuneiform)",
+  "description": "A round-topped limestone stele showing Shalmaneser III before divine symbols, with a cuneiform text across its face, base and sides. The text ends with the battle of Qarqar in Syria in 853 BC. It lists the allied kings and their forces, including '2,000 chariots, 10,000 soldiers of Ahab of Israel'.",
+  "connection": "Ahab son of Omri ruled Israel from Samaria according to 1 Kings 16–22. This is the earliest datable mention of an Israelite king in a foreign record, and it shows Ahab as a major military power.",
+  "establishes": "Ahab king of Israel was a contemporary of Shalmaneser III and sent a large force, including the coalition's largest chariot contingent, to Qarqar in 853 BC.",
+  "limits": "The Bible does not mention Qarqar. The troop numbers are an Assyrian scribe's figures and cannot be checked independently.",
+  "status": "corroborates",
+  "passages": [
+   "1Kgs.16.29-16.33",
+   "1Kgs.22.39-22.40"
+  ],
+  "people": [
+   "ahab_113"
+  ],
+  "dating": [
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "Stela (The Kurkh Stela), museum number 118884",
+    "publisher": "British Museum",
+    "url": "https://www.britishmuseum.org/collection/object/W_1863-0619-2"
+   },
+   {
+    "title": "Shalmaneser III, Kurkh, Assyria",
+    "publisher": "Posen Library of Jewish Culture and Civilization",
+    "url": "https://www.posenlibrary.com/node/694"
+   },
+   {
+    "title": "Kurkh Stele, 853 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/?p=6525"
+   }
+  ]
+ },
+ {
+  "id": "black-obelisk-shalmaneser-iii",
+  "name": "Black Obelisk of Shalmaneser III",
+  "kind": "royal-record",
+  "summary": "An Assyrian obelisk from Nimrud whose second panel shows a kneeling ruler captioned 'tribute of Jehu, son of Omri'.",
+  "objectDate": {
+   "text": "About 825 BC (Jehu's tribute about 841 BC)",
+   "sort": -825
+  },
+  "found": {
+   "year": 1846,
+   "by": "Austen Henry Layard",
+   "where": "Nimrud (ancient Kalhu, biblical Calah), northern Iraq"
+  },
+  "location": {
+   "lat": 36.099,
+   "lon": 43.329,
+   "placeSlug": "calah_268"
+  },
+  "heldAt": {
+   "institution": "British Museum, London",
+   "ref": "118885 (1848,1104.1)"
+  },
+  "language": "Akkadian (cuneiform)",
+  "description": "A black limestone obelisk with five registers of reliefs showing tribute brought to Shalmaneser III, and a long text listing his campaigns. In the second register a man bows to the ground before the king. The caption names him as Jehu and lists silver, gold, a golden bowl, golden vessels, tin and other goods.",
+  "connection": "2 Kings 9–10 tells how Jehu seized Israel's throne and ended the dynasty of Omri and Ahab. 'Son of Omri' reflects the Assyrian name for Israel, 'House of Omri', rather than family descent.",
+  "establishes": "Jehu of Israel paid tribute to Shalmaneser III of Assyria in about 841 BC.",
+  "limits": "The Bible does not record Jehu's tribute to Assyria. The obelisk records submission from the Assyrian point of view and says nothing about Jehu's reign inside Israel.",
+  "status": "corroborates",
+  "passages": [
+   "2Kgs.9.1-9.13",
+   "2Kgs.10.32-10.36"
+  ],
+  "people": [
+   "jehu_817",
+   "omri_2243"
+  ],
+  "dating": [
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "The Black Obelisk, museum number 118885",
+    "publisher": "British Museum",
+    "url": "https://britishmuseum.org/collection/object/W_1848-1104-1"
+   },
+   {
+    "title": "The Black Obelisk (replica panel)",
+    "publisher": "University of Saskatchewan, Museum of Antiquities",
+    "url": "https://artsandscience.usask.ca/antiquities/collections/items/near-eastern-items/assyrian-items/blackobelisk.php"
+   },
+   {
+    "title": "The Black Obelisk (S. German and B. Harris)",
+    "publisher": "Smarthistory",
+    "url": "https://smarthistory.org/?p=96344"
+   }
+  ]
+ },
+ {
+  "id": "tiglath-pileser-iii-inscriptions",
+  "name": "Inscriptions of Tiglath-pileser III naming kings of Israel and Judah",
+  "kind": "royal-record",
+  "summary": "Assyrian annals, summary inscriptions and a stele of Tiglath-pileser III that name Menahem of Samaria, Pekah, Hoshea and Ahaz of Judah.",
+  "objectDate": {
+   "text": "About 738–729 BC",
+   "sort": -733
+  },
+  "found": {
+   "year": null,
+   "by": "Several texts: palace inscriptions at Nimrud (some recorded in 1853–1854 only by squeezes, now lost); a stele said to come from western Iran",
+   "where": "Nimrud (Kalhu) and western Iran"
+  },
+  "location": {
+   "lat": 36.099,
+   "lon": 43.329,
+   "placeSlug": "calah_268"
+  },
+  "heldAt": {
+   "institution": "British Museum, London (annals fragments and Summary Inscription 7); Israel Museum, Jerusalem (Iran stele)",
+   "ref": ""
+  },
+  "language": "Akkadian (cuneiform)",
+  "description": "Tribute lists in the annals and on the Iran stele include 'Menahem of Samaria' alongside Rezin of Damascus. Summary Inscription 7 lists 'Jehoahaz (Ahaz) of Judah' among western kings who paid tribute. Summary Inscription 4 says that the people of Israel ('House of Omri') overthrew their king Pekah and that Tiglath-pileser placed Hoshea as king over them.",
+  "connection": "2 Kings 15 says Menahem paid tribute to 'Pul' king of Assyria, and that Hoshea killed Pekah and reigned in his place. 2 Kings 16 says Ahaz sent silver and gold to Tiglath-pileser for help against Rezin and Pekah.",
+  "establishes": "Assyrian records name Menahem, Pekah, Hoshea and Ahaz as rulers of Israel and Judah in the 730s BC in a sequence consistent with 2 Kings 15–16.",
+  "limits": "Several texts are fragmentary or known only from old squeezes, and the Iran stele has no secure findspot. Scholars debate the exact years of the tribute lists and how they fit the biblical chronology of these kings.",
+  "status": "corroborates",
+  "passages": [
+   "2Kgs.15.19-15.20",
+   "2Kgs.15.29-15.30",
+   "2Kgs.16.5-16.10",
+   "Isa.7.1-7.9"
+  ],
+  "people": [
+   "tilgath-pilneser_2376",
+   "menahem_1996",
+   "pekah_2299",
+   "hoshea_1559",
+   "ahaz_118",
+   "rezin_2435"
+  ],
+  "dating": [
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "A New Look at the Inscriptions of Tiglath-pileser III (G. Galil), Biblica 81 (2000)",
+    "publisher": "Biblica (Pontifical Biblical Institute)",
+    "url": "https://www.bsw.org/biblica/vol-81-2000/a-new-look-at-the-inscriptions-of-tiglath-pileser-iii/305/article-p516.html"
+   },
+   {
+    "title": "Iran Stele, 737 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/?p=6133"
+   },
+   {
+    "title": "Tiglath-Pileser III and the Syro-Ephraimite War: Kalah Palace Summary Inscription, 729 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/?p=8298"
+   },
+   {
+    "title": "Tiglath-Pileser III and the Syro-Ephraimite War: Kalah Palace Summary Inscription 4, 730 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/?p=8299"
+   }
+  ]
+ },
+ {
+  "id": "sargon-ii-samaria-inscriptions",
+  "name": "Sargon II's inscriptions on Samaria",
+  "kind": "royal-record",
+  "summary": "Royal inscriptions of Sargon II of Assyria claiming the conquest of Samaria, the deportation of 27,290 people and the resettlement of the region.",
+  "objectDate": {
+   "text": "About 720–706 BC",
+   "sort": -715
+  },
+  "found": {
+   "year": null,
+   "by": "",
+   "where": "Nimrud (Nimrud Prism) and Khorsabad (annals), northern Iraq"
+  },
+  "location": {
+   "lat": 36.099,
+   "lon": 43.329,
+   "placeSlug": "calah_268"
+  },
+  "heldAt": {
+   "institution": "British Museum, London (Nimrud Prism)",
+   "ref": ""
+  },
+  "language": "Akkadian (cuneiform)",
+  "description": "Sargon II claims that he took Samaria, deported 27,290 of its people, and resettled it with people from other conquered lands. He says he appointed his own official as governor and counted the settlers as Assyrians. The phrase 'I settled Samaria again, more than before' appears in the Khorsabad annals and a Nimrud prism.",
+  "connection": "2 Kings 17 describes the fall of Samaria, the deportation of Israelites, and the settling of foreigners in the cities of Samaria. Isaiah 20:1 is the only biblical verse that names Sargon.",
+  "establishes": "An Assyrian king named Sargon claimed the conquest and repopulation of Samaria around 720 BC.",
+  "limits": "2 Kings 17:3 and 18:9 name Shalmaneser as the king who came against Hoshea and besieged Samaria, and scholars debate how the credit is shared between Shalmaneser V and Sargon II. Royal inscriptions present the governor's work as the king's own.",
+  "status": "corroborates",
+  "passages": [
+   "2Kgs.17.3-17.6",
+   "2Kgs.17.24-17.24",
+   "2Kgs.18.9-18.11",
+   "Isa.20.1-20.1"
+  ],
+  "people": [
+   "hoshea_1559"
+  ],
+  "dating": [
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "Sargon in Samaria: Unusual Formulations in the Royal Inscriptions and Their Value for Historical Reconstruction, Journal of the American Oriental Society",
+    "publisher": "PhilPapers (record of a JAOS article)",
+    "url": "https://philpapers.org/rec/ASTSIS"
+   },
+   {
+    "title": "The Nimrud Prism, 720 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/the_nimrud_prism-_720_bce/"
+   }
+  ]
+ },
+ {
+  "id": "sennacherib-prisms",
+  "name": "Sennacherib's annals (Taylor Prism and related prisms)",
+  "kind": "royal-record",
+  "summary": "Clay prisms of Sennacherib describing his 701 BC campaign against Judah, in which Hezekiah was shut up in Jerusalem 'like a bird in a cage'.",
+  "objectDate": {
+   "text": "About 691 BC (Taylor Prism); campaign of 701 BC",
+   "sort": -691
+  },
+  "found": {
+   "year": null,
+   "by": "Bought by Colonel R. Taylor in 1830; not from a scientific excavation",
+   "where": "Said to come from Nebi Yunus, Nineveh, northern Iraq"
+  },
+  "location": {
+   "lat": 36.355,
+   "lon": 43.155,
+   "placeSlug": "nineveh_899"
+  },
+  "heldAt": {
+   "institution": "British Museum, London (Taylor Prism); copies in the Israel Museum, Jerusalem, and the Oriental Institute (ISAC), Chicago",
+   "ref": "91032 (1855,1003.1)"
+  },
+  "language": "Akkadian (cuneiform)",
+  "description": "Six-sided clay prisms recording Sennacherib's campaigns. For 701 BC he claims to have besieged 46 of Hezekiah's fortified cities and deported 200,150 people. He says he made Hezekiah 'a prisoner in Jerusalem, his royal residence, like a bird in a cage', and lists heavy tribute including 30 talents of gold and 800 talents of silver.",
+  "connection": "2 Kings 18–19, Isaiah 36–37 and 2 Chronicles 32 describe Sennacherib's invasion in Hezekiah's 14th year, the taking of Judah's fortified cities, and Hezekiah's payment of 300 talents of silver and 30 talents of gold.",
+  "establishes": "Sennacherib campaigned in Judah in 701 BC, took many of its towns, besieged Jerusalem without claiming to capture it, and received tribute from Hezekiah.",
+  "limits": "It is royal propaganda. The silver figure differs from 2 Kings. It is silent about the Assyrian withdrawal that 2 Kings 19:35–36 attributes to divine action. The prisms were not found in controlled excavations.",
+  "status": "corroborates",
+  "passages": [
+   "2Kgs.18.13-18.16",
+   "2Kgs.19.35-19.37",
+   "Isa.36.1-36.1",
+   "2Chr.32.1-32.23"
+  ],
+  "people": [
+   "sennacherib_2489",
+   "hezekiah_1512"
+  ],
+  "dating": [
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "The Taylor Prism, museum number 91032",
+    "publisher": "British Museum",
+    "url": "https://www.britishmuseum.org/collection/object/W_1855-1003-1"
+   },
+   {
+    "title": "Hezekiah's Defeat: The Annals of Sennacherib on the Taylor, Jerusalem, and Oriental Institute Prisms, 700 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/hezekiah-s_defeat-_the_annals_of_sennacherib_on_the_taylor-_jerusalem-_and_oriental_institute_prisms-_700_bce/"
+   },
+   {
+    "title": "Sennacherib: The Invasion of Palestine (Ancient History Sourcebook)",
+    "publisher": "Fordham University",
+    "url": "https://sourcebooks.web.fordham.edu/ancient/701sennach.asp"
+   }
+  ]
+ },
+ {
+  "id": "lachish-reliefs",
+  "name": "Lachish reliefs from Sennacherib's palace",
+  "kind": "royal-record",
+  "summary": "Carved wall panels from Sennacherib's South-West Palace at Nineveh showing the Assyrian siege and capture of the Judahite city of Lachish in 701 BC.",
+  "objectDate": {
+   "text": "About 700–692 BC",
+   "sort": -696
+  },
+  "found": {
+   "year": null,
+   "by": "British excavations at Nineveh in the mid-19th century (the British Museum lists H. Rassam, H. C. Rawlinson, W. K. Loftus and J. G. Taylor)",
+   "where": "South-West Palace, Nineveh, Room XXXVI"
+  },
+  "location": {
+   "lat": 36.359,
+   "lon": 43.152,
+   "placeSlug": "nineveh_899"
+  },
+  "heldAt": {
+   "institution": "British Museum, London",
+   "ref": "124905 (one panel)"
+  },
+  "language": "Akkadian (cuneiform caption)",
+  "description": "A series of gypsum panels that lined a room in Sennacherib's palace. They show archers, slingers and battering rams on siege ramps, defenders on the walls, captives leaving the city and plunder carried away. A caption reads that Sennacherib 'sat on the throne as the plunder of Lachish passed before him'.",
+  "connection": "2 Kings 18:14 and 18:17 place Sennacherib at Lachish when he dealt with Hezekiah, and 2 Chronicles 32:9 says he besieged Lachish with all his forces. Arrows and slingstones from the battle have also been excavated at Lachish.",
+  "establishes": "Sennacherib besieged and took Lachish and chose to display this victory prominently in his palace.",
+  "limits": "The reliefs are royal art made for an Assyrian audience, with conventional figures. Sennacherib's written annals do not name Lachish, so the caption is the main Assyrian text for this siege.",
+  "status": "corroborates",
+  "passages": [
+   "2Kgs.18.14-18.17",
+   "2Chr.32.9-32.9",
+   "Isa.36.2-36.2"
+  ],
+  "people": [
+   "sennacherib_2489",
+   "hezekiah_1512"
+  ],
+  "dating": [
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "Wall panel (relief), museum number 124905",
+    "publisher": "British Museum",
+    "url": "https://www.britishmuseum.org/collection/object/W_1856-0909-14"
+   },
+   {
+    "title": "The Lachish Reliefs",
+    "publisher": "Tyndale House, Cambridge",
+    "url": "https://tyndale.cam.ac.uk/explore/articles/the-lachish-reliefs/"
+   }
+  ]
+ },
+ {
+  "id": "siloam-inscription",
+  "name": "Siloam Inscription and Hezekiah's Tunnel",
+  "kind": "inscription",
+  "summary": "A Hebrew inscription cut in a water tunnel under the City of David, recording the moment two digging crews met.",
+  "objectDate": {
+   "text": "Late 8th century BC",
+   "sort": -701
+  },
+  "found": {
+   "year": 1880,
+   "by": "Found by local boys near the southern end of the tunnel",
+   "where": "Hezekiah's (Siloam) Tunnel, City of David, Jerusalem"
+  },
+  "location": {
+   "lat": 31.7735,
+   "lon": 35.2355,
+   "placeSlug": "siloam_1096"
+  },
+  "heldAt": {
+   "institution": "Istanbul Archaeological Museums",
+   "ref": ""
+  },
+  "language": "Hebrew (Old Hebrew script)",
+  "description": "The text describes two teams of quarrymen cutting towards each other through the rock, hearing each other's voices, and breaking through. It says the water then flowed from the spring to the pool for 1,200 cubits. Thieves cut the inscription from the wall, breaking it, and it was later taken by the Ottoman authorities.",
+  "connection": "2 Kings 20:20 says Hezekiah made a pool and a conduit and brought water into the city. 2 Chronicles 32:30 says he stopped the upper outlet of the Gihon and brought it down to the west side of the City of David.",
+  "establishes": "A rock-cut tunnel bringing spring water into Jerusalem was completed in the late Iron Age, and its builders recorded the event in Hebrew.",
+  "limits": "The inscription does not name a king. Its link to Hezekiah rests on the script, the language and the biblical texts; most scholars accept this link.",
+  "status": "consistent",
+  "passages": [
+   "2Kgs.20.20-20.20",
+   "2Chr.32.2-32.4",
+   "2Chr.32.30-32.30"
+  ],
+  "people": [
+   "hezekiah_1512"
+  ],
+  "dating": [
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "ANET pp. 320–321 (Gezer Calendar, Moabite Stone, Siloam Inscription, Lachish Ostraca), course reading",
+    "publisher": "University of Michigan (from J. B. Pritchard, Ancient Near Eastern Texts, Princeton University Press)",
+    "url": "https://courses.lsa.umich.edu/israel-palestine/wp-content/uploads/sites/142/2013/12/028.-ANET-320-321.pdf"
+   },
+   {
+    "title": "Hezekiah's (or Siloam) Tunnel Inscription, 701 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/hezekiah-s_-or_siloam-_tunnel_inscription-_701_bce/"
+   }
+  ]
+ },
+ {
+  "id": "babylonian-chronicle-jerusalem-597",
+  "name": "Babylonian Chronicle of Nebuchadnezzar II (capture of Jerusalem, 597 BC)",
+  "kind": "royal-record",
+  "summary": "A Babylonian chronicle tablet recording that Nebuchadnezzar seized 'the city of Judah' on 2 Adar 597 BC, captured its king and appointed another.",
+  "objectDate": {
+   "text": "Events of 605–594 BC; tablet copied about 550–400 BC",
+   "sort": -597
+  },
+  "found": {
+   "year": null,
+   "by": "Registered at the British Museum in 1896",
+   "where": "Babylonia (findspot not stated in the cited sources)"
+  },
+  "location": {
+   "lat": 32.536,
+   "lon": 44.421,
+   "placeSlug": "babylon_151"
+  },
+  "heldAt": {
+   "institution": "British Museum, London",
+   "ref": "21946 (1896,0409.51)"
+  },
+  "language": "Akkadian (cuneiform)",
+  "description": "A clay tablet covering the years from Nabopolassar's 21st year (605 BC) to Nebuchadnezzar's 11th year (594 BC). It reports that on the second day of the month Adar the king of Babylon took the city of Judah and seized its king. It adds that he appointed a king of his own choice over it.",
+  "connection": "2 Kings 24:10–17 and 2 Chronicles 36:9–10 say that Nebuchadnezzar besieged Jerusalem, took King Jehoiachin to Babylon with treasure, and made Mattaniah, renamed Zedekiah, king in his place.",
+  "establishes": "Jerusalem fell to Nebuchadnezzar II in early 597 BC, its king was taken, and a replacement king was installed. The chronicle gives an exact date for a biblical event.",
+  "limits": "The chronicle names neither Jehoiachin nor Zedekiah; the identification comes from the biblical account. The tablet is a later copy.",
+  "status": "corroborates",
+  "passages": [
+   "2Kgs.24.10-24.17",
+   "2Chr.36.9-36.10"
+  ],
+  "people": [
+   "nebuchadnezzar_2167",
+   "jehoiachin_791",
+   "zedekiah_1950"
+  ],
+  "dating": [
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "Cuneiform tablet with part of the Babylonian Chronicle (605–594 BC)",
+    "publisher": "British Museum",
+    "url": "https://www.britishmuseum.org/explore/highlights/highlight_objects/me/c/cuneiform_nebuchadnezzar_ii.aspx"
+   },
+   {
+    "title": "The Babylonian Chronicle (Chronicle 5): Nebuchadnezzar Besieges Jerusalem, 597 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/?p=7864"
+   }
+  ]
+ },
+ {
+  "id": "jehoiachin-ration-tablets",
+  "name": "Jehoiachin ration tablets",
+  "kind": "royal-record",
+  "summary": "Babylonian administrative tablets listing oil rations for 'Ya'u-kinu, king of the land of Yahudu', his sons and other foreign captives.",
+  "objectDate": {
+   "text": "About 592/591 BC (Nebuchadnezzar's 13th year on the dated tablet)",
+   "sort": -592
+  },
+  "found": {
+   "year": null,
+   "by": "German excavations at Babylon in the early 20th century",
+   "where": "Vaulted building in the north-east corner of the Southern Palace, Babylon, Iraq"
+  },
+  "location": {
+   "lat": 32.5425,
+   "lon": 44.4275,
+   "placeSlug": "babylon_151"
+  },
+  "heldAt": {
+   "institution": "Vorderasiatisches Museum, Staatliche Museen zu Berlin",
+   "ref": "VAT 16378 (one of the tablets)"
+  },
+  "language": "Akkadian (Neo-Babylonian cuneiform)",
+  "description": "Fragmentary clay tablets from the royal administration of Nebuchadnezzar II recording oil rations issued to prisoners and dependants at court. They name the king of Judah, his five sons and other foreigners, including Egyptians.",
+  "connection": "2 Kings 24 says Jehoiachin was taken to Babylon in 597 BC. 2 Kings 25:27–30 and Jeremiah 52:31–34 say he was later released from prison and given a regular allowance at the king's table.",
+  "establishes": "Jehoiachin, king of Judah, and his sons lived as royal dependants in Babylon and received state rations in the 590s BC.",
+  "limits": "The tablets date from Nebuchadnezzar's reign, not from Evil-merodach's release of Jehoiachin decades later. They show his status, not his release.",
+  "status": "corroborates",
+  "passages": [
+   "2Kgs.24.12-24.15",
+   "2Kgs.25.27-25.30",
+   "Jer.52.31-52.34"
+  ],
+  "people": [
+   "jehoiachin_791",
+   "nebuchadnezzar_2167"
+  ],
+  "dating": [
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "Rationsliste für Gefangene mit Erwähnung des Königs Jojachin von Juda (VAT 16378)",
+    "publisher": "Staatliche Museen zu Berlin",
+    "url": "https://search.smb.museum/en/object/obj-1743721"
+   },
+   {
+    "title": "Babylonian Ration List: King Jehoiakhin in Exile, 592-1 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/?p=4828"
+   }
+  ]
+ },
+ {
+  "id": "nabonidus-cylinder-ur",
+  "name": "Nabonidus Cylinder from Ur",
+  "kind": "royal-record",
+  "summary": "A clay foundation cylinder of Nabonidus, last king of Babylon, that prays for the king and 'Belshazzar, his son'.",
+  "objectDate": {
+   "text": "555–539 BC",
+   "sort": -545
+  },
+  "found": {
+   "year": null,
+   "by": "",
+   "where": "Ur, southern Iraq"
+  },
+  "location": {
+   "lat": 30.9625,
+   "lon": 46.103
+  },
+  "heldAt": {
+   "institution": "British Museum, London",
+   "ref": "91128"
+  },
+  "language": "Akkadian (cuneiform)",
+  "description": "A complete fired clay cylinder with 26 lines in two columns. It records Nabonidus' work on the ziggurat temple of the moon god Sin at Ur and closes with a prayer for the king and for Belshazzar his son.",
+  "connection": "Daniel 5 presents Belshazzar as king of Babylon on the night the city fell. This cylinder names him as the son of Babylon's last king.",
+  "establishes": "Belshazzar was a real person, the son and heir of Nabonidus, king of Babylon in the mid-6th century BC.",
+  "limits": "The cylinder does not call Belshazzar king or mention the fall of Babylon. Daniel calls Nebuchadnezzar his father, which scholars explain in different ways.",
+  "status": "corroborates",
+  "passages": [
+   "Dan.5.1-5.31",
+   "Dan.7.1-7.1",
+   "Dan.8.1-8.1"
+  ],
+  "people": [
+   "belshazzar_437"
+  ],
+  "dating": [
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "Cylinder of Nabonidus, museum number 91128",
+    "publisher": "British Museum",
+    "url": "https://www.britishmuseum.org/collection/object/W_K-1692"
+   },
+   {
+    "title": "Mesopotamian Cylinder Naming Nabonidus & Sacred Buildings",
+    "publisher": "World History Encyclopedia",
+    "url": "https://www.worldhistory.org/image/4915/mesopotamian-cylinder-naming-nabonidus--sacred-bui/"
+   }
+  ]
+ },
+ {
+  "id": "cyrus-cylinder",
+  "name": "Cyrus Cylinder",
+  "kind": "royal-record",
+  "summary": "A Babylonian clay cylinder presenting Cyrus' capture of Babylon in 539 BC and his claim to have restored deported gods and peoples.",
+  "objectDate": {
+   "text": "After 539 BC",
+   "sort": -539
+  },
+  "found": {
+   "year": 1879,
+   "by": "Hormuzd Rassam",
+   "where": "Babylon (Amran mound), Iraq"
+  },
+  "location": {
+   "lat": 32.537,
+   "lon": 44.424,
+   "placeSlug": "babylon_151"
+  },
+  "heldAt": {
+   "institution": "British Museum, London",
+   "ref": "90920 (1880,0617.1941)"
+  },
+  "language": "Akkadian (cuneiform)",
+  "description": "A fired clay cylinder written to be buried in Babylon's wall. It accuses Nabonidus of corrupting the cults of the gods and says Marduk chose Cyrus, who entered Babylon without a battle. Cyrus claims to have returned deported gods and their peoples to their sanctuaries and restored their cults.",
+  "connection": "Ezra 1 and 2 Chronicles 36 say Cyrus allowed the Jews to return and rebuild the temple in Jerusalem, and Isaiah 45:1 calls Cyrus the Lord's anointed. The cylinder shows a policy of returning peoples and restoring temples that fits this picture.",
+  "establishes": "Cyrus took Babylon in 539 BC and publicised a policy of restoring local cults and returning deported peoples.",
+  "limits": "The cylinder does not mention Jews, Judah, Jerusalem or Israel's God. It is written from a Babylonian viewpoint and credits Marduk. It is not the decree quoted in Ezra.",
+  "status": "consistent",
+  "passages": [
+   "Ezra.1.1-1.4",
+   "2Chr.36.22-36.23",
+   "Isa.45.1-45.1"
+  ],
+  "people": [
+   "cyrus_968"
+  ],
+  "dating": [
+   "historical-synchronism"
+  ],
+  "sources": [
+   {
+    "title": "The Cyrus Cylinder, museum number 90920",
+    "publisher": "British Museum",
+    "url": "https://www.britishmuseum.org/collection/object/W_1880-0617-1941"
+   },
+   {
+    "title": "Cyrus Cylinder",
+    "publisher": "ANU – Museum of the Jewish People",
+    "url": "https://index.anumuseum.org.il/exhibit/artifact-cyrus-cylinder/"
+   }
+  ]
+ },
+ {
+  "id": "lachish-letters",
+  "name": "Lachish Letters (ostraca)",
+  "kind": "inscription",
+  "summary": "Hebrew letters written in ink on potsherds at Lachish in the last years of the kingdom of Judah, before the Babylonian conquest.",
+  "objectDate": {
+   "text": "Early 6th century BC (before about 588 BC)",
+   "sort": -589
+  },
+  "found": {
+   "year": 1935,
+   "by": "J. L. Starkey (18 ostraca in 1935, three more in 1938)",
+   "where": "Tell ed-Duweir (Lachish), Israel"
+  },
+  "location": {
+   "lat": 31.5648,
+   "lon": 34.849,
+   "placeSlug": "lachish_711"
+  },
+  "heldAt": {
+   "institution": "British Museum, London (including Letter I); Letter 6 on display at the Rockefeller Museum, Jerusalem",
+   "ref": "125701 (1959,0711.1) for Letter I"
+  },
+  "language": "Hebrew (Old Hebrew script)",
+  "description": "Twenty-one ostraca, mostly letters, of which about a third are well enough preserved to read throughout. Many are from Hoshayahu to his superior Yaush. Letter 4 says the writer is watching for the signal fires of Lachish. Letter 6 complains of words from Jerusalem that weaken morale.",
+  "connection": "Jeremiah 34:7 says that when Babylon's army attacked Jerusalem, Lachish and Azekah were the last fortified cities of Judah still standing. The letters show the military communication of that late period.",
+  "establishes": "Officers in Judah's army wrote to one another in Hebrew in the tense period before the Babylonian conquest.",
+  "limits": "Some read Letter 4 as saying Azekah had already fallen because its signals could no longer be seen, but many scholars reject this. Proposed links between named persons and people in Jeremiah are uncertain.",
+  "status": "consistent",
+  "passages": [
+   "Jer.34.6-34.7"
+  ],
+  "people": [],
+  "dating": [
+   "stratigraphy",
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "Ostracon (Lachish Letter I), museum number 125701",
+    "publisher": "British Museum",
+    "url": "https://www.britishmuseum.org/collection/object/W_1959-0711-1"
+   },
+   {
+    "title": "ANET pp. 320–321 (Gezer Calendar, Moabite Stone, Siloam Inscription, Lachish Ostraca), course reading",
+    "publisher": "University of Michigan (from J. B. Pritchard, Ancient Near Eastern Texts, Princeton University Press)",
+    "url": "https://courses.lsa.umich.edu/israel-palestine/wp-content/uploads/sites/142/2013/12/028.-ANET-320-321.pdf"
+   },
+   {
+    "title": "The Lakhish Ostraca",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/?p=6532"
+   }
+  ]
+ },
+ {
+  "id": "arad-ostraca",
+  "name": "Arad ostraca",
+  "kind": "inscription",
+  "summary": "Hebrew letters and records on potsherds from the Judahite fortress at Arad, many from the archive of an officer named Eliashib.",
+  "objectDate": {
+   "text": "About 600 BC (late 7th to early 6th century BC)",
+   "sort": -600
+  },
+  "found": {
+   "year": null,
+   "by": "Tel Aviv University expedition directed by Yohanan Aharoni (1960s)",
+   "where": "Tel Arad, northern Negev, Israel"
+  },
+  "location": {
+   "lat": 31.2805,
+   "lon": 35.1265,
+   "placeSlug": "arad_81"
+  },
+  "heldAt": {
+   "institution": "",
+   "ref": ""
+  },
+  "language": "Hebrew (Old Hebrew script)",
+  "description": "Ink inscriptions on pottery, many from one archive of military letters addressed to Eliashib about supplies and troop movements. Some letters show concern about the nearby Edomites. Arad 18 briefly mentions a shrine: 'the house of the Lord is well. It remains.'",
+  "connection": "The ostraca come from a Judahite fortress in the last decades of the kingdom of Judah, the period of 2 Kings 23–25. A study of 16 of them found at least six different writers, suggesting that writing reached down the military ranks.",
+  "establishes": "Judah's army ran a written supply and command system in the Negev around 600 BC.",
+  "limits": "It is unclear whether 'house of the LORD' in Arad 18 refers to the Jerusalem temple. The ostraca do not name any biblical king or event, and wider claims about literacy and the writing of biblical books are debated.",
+  "status": "consistent",
+  "passages": [
+   "2Kgs.24.1-24.2",
+   "2Kgs.25.1-25.10"
+  ],
+  "people": [],
+  "dating": [
+   "stratigraphy",
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "Arad Ostraca, c. 600 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/arad_ostraca-_c-_600_bce/"
+   },
+   {
+    "title": "Algorithmic handwriting analysis of Judah's military correspondence sheds light on composition of biblical texts (Faigenbaum-Golovin et al., PNAS 113.17, 2016)",
+    "publisher": "Hebrew University of Jerusalem research portal",
+    "url": "https://cris.huji.ac.il/en/publications/algorithmic-handwriting-analysis-of-judahs-military-correspondenc-2/"
+   }
+  ]
+ },
+ {
+  "id": "gezer-calendar",
+  "name": "Gezer Calendar",
+  "kind": "inscription",
+  "summary": "A small limestone tablet from Gezer listing the farming year month by month, one of the oldest known Hebrew or Canaanite inscriptions.",
+  "objectDate": {
+   "text": "10th century BC",
+   "sort": -925
+  },
+  "found": {
+   "year": 1908,
+   "by": "R. A. S. Macalister, for the Palestine Exploration Fund",
+   "where": "Tel Gezer, Israel"
+  },
+  "location": {
+   "lat": 31.859,
+   "lon": 34.9205,
+   "placeSlug": "gezer_463"
+  },
+  "heldAt": {
+   "institution": "Istanbul Archaeological Museums",
+   "ref": ""
+  },
+  "language": "Early Hebrew or Canaanite (debated)",
+  "description": "A soft limestone tablet listing agricultural tasks: two months each of olive harvest, sowing and late sowing, then flax, barley harvest, harvest and feasting, vine-tending and summer fruit. A partly preserved name is reconstructed as Abiyah.",
+  "connection": "It reflects the farming year assumed by biblical laws and festivals, such as the feast of harvest. Gezer is the city that 1 Kings 9 says Solomon fortified.",
+  "establishes": "Alphabetic writing was in use at Gezer in the 10th century BC, recording the agricultural calendar of the region.",
+  "limits": "It names no king or event. Scholars debate whether its script is Phoenician or early Hebrew, whether its language is Hebrew, and whether it was an almanac, a writing exercise or something else.",
+  "status": "consistent",
+  "passages": [
+   "Exod.23.16-23.16",
+   "1Kgs.9.15-9.17"
+  ],
+  "people": [],
+  "dating": [
+   "palaeography",
+   "stratigraphy"
+  ],
+  "sources": [
+   {
+    "title": "The Gezer Calendar",
+    "publisher": "Biblical Archaeology Society",
+    "url": "https://www.biblicalarchaeology.org/daily/biblical-artifacts/inscriptions/the-gezer-calendar/"
+   },
+   {
+    "title": "ANET pp. 320–321 (Gezer Calendar, Moabite Stone, Siloam Inscription, Lachish Ostraca), course reading",
+    "publisher": "University of Michigan (from J. B. Pritchard, Ancient Near Eastern Texts, Princeton University Press)",
+    "url": "https://courses.lsa.umich.edu/israel-palestine/wp-content/uploads/sites/142/2013/12/028.-ANET-320-321.pdf"
+   }
+  ]
+ },
+ {
+  "id": "ketef-hinnom-amulets",
+  "name": "Ketef Hinnom silver amulets",
+  "kind": "artefact",
+  "summary": "Two tiny rolled silver amulets from a Jerusalem tomb, inscribed with a blessing almost identical to the Priestly Blessing of Numbers 6.",
+  "objectDate": {
+   "text": "About 600 BC (late 7th or early 6th century BC)",
+   "sort": -600
+  },
+  "found": {
+   "year": 1979,
+   "by": "Gabriel Barkay (Tel Aviv University excavations)",
+   "where": "Burial cave at Ketef Hinnom, above the Hinnom Valley, Jerusalem"
+  },
+  "location": {
+   "lat": 31.7699,
+   "lon": 35.2277
+  },
+  "heldAt": {
+   "institution": "Israel Museum, Jerusalem",
+   "ref": ""
+  },
+  "language": "Hebrew (Old Hebrew script)",
+  "description": "Two small silver sheets, rolled up and worn as amulets, found in a rock-cut tomb. Once unrolled at the Israel Museum laboratories, they were found to carry benediction formulas in Old Hebrew script that include the divine name YHWH.",
+  "connection": "The blessing closely matches Numbers 6:24–26: 'The LORD bless thee, and keep thee...'. It shows this blessing was in use in Judah before the Babylonian exile.",
+  "establishes": "A form of the Priestly Blessing was written and used in Jerusalem around 600 BC, centuries before the Dead Sea Scrolls.",
+  "limits": "The amulets are not a copy of the book of Numbers; the blessing may have circulated as a liturgical text on its own. The text is tiny and damaged, so its readings depend on close study.",
+  "status": "corroborates",
+  "passages": [
+   "Num.6.24-6.26"
+  ],
+  "people": [],
+  "dating": [
+   "stratigraphy",
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "Archaeological Sites in Israel – Jerusalem: Silver Plaques",
+    "publisher": "Israel Ministry of Foreign Affairs",
+    "url": "https://embassies.gov.il/MFA/IsraelExperience/history/Pages/Archaeological%20Sites%20in%20Israel%20-%20Jerusalem%20-%20Silve.aspx"
+   },
+   {
+    "title": "Silver Scroll Amulets from Ketef Hinnom, c. 600 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/?p=7652"
+   }
+  ]
+ },
+ {
+  "id": "ishtar-gate-babylon",
+  "name": "Ishtar Gate of Babylon",
+  "kind": "site",
+  "summary": "A glazed-brick city gate of Babylon built by Nebuchadnezzar II, with a building inscription in his name; it is now reconstructed in Berlin.",
+  "objectDate": {
+   "text": "About 575 BC",
+   "sort": -575
+  },
+  "found": {
+   "year": 1899,
+   "by": "German excavations at Babylon (1899–1914)",
+   "where": "Northern entrance of the inner city, Babylon, Iraq"
+  },
+  "location": {
+   "lat": 32.5434,
+   "lon": 44.421,
+   "placeSlug": "babylon_151"
+  },
+  "heldAt": {
+   "institution": "Vorderasiatisches Museum, Staatliche Museen zu Berlin (reconstruction with original glazed reliefs)",
+   "ref": ""
+  },
+  "language": "Akkadian (cuneiform)",
+  "description": "A double gate in Babylon's inner wall, faced with glazed brick showing rows of bulls and dragons, the animals of the gods Adad and Marduk. Nebuchadnezzar's foundation inscription describes its cedar roof, bronze-clad doors and decoration. The Berlin reconstruction shows only the smaller outer gate.",
+  "connection": "Nebuchadnezzar is the king who took Jerusalem and deported its people (2 Kings 24–25). Daniel 4:30 has him boast of 'great Babylon, that I have built'; the gate is part of his large building programme in the city.",
+  "establishes": "Nebuchadnezzar II carried out major building works in Babylon and recorded them in his own name.",
+  "limits": "The gate and its inscription do not mention Judah, Jerusalem or the exiles. It illustrates the city of the biblical exile rather than any specific biblical event.",
+  "status": "consistent",
+  "passages": [
+   "2Kgs.24.1-24.1",
+   "Dan.4.29-4.30"
+  ],
+  "people": [
+   "nebuchadnezzar_2167"
+  ],
+  "dating": [
+   "historical-synchronism",
+   "stratigraphy"
+  ],
+  "sources": [
+   {
+    "title": "Ischtar-Tor (III. Baustufe), object record",
+    "publisher": "Staatliche Museen zu Berlin (museum-digital)",
+    "url": "https://smb.museum-digital.de/pdf/object/141537.pdf?lang=en"
+   },
+   {
+    "title": "The Ishtar Gate and Neo-Babylonian art and architecture (S. German)",
+    "publisher": "Smarthistory",
+    "url": "https://smarthistory.org/neo-babylonian"
+   },
+   {
+    "title": "Ishtar Gate, c. 575 BCE",
+    "publisher": "Center for Online Judaic Studies",
+    "url": "https://cojs.org/?p=6169"
+   }
+  ]
+ },
+ {
+  "id": "elephantine-papyri",
+  "name": "Elephantine papyri (Jewish community letters)",
+  "kind": "manuscript",
+  "summary": "Aramaic papyri of a Jewish military colony in southern Egypt under Persian rule, naming Sanballat governor of Samaria and the high priest Johanan.",
+  "objectDate": {
+   "text": "About 495–400 BC; temple petition dated 407 BC",
+   "sort": -407
+  },
+  "found": {
+   "year": null,
+   "by": "Acquired and excavated in several lots (Wilbour, Mond-Cecil, Bodleian and German excavation groups)",
+   "where": "Elephantine Island and Aswan, Egypt"
+  },
+  "location": {
+   "lat": 24.087,
+   "lon": 32.887
+  },
+  "heldAt": {
+   "institution": "Divided between the Brooklyn Museum, the Egyptian Museum in Cairo, the Bodleian Library and the Staatliche Museen zu Berlin",
+   "ref": ""
+  },
+  "language": "Aramaic",
+  "description": "Contracts, letters and lists of a Jewish garrison that served the Persians at Elephantine and had its own temple of Yaho (YHW). After the temple was destroyed in 410 BC, the community petitioned the governor of Judah, Bagavahya (Bagoas), in year 17 of Darius (407 BC). The letter says they had already written to 'the high priest Johanan' in Jerusalem and to 'Delaiah and Shelemiah, the sons of Sanballat the governor of Samaria'.",
+  "connection": "Nehemiah names Sanballat as Nehemiah's chief opponent, and Nehemiah 12–13 lists the high priestly line of Eliashib, Joiada and Johanan. The papyri date Sanballat and a high priest Johanan to the late 5th century BC.",
+  "establishes": "A Sanballat was governor of Samaria and a Johanan was high priest in Jerusalem in the late 5th century BC, and Jews in Egypt worshipped YHW at their own temple.",
+  "limits": "The papyri do not mention Nehemiah or Ezra. Identifying this Johanan with the Johanan of Nehemiah 12 is a scholarly inference from the order of names, and the Elephantine temple and its practice differ from the Jerusalem-centred religion of Ezra–Nehemiah.",
+  "status": "corroborates",
+  "passages": [
+   "Neh.2.10-2.10",
+   "Neh.4.1-4.2",
+   "Neh.12.22-12.23",
+   "Neh.13.28-13.28"
+  ],
+  "people": [
+   "sanballat_2470",
+   "johanan_1698"
+  ],
+  "dating": [
+   "historical-synchronism",
+   "palaeography"
+  ],
+  "sources": [
+   {
+    "title": "Elephantine (B. Porten), Shalvi/Hyman Encyclopedia of Jewish Women",
+    "publisher": "Jewish Women's Archive",
+    "url": "https://jwa.org/encyclopedia/article/elephantine"
+   },
+   {
+    "title": "ANET pp. 491–492 (Aramaic papyri from Elephantine), course reading",
+    "publisher": "University of Michigan (from J. B. Pritchard, Ancient Near Eastern Texts, Princeton University Press)",
+    "url": "https://courses.lsa.umich.edu/israel-palestine/wp-content/uploads/sites/142/2013/12/040.-ANET-491-492.pdf"
+   }
+  ]
+ }
+]
