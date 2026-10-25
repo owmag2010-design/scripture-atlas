@@ -1,0 +1,28 @@
+# Scripture Atlas (Phase 1) — static site, no build step.
+[build]
+  publish = "public"
+  # Every dataset is downloaded from its original open source and built here (see README).
+  command = "node scripts/fetch-sources.mjs && node scripts/fetch-ebible.mjs && npm run build"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+  included_files = ["public/data/index.json", "public/data/kjv/**", "public/data/web/**", "public/data/xref/**", "public/data/hist/vx/**", "public/data/hist/people.json", "public/data/hist/events.json"]
+
+[[headers]]
+  for = "/data/bible/*"
+  [headers.values]
+    Content-Type = "application/octet-stream"
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'"

@@ -1,0 +1,18 @@
+{
+  "name": "scripture-atlas",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-data.mjs && node scripts/build-lang.mjs && node scripts/build-hist.mjs && node scripts/build-trans.mjs && node scripts/build-research.mjs",
+    "build:data": "node scripts/build-data.mjs",
+    "build:lang": "node scripts/build-lang.mjs",
+    "test": "node --test test/*.test.mjs",
+    "build:hist": "node scripts/build-hist.mjs",
+    "build:trans": "node scripts/build-trans.mjs",
+    "fetch": "node scripts/fetch-sources.mjs && node scripts/fetch-ebible.mjs",
+    "build:research": "node scripts/build-research.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.133.0"
+  }
+}
