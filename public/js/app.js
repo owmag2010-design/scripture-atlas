@@ -60,7 +60,7 @@ function discImg(d, { cls = "", sizes = "100vw", eager = false } = {}) {
   const m = d?.image; if (!m?.local) return "";
   return `<img class="${cls}" src="img/disc/${d.id}-sm.webp" srcset="img/disc/${d.id}-sm.webp 640w, img/disc/${d.id}.webp 1400w" sizes="${sizes}" alt="${esc(m.alt || d.name)}" width="${m.w}" height="${m.h}" style="object-position:${m.focus || "50% 50%"}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
 }
-const discCredit = d => d?.image?.local ? `Photo: ${esc(d.image.author || "unknown")}, ${esc(d.image.licence || "")}, via Wikimedia Commons` : "";
+const discCredit = d => { const m = d?.image; if (!m?.local) return ""; const lic = m.licenceUrl ? `<a href="${esc(m.licenceUrl)}" target="_blank" rel="noopener noreferrer">${esc(m.licence)}</a>` : esc(m.licence || ""); return `Photo: ${esc(m.author || "unknown")}, ${lic}${m.source ? `, <a href="${esc(m.source)}" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a>` : ", via Wikimedia Commons"}`; };
 const dChip = d => `<span class="dstat s-${d.status}" title="${esc(DSTATUS[d.status]?.note || "")}">${DSTATUS[d.status]?.label || d.status}</span>`;
 /** "2Kgs.9.14-9.29" → "2 Kings 9:14–29" */
 function rangeLabel(r) {
@@ -1564,6 +1564,8 @@ function renderLibrary() {
       ${(INDEX?.language?.sources || []).map(s => `<tr><td>${credit(s.name, s.url)}</td><td>Original language data</td><td>${s.owner}</td><td>${s.licence}</td><td>Word tagging, lexicons or cross references</td></tr>`).join("")}</tbody></table></div></div>
     ${Object.keys(IMAGES).length ? `<section class="card" style="margin-bottom:18px"><h2 style="font-size:1.5rem;margin-bottom:8px">Image credits</h2><p class="small">Artwork, maps and manuscript photographs, via Wikimedia Commons. Each is public domain or openly licensed, as stated.</p>
       <ul class="credits">${Object.entries(IMAGES).map(([k, m]) => `<li><b>${esc(m.title)}</b>, ${esc(m.artist)}${m.date ? `, ${esc(m.date)}` : ""}. ${esc(m.licence)}${m.attribution ? `, ${esc(m.attribution)}` : ""}. <span class="mono">${esc(m.source)}</span></li>`).join("")}</ul></section>` : ""}
+      ${DISCOVERIES.some(d => d.image?.local) ? `<section class="card"><h2 style="font-size:1.4rem">Discovery photographs</h2><p class="small">Each is used under the licence shown; CC BY-SA images remain under that licence.</p><ul class="credits">${DISCOVERIES.filter(d => d.image?.local).map(d => `<li><b><a href="#/discoveries/${d.id}">${esc(d.name)}</a></b>. ${discCredit(d)}</li>`).join("")}</ul></section>` : ""}
+      <section class="card"><h2 style="font-size:1.4rem">Gustave Doré's Bible engravings</h2><p class="small">Book and people pictures are Gustave Doré's engravings for La Grande Bible de Tours (1866), public domain, from Wikimedia Commons.</p></section>
     <section class="card"><h2 style="font-size:1.5rem">How to read the labels</h2>
       <dl class="facts" style="margin-top:10px;grid-template-columns:110px minmax(0,1fr)">
         <dt>Scripture</dt><dd>The Bible text itself, in a named translation.</dd>
