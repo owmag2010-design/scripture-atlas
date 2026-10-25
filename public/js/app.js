@@ -963,7 +963,7 @@ const COURSE_ART = { foundations: "gutenberg", genesis: "creation-light", jesus:
 async function renderHistory(tab = "map", sub = "") {
   setNav("history"); setTitle("History");
   view.innerHTML = `${artHead(tab === "timeline" ? "era-exodus" : tab === "people" ? "era-patriarchs" : "map-holyland")}<span class="eyebrow">History</span><h1>Where and when the story happened, and how sure we are.</h1>
-    <div class="tabsrow">${[["map", "Map"], ["journeys", "Journeys"], ["timeline", "Timeline"], ["people", "People"]].map(([k, l]) => `<a class="btn ${k === tab ? "on" : ""}" href="#/history/${k}">${l}</a>`).join("")}${DISCOVERIES.length ? `<a class="btn" href="#/discoveries">Discoveries</a>` : ""}</div></div><div id="hist"><p class="loading">Loading…</p></div>`;
+    <div class="tabsrow">${[["map", "Map"], ["journeys", "Journeys"], ["timeline", "Timeline"], ["people", "People"]].map(([k, l]) => `<a class="btn ${k === tab ? "on" : ""}" href="#/history/${k}">${l}</a>`).join("")}<a class="btn gold" href="#/atlas">Full-screen atlas</a>${DISCOVERIES.length ? `<a class="btn" href="#/discoveries">Discoveries</a>` : ""}</div></div><div id="hist"><p class="loading">Loading…</p></div>`;
   const box = $("#hist");
   if (tab === "timeline") return renderTimeline(box);
   if (tab === "people") return renderPeopleList(box);
@@ -998,7 +998,7 @@ async function renderJourneys(box, id) {
     <div class="maplayout journey" style="--c:${j.colour}"><div class="card mapcard"><div id="jmap"></div></div>
       <aside class="card mapside"><h2 style="font-size:1.35rem">${esc(j.title)}</h2><p class="small">${esc(j.range)} · ${esc(j.when)}</p>
         ${j.note ? `<div class="textnote"><b>How sure is this?</b><br>${esc(j.note)}</div>` : ""}
-        <div class="actions"><button class="btn pri" type="button" id="jplay">Play the journey</button><span class="small" id="jstep"></span></div>
+        <div class="actions"><button class="btn pri" type="button" id="jplay">Play the journey</button><a class="btn" href="#/atlas/journey/${j.id}">Full-screen atlas</a><span class="small" id="jstep"></span></div>
         <ol class="jstops" id="jstops">${j.stops.map(([sl, o, what], i) => { const r = fromOsis(o); return `<li data-i="${i}"><button type="button" class="jstop" data-i="${i}"><b>${esc(lm.get(sl)?.[1] || sl)}</b><span>${esc(what)}</span></button><a class="small" href="#/lens/${o}">${labelOf(o)}</a></li>`; }).join("")}</ol>
         <p class="small">Places: Theographic Bible Metadata (CC BY-SA 4.0); lines join the stops in order and do not show the exact road or sea lane.</p></aside></div>`;
   const map = mountMap($("#jmap"), { base, places, only: new Set(slugs), onPick: s => { const i = slugs.indexOf(s); if (i >= 0) show(i); } });
@@ -1096,7 +1096,7 @@ async function renderPlace(slug) {
   const plotted = p.cls !== "unknown" && p.lat != null && inMapBox(p.lon, p.lat);
   view.innerHTML = `<div class="pagehead"><span class="eyebrow">History · Place</span><h1>${esc(p.name)}</h1>
     <p style="margin:0" class="small">${esc([p.type, p.sub].filter(Boolean).join(" · "))}${p.other ? ` · also ${esc(p.other)}` : ""}${p.comment ? ` · ${esc(p.comment)}` : ""}</p>
-    <div class="actions"><a class="btn" href="#/research/place/${slug}">See connections</a><span class="prec ${p.cls}">${PRECISION[p.cls].label}</span><span class="small">${PRECISION[p.cls].note}${p.lat != null && p.cls !== "unknown" ? ` (${p.lat.toFixed(2)}°, ${p.lon.toFixed(2)}°)` : ""}</span></div></div>
+    <div class="actions"><a class="btn pri" href="#/atlas/place/${slug}">Open in the Atlas</a><a class="btn" href="#/research/place/${slug}">See connections</a><span class="prec ${p.cls}">${PRECISION[p.cls].label}</span><span class="small">${PRECISION[p.cls].note}${p.lat != null && p.cls !== "unknown" ? ` (${p.lat.toFixed(2)}°, ${p.lon.toFixed(2)}°)` : ""}</span></div></div>
   ${(() => { const dl = discForPlace(DISCOVERIES, slug); return dl.length ? `<section class="shelf" style="margin:0 0 20px"><div class="ribbon-head"><h2>Found here</h2><p class="small">Excavations and finds from this place.</p></div><div class="dgrid">${dl.map(d => discCard(d)).join("")}</div></section>` : ""; })()}
   <div class="two">
     <section class="card">${plotted ? `<div id="pmap"></div>` : `<p class="small">This place is not shown on the map.</p>`}
@@ -1691,7 +1691,7 @@ async function renderLens(osis, modeArg) {
   view.innerHTML = `<div class="lens" data-mode="${mode}">
     <header class="lenshead">
       <div><span class="eyebrow">Scripture Lens</span><h1>${esc(label)}</h1></div>
-      <nav class="lensnav"><a class="btn" href="#/lens/${v > 1 ? toOsis(r.book, r.chapter, v - 1) : toOsis(r.book, r.chapter, 1)}/${mode}" ${v > 1 ? "" : 'aria-disabled="true"'}>‹</a><a class="btn" href="${readUrl("kjv", r.book, r.chapter, v)}">Reader</a><a class="btn" href="#/lens/${v < nV ? toOsis(r.book, r.chapter, v + 1) : o}/${mode}">›</a></nav>
+      <nav class="lensnav"><a class="btn" href="#/lens/${v > 1 ? toOsis(r.book, r.chapter, v - 1) : toOsis(r.book, r.chapter, 1)}/${mode}" ${v > 1 ? "" : 'aria-disabled="true"'}>‹</a><a class="btn" href="${readUrl("kjv", r.book, r.chapter, v)}">Reader</a><a class="btn" href="#/atlas/q/${encodeURIComponent(formatRef(r.book, r.chapter))}" title="Places in this chapter on the map">Map</a><a class="btn" href="#/lens/${v < nV ? toOsis(r.book, r.chapter, v + 1) : o}/${mode}">›</a></nav>
       <div class="modes" role="tablist">${LENS_MODES.map(([k, l, d]) => `<a role="tab" aria-selected="${k === mode}" href="#/lens/${o}/${k}" title="${d}">${l}</a>`).join("")}</div>
     </header>
     <div class="lensgrid">

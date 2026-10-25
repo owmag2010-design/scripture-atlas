@@ -1023,7 +1023,7 @@ body.atlasmode main#view { max-width: none; padding: 0; margin: 0; }
   .atl-search input { padding: 11px 13px; font-size: 16px; }
   .atl-time { left: 0; right: 0; bottom: 0; border-radius: 0; padding: 5px 8px; }
   .atl-panel { top: auto; left: 0; right: 0; bottom: 46px; width: auto; max-height: 44%; border-radius: 18px 18px 0 0; transition: max-height .3s cubic-bezier(.2, .8, .2, 1); }
-  .atl-panel.open { max-height: 80%; }
+  .atl-panel.open { max-height: 80%; } .atl-panel.min { max-height: 64px; }
   .atl-grab { display: block; flex: none; height: 22px; border: 0; background: none; cursor: pointer; position: relative; }
   .atl-grab::after { content: ""; position: absolute; left: 50%; top: 8px; width: 42px; height: 5px; margin-left: -21px; border-radius: 9px; background: var(--line); }
   .atl-body { padding: 4px 16px 18px; } .aphoto { margin: -4px -16px 12px; } .aphoto img { height: 150px; }

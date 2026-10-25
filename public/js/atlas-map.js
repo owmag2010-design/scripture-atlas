@@ -32,7 +32,17 @@ export function mountMap(el, { base, places, focus = null, onPick = () => {}, sh
   const pickRelief = () => { if (!reliefImg) return; const s = W / vb.w, want = s >= 2.2 ? "hi" : s >= 1.1 ? "md" : "lo"; const href = `atlas/relief-${want}.webp`; if (reliefImg.getAttribute("href") !== href) reliefImg.setAttribute("href", href); };
   // fill: the map fills its box (any shape); the view keeps the box's aspect so nothing is stretched or letterboxed.
   const fixAspect = v => { if (!fill) return v; const b = svg.getBoundingClientRect(); if (!b.width || !b.height) return v; const h = v.w * b.height / b.width, cy = v.y + v.h / 2; return { x: v.x, y: cy - h / 2, w: v.w, h }; };
-  const apply = () => { vb = fixAspect(vb); svg.setAttribute("viewBox", `${vb.x} ${vb.y} ${vb.w} ${vb.h}`); pickRelief(); draw(); };
+  // In fill mode the view never shows more than the relief covers, and never drifts off it.
+  const constrain = v => {
+    if (!fill) return v;
+    const b = svg.getBoundingClientRect(); if (!b.width || !b.height) return v;
+    const maxW = Math.min(W * 1.02, H * 1.06 * b.width / b.height);
+    let { x, y, w, h } = v;
+    if (w > maxW) { const cx = x + w / 2, cy = y + h / 2; h = h * maxW / w; w = maxW; x = cx - w / 2; y = cy - h / 2; }
+    const cl = (a, lo, hi) => (lo > hi ? (lo + hi) / 2 : Math.min(Math.max(a, lo), hi));
+    return { x: cl(x, -W * 0.01, W * 1.01 - w), y: cl(y, -H * 0.03, H * 1.03 - h), w, h };
+  };
+  const apply = () => { vb = constrain(fixAspect(vb)); svg.setAttribute("viewBox", `${vb.x} ${vb.y} ${vb.w} ${vb.h}`); pickRelief(); draw(); };
   if (fill && "ResizeObserver" in window) new ResizeObserver(() => apply()).observe(svg);
   const scale = () => W / vb.w;
   function draw() {
@@ -118,7 +128,7 @@ export function mountMap(el, { base, places, focus = null, onPick = () => {}, sh
     vb.x -= dx; vb.y -= dy; last = [e.clientX, e.clientY];
     svg.setAttribute("viewBox", `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
   });
-  const up = e => { ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch = null; if (moved) draw(); };
+  const up = e => { ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch = null; if (moved) apply(); };
   svg.addEventListener("pointerup", e => {
     const target = e.target.closest?.(".pm, .rl, .dm");
     up(e);
@@ -161,6 +171,7 @@ export function mountMap(el, { base, places, focus = null, onPick = () => {}, sh
     },
     /** Animate the view to a box {x, y, w, h} in map units. */
     flyBox(to, ms = 900) {
+      to = constrain(fixAspect(to));
       const from = { ...vb }, t0 = performance.now(), reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
       if (reduce || ms <= 0) { vb = to; apply(); return; }
       const lw0 = Math.log(from.w), lw1 = Math.log(to.w), ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;

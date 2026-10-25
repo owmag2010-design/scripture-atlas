@@ -49,8 +49,9 @@ async function mount(ctx) {
 
   // ---------- panel helpers ----------
   const sheet = $("#apanel");
-  const open = (html, { expand = false } = {}) => { body.innerHTML = html; body.scrollTop = 0; sheet.classList.toggle("open", expand); };
-  $("#agrab").addEventListener("click", () => sheet.classList.toggle("open"));
+  const open = (html, { expand = false } = {}) => { body.innerHTML = html; body.scrollTop = 0; sheet.classList.remove("min"); sheet.classList.toggle("open", expand); };
+  // Phone sheet cycles: middle → full → minimised → middle.
+  $("#agrab").addEventListener("click", () => { if (sheet.classList.contains("open")) { sheet.classList.remove("open"); sheet.classList.add("min"); } else if (sheet.classList.contains("min")) sheet.classList.remove("min"); else sheet.classList.add("open"); });
   const refLink = n => { const r = ctx.unpackRef(n); return `<a href="${ctx.readUrl("kjv", r.book, r.chapter, r.verse)}">${ctx.formatRef(r.book, r.chapter, r.verse)}</a>`; };
   const pname = s => esc(lm.get(s)?.[1] || s);
   const precision = cls => ctx.PRECISION[cls] ? `<span class="prec ${cls}" title="${esc(ctx.PRECISION[cls].note)}">${ctx.PRECISION[cls].label}</span>` : "";
