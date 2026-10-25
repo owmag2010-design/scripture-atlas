@@ -1556,7 +1556,7 @@ function renderLibrary() {
       <div class="grid3">${MANUSCRIPTS.map(m => `<article class="card mscard">${IMAGES[m.img] ? `<span class="msimg">${pic(m.img, { sizes: "(max-width: 760px) 100vw, 400px" })}</span>` : ""}<span class="eyebrow">${esc(m.lang)}</span><h3 style="font-size:1.3rem;margin:4px 0">${esc(m.name)}</h3>
         <p class="small"><b>${esc(m.date)}</b> · ${esc(m.where)}</p><p>${esc(m.about)}</p><a class="small" href="${msLink(m)}">${esc(m.see[1])} ›</a></article>`).join("")}</div>
       <p class="small">Ereunia editorial summaries of widely published scholarship.</p></section>
-    <div class="card" style="margin:22px 0 18px"><h2 style="font-size:1.5rem;margin-bottom:8px">Source register</h2><div class="tablewrap"><table class="reg">
+    <div class="card" id="credits" style="margin:22px 0 18px;scroll-margin-top:130px"><h2 style="font-size:1.5rem;margin-bottom:8px">Credits and source register</h2><div class="tablewrap"><table class="reg">
       <thead><tr><th>Source</th><th>Type</th><th>Owner</th><th>Licence</th><th>How it is used</th></tr></thead>
       <tbody>${SOURCES.map(s => `<tr><td>${credit(s.name, s.url)}</td><td>${s.type}</td><td>${s.owner}</td><td>${s.licence}</td><td>${s.use}</td></tr>`).join("")}
       <tr><td>${credit("54 Bibles from eBible.org", "https://ebible.org/")}</td><td>Scripture · translations</td><td>Each translation's publisher</td><td>Public domain, CC BY, CC BY-SA or CC BY-ND, shown on each Bible's page</td><td>Full text, unchanged</td></tr>
@@ -2008,6 +2008,7 @@ async function route() {
     else if (head === "place") await renderPlace(rest[0]);
     else if (head === "study") await renderStudy();
     else if (head === "library") { await getIndex(); renderLibrary(); }
+    else if (head === "credits") { await getIndex(); renderLibrary(); document.getElementById("credits")?.scrollIntoView(); return; }
     else if (head === "research") await renderResearch(rest);
     else if (head === "lens") await renderLens(rest[0], rest[1]);
     else if (head === "sermon") await renderSermon(rest[0]);

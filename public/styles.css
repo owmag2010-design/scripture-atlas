@@ -86,11 +86,6 @@ main:focus { outline: none; }
 .loading { color: var(--muted); font-style: italic; }
 footer.site { max-width: 1240px; margin: 0 auto; padding-block: 28px 44px; border-top: 1px solid var(--line); color: var(--muted); font-size: .88rem; }
 footer.site p { max-width: 80ch; margin: 6px 0; }
-@media (min-width: 900px) {
-  footer.site { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); column-gap: 56px; align-items: start; }
-  footer.site > :not(.fcred) { grid-column: 1; }
-  footer.site .fcred { grid-column: 2; grid-row: 1 / span 4; margin-top: 4px; font-size: .82rem; line-height: 1.6; }
-}
 .motto { font-family: var(--serif); font-size: 1.15rem; color: var(--ink) !important; }
 
 /* shared */
@@ -1056,3 +1051,9 @@ body.atlasmode main#view { max-width: none; padding: 0; margin: 0; }
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .atl-map .mapcredit { background: rgba(21,18,14,.7); color: rgba(255,255,255,.75); } }
 :root[data-theme="dark"] .atl-map .mapcredit { background: rgba(21,18,14,.7); color: rgba(255,255,255,.75); }
+@media (min-width: 900px) {
+  footer.site { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 56px; align-items: center; }
+  footer.site .footlogo, footer.site .motto { grid-column: 1; }
+  footer.site .namenote { grid-column: 2; grid-row: 1; justify-self: end; text-align: right; }
+  footer.site .fproj { grid-column: 2; grid-row: 2; justify-self: end; text-align: right; }
+}
