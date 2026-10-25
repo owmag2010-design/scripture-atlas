@@ -780,3 +780,4 @@ body.kidsmode main { max-width: 1180px; }
 .jstop { all: unset; cursor: pointer; display: grid; gap: 1px; } .jstop b { font-weight: 600; } .jstop span { font-size: .88rem; color: var(--muted); }
 .jstops li > a { grid-column: 2; color: var(--rubric); text-decoration: none; }
 .tile.t-kids::after { background: linear-gradient(180deg, rgba(60, 20, 110, 0) 35%, rgba(60, 20, 110, .82) 100%); } .tile.t-kids .tcap b { font-family: "Fredoka", var(--sans); font-size: 1.5rem; }
+.mono { overflow-wrap: anywhere; word-break: break-word; } .credits li, .reg td { overflow-wrap: anywhere; }
