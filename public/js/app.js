@@ -605,7 +605,7 @@ function tokensHtml(tokens) {
 }
 function verseSpan(t, i, text, osis, tokens = null) {
   const cls = ["v"];
-  const h = store.highlight(osis); if (h) cls.push("hl-" + h);
+  const h = store.highlight(osis); if (h && /^[a-z]+$/.test(h)) cls.push("hl-" + h);
   if (store.isBookmarked(osis)) cls.push("bm");
   if (store.note(osis)) cls.push("nt");
   if (R.verse === i + 1) cls.push("sel");
@@ -878,7 +878,7 @@ async function renderStudy(tab = "notes") {
     if (tab === "collections") return `<div class="hit coll"><span class="meta"><b>${esc(it.name)}</b><span class="small">${it.items.length} verse${it.items.length === 1 ? "" : "s"}</span><button class="linkbtn small" type="button" data-delc="${ci}">Delete</button></span>${(await Promise.all(it.items.map(async o => `<a class="cref" href="#/lens/${o}"><b>${labelOf(o)}</b> <span class="small">${esc(await anyText(o))}</span></a>`))).join("")}</div>`;
     if (tab === "history") { const r = fromOsis(it.osis); return `<a class="hit" href="${readUrl(it.translation || "kjv", r.book, r.chapter)}"><span class="meta"><span class="ref">${formatRef(r.book, r.chapter)}</span><span class="small">${TR[it.translation] || ""} · ${new Date(it.at).toLocaleString()}</span></span></a>`; }
     const r = fromOsis(it.osis); const txt = await anyText(it.osis);
-    return `<a class="hit" href="${readUrl("kjv", r.book, r.chapter, r.verse)}"><span class="meta"><span class="ref">${labelOf(it.osis)}</span>${it.color ? `<span class="chip">${it.color}</span>` : ""}</span><span class="tx">${esc(txt)}</span>${it.text ? `<span>${esc(it.text).replace(/\n/g, "<br>")}</span>` : ""}</a>`;
+    return `<a class="hit" href="${readUrl("kjv", r.book, r.chapter, r.verse)}"><span class="meta"><span class="ref">${labelOf(it.osis)}</span>${it.color ? `<span class="chip">${esc(it.color)}</span>` : ""}</span><span class="tx">${esc(txt)}</span>${it.text ? `<span>${esc(it.text).replace(/\n/g, "<br>")}</span>` : ""}</a>`;
   }));
   $("#slist").innerHTML = rows.length ? rows.join("") : `<p class="empty">${{ notes: "No notes yet. In the reader, tap a verse and write in the note box.", bookmarks: "No bookmarks yet. Tap a verse and choose Bookmark.", highlights: "No highlights yet. Tap a verse and pick a colour.", history: "Chapters you open will be listed here.", collections: "No collections yet. In Scripture Lens, choose “Add to a collection” to group verses for a study or a sermon." }[tab]}</p>`;
   view.querySelectorAll("[data-delc]").forEach(b => b.addEventListener("click", () => { const l = collLoad(); l.splice(+b.dataset.delc, 1); collSave(l); renderStudy("collections"); }));
@@ -1294,7 +1294,7 @@ async function renderTranslations() {
 
 async function renderTranslation(id) {
   await getIndex();
-  const t = META[id]; if (!t) return renderTranslations();
+  const t = Object.hasOwn(META, id) ? META[id] : null; if (!t) return renderTranslations();
   setNav("bibles"); setTitle(t.name);
   const h = HISTORY[id] || {};
   const samples = await Promise.all([["John.3.16"], ["Ps.23.1"], ["Gen.1.1"]].map(async ([o]) => [o, await verseText(id, o).catch(() => "")]));
@@ -1320,11 +1320,11 @@ async function renderTranslation(id) {
 const AI_EXAMPLES = [["John 3:16", "What does this verse mean, and how do the KJV and WEB differ?"], ["Genesis 15:6", "How do Paul and James use this verse?"], ["", "What does the Bible say about forgiveness?"], ["Ruth 1:16", "Explain this to a beginner, with its background."]];
 function renderAnswer(res) {
   const src = new Map(res.sources.map(s => [s.id, s]));
-  const chip = id => `<button type="button" class="srcchip" data-src="${id}" title="${esc(src.get(id)?.label || "")}">${id}</button>`;
+  const chip = id => `<button type="button" class="srcchip" data-src="${esc(id)}" title="${esc(src.get(id)?.label || "")}">${esc(id)}</button>`;
   const secs = SECTIONS.filter(([k]) => res.sections[k]?.length).map(([k, title, desc]) => `<section class="ans ${k}"><h3>${title} <span class="small">${desc}</span></h3><ul>${res.sections[k].map(st => `<li>${esc(st.text)} ${st.cites.map(chip).join(" ")}</li>`).join("")}</ul></section>`).join("");
   return `<div class="card answer"><div class="actions"><span class="chip draftchip">AI-generated</span><span class="small">Every statement links to the sources it used. ${res.dropped?.length ? `${res.dropped.length} statement${res.dropped.length === 1 ? " was" : "s were"} removed because ${res.dropped.length === 1 ? "it" : "they"} failed the citation check.` : "All statements passed the citation check."}</span></div>
     ${secs}
-    <details class="srcs" open><summary>Sources (${res.sources.length})</summary><ol>${res.sources.map(s => `<li id="src-${s.id}"><b>${s.id}</b> <span class="chip ${s.type === "scripture" || s.type === "translation" ? "scripture" : "ext"}">${s.type === "scripture" ? "Scripture" : s.type === "translation" ? "Translation" : s.type === "dataset" ? "Dataset" : "Editorial"}</span> ${esc(s.label)}<p class="small">${esc(s.text)}</p></li>`).join("")}</ol></details>
+    <details class="srcs" open><summary>Sources (${res.sources.length})</summary><ol>${res.sources.map(s => `<li id="src-${esc(s.id)}"><b>${esc(s.id)}</b> <span class="chip ${s.type === "scripture" || s.type === "translation" ? "scripture" : "ext"}">${s.type === "scripture" ? "Scripture" : s.type === "translation" ? "Translation" : s.type === "dataset" ? "Dataset" : "Editorial"}</span> ${esc(s.label)}<p class="small">${esc(s.text)}</p></li>`).join("")}</ol></details>
     ${res.dropped?.length ? `<details><summary>Removed statements (${res.dropped.length})</summary><ul>${res.dropped.map(d => `<li><span class="small">${esc(d.reason)}:</span> ${esc(d.text)}</li>`).join("")}</ul></details>` : ""}
     <p class="small">An AI summary of the sources above, not an authority. Read the passages yourself; for pastoral questions, talk with someone who knows you.</p></div>`;
 }
@@ -1600,7 +1600,7 @@ async function renderCompare(osis) {
 }
 
 function renderSoon(key) {
-  const s = SOON[key];
+  const s = Object.hasOwn(SOON, key) ? SOON[key] : undefined;
   if (!s) return renderHome();
   setNav(key); setTitle(s.title);
   view.innerHTML = `<div class="pagehead soon"><span class="eyebrow">${s.title} · arrives in Phase ${s.phase}</span><h1>${s.lead}</h1></div>
@@ -1792,7 +1792,7 @@ async function renderSermon(openId) {
         <section class="card"><h2>Study notes</h2><p class="small">Make an outline, big idea, discussion questions and application from the transcript.</p>
           <button class="btn pri" type="button" id="souts">Make study notes with AI</button><div id="sout"></div></section>
         <section class="card"><h2>Words that recur</h2><div id="swords" class="small">None yet.</div><p class="small" id="scount"></p></section>
-        ${saved.length ? `<section class="card"><h2>Saved sermons</h2><ul class="linklist">${saved.slice().reverse().map(x => `<li><a href="#/sermon/${x.id}"><span><span class="t">${esc(x.title || "Untitled sermon")}</span><span class="d">${esc([x.speaker, x.date].filter(Boolean).join(", "))}</span></span><span class="arr">›</span></a></li>`).join("")}</ul></section>` : ""}
+        ${saved.length ? `<section class="card"><h2>Saved sermons</h2><ul class="linklist">${saved.slice().reverse().map(x => `<li><a href="#/sermon/${encodeURIComponent(x.id)}"><span><span class="t">${esc(x.title || "Untitled sermon")}</span><span class="d">${esc([x.speaker, x.date].filter(Boolean).join(", "))}</span></span><span class="arr">›</span></a></li>`).join("")}</ul></section>` : ""}
       </aside>
     </div>`;
   const ta = $("#stext");
@@ -1986,7 +1986,7 @@ function renderStory(id) {
 async function route() {
   await Promise.all([imagesReady, artReady]);
   closeMore();
-  const h = decodeURIComponent(location.hash.replace(/^#\/?/, "").split("#")[0]);
+  let h = location.hash.replace(/^#\/?/, "").split("#")[0]; try { h = decodeURIComponent(h); } catch {}
   const [head, ...rest] = h.split("/");
   document.body.classList.remove("focus", "kidsmode"); window.speechSynthesis?.cancel(); document.querySelector(".exitfocus")?.remove();
   try {
@@ -2016,7 +2016,7 @@ async function route() {
     else await renderHome();
   } catch (e) {
     console.error(e);
-    view.innerHTML = `<p class="empty">Something did not load. Check your connection, then <a href="${location.hash || "#/"}">try again</a>.</p>`;
+    view.innerHTML = `<p class="empty">Something did not load. Check your connection, then <a href="${esc(location.hash || "#/")}">try again</a>.</p>`;
   }
   if (head !== "read") window.scrollTo(0, 0);
 }

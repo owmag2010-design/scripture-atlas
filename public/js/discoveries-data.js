@@ -2049,7 +2049,7 @@ export const DISCOVERIES = [
    "focus": "50% 45%",
    "author": "Gary Todd from Xinzheng, China",
    "licence": "CC0",
-   "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "licenceUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
    "source": "https://commons.wikimedia.org/wiki/File:Letter,_Arad,_6th_Century_BC,_Ink_on_Pottery,_Earliest_Reference_to_Solomon%27s_Temple_(42499943804).jpg"
   }
  },
@@ -2812,7 +2812,7 @@ export const DISCOVERIES = [
    "focus": "50% 55%",
    "author": "Davidbena",
    "licence": "CC0",
-   "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "licenceUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
    "source": "https://commons.wikimedia.org/wiki/File:Excavations_at_Khirbet_Qeiyafa.jpg"
   }
  },

@@ -180,7 +180,7 @@ async function mount(ctx) {
       <div class="actions"><a class="btn" href="#/person/${slug}">Full page</a><a class="btn" href="#/research/person/${slug}">Connections</a></div>`);
   }
 
-  async function ask(q) {
+  async function ask(q, auto = true) {
     $("#aq").value = q;
     const r = resolveQuery(q, { people: [...pm.values()], places, journeys: JOURNEYS, names: NAMES, books: BOOKS, discoveries: DISCOVERIES, periods: PERIODS, parseRef: ctx.parseRef });
     if (r.type === "place") return r.focus === "discoveries" ? showPlace(r.slug).then(() => body.querySelector("h3")?.scrollIntoView({ block: "start" })) : showPlace(r.slug);
@@ -196,6 +196,12 @@ async function mount(ctx) {
       return open(`<span class="eyebrow">Passage</span><h1>${esc(ctx.formatRef(r.ref.book, r.ref.chapter, r.ref.verse, r.ref.verseEnd))}</h1>${slugs.length ? `<p>${slugs.length} mapped place${slugs.length === 1 ? "" : "s"} in this passage.</p>${placeList(slugs)}` : `<p>No mappable places are named in this passage.</p>`}<div class="actions"><a class="btn" href="${ctx.readUrl("kjv", r.ref.book, r.ref.chapter, r.ref.verse)}">Read it</a></div>`);
     }
     // Anything else: the AI research assistant, answering only from cited sources; the map shows the places in those sources.
+    // A shared link never spends an AI call or shows AI text by itself: the reader has to ask.
+    if (!auto) {
+      open(`<span class="eyebrow">Ask the atlas</span><h1>${esc(q)}</h1><p>This isn't a place, person, journey, book or passage in the atlas. The AI research assistant can answer it from cited sources.</p><div class="actions"><button type="button" class="btn pri" id="aiask">Ask the AI assistant</button></div>`);
+      body.querySelector("#aiask")?.addEventListener("click", () => ask(q, true));
+      return;
+    }
     open(`<span class="eyebrow">Ask the atlas</span><h1>${esc(q)}</h1><p class="loading">Searching the sources…</p>`);
     try {
       const res = await fetch("api/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q, level: "intermediate" }) });
@@ -208,9 +214,9 @@ async function mount(ctx) {
       map.setPeriod(null); map.route([]); map.highlight(new Set(slugs)); if (slugs.length) map.flyFit(slugs, 900);
       const secs = ctx.SECTIONS.filter(([k]) => data.sections?.[k]?.length);
       open(`<span class="eyebrow">Ask the atlas · AI answer from cited sources</span><h1>${esc(q)}</h1>
-        ${secs.map(([k, l]) => `<h3>${l}</h3><ul class="aai">${data.sections[k].map(x => `<li>${esc(x.text)} ${x.cites.map(c => `<sup title="${esc((data.sources.find(s => s.id === c) || {}).label || "")}">${c}</sup>`).join("")}</li>`).join("")}</ul>`).join("") || `<p>No answer survived the source check. Try naming a place, person or passage.</p>`}
+        ${secs.map(([k, l]) => `<h3>${l}</h3><ul class="aai">${data.sections[k].map(x => `<li>${esc(x.text)} ${x.cites.map(c => `<sup title="${esc((data.sources.find(s => s.id === c) || {}).label || "")}">${esc(c)}</sup>`).join("")}</li>`).join("")}</ul>`).join("") || `<p>No answer survived the source check. Try naming a place, person or passage.</p>`}
         ${slugs.length ? `<h3>On the map</h3>${placeList(slugs, 20)}` : ""}
-        <details><summary>Sources (${(data.sources || []).length})</summary><ol class="small">${(data.sources || []).map(s => `<li><b>${s.id}</b> ${esc(s.label)}</li>`).join("")}</ol></details>
+        <details><summary>Sources (${(data.sources || []).length})</summary><ol class="small">${(data.sources || []).map(s => `<li><b>${esc(s.id)}</b> ${esc(s.label)}</li>`).join("")}</ol></details>
         <p class="small">Written by AI from the numbered sources only; statements that failed the citation check were removed. Check the passages yourself.</p>`);
     } catch {
       open(`<span class="eyebrow">Ask the atlas</span><h1>${esc(q)}</h1><p>The AI assistant is not available right now. Try a place, person, journey, book or verse, for example <a href="#/atlas/q/Jerusalem">Jerusalem</a> or <a href="#/atlas/q/Paul">Paul</a>.</p>`);
@@ -242,7 +248,7 @@ async function mount(ctx) {
       if (kind === "period") return showPeriod(arg);
       if (kind === "book") return showBook(arg);
       if (kind === "person") return showPerson(arg);
-      if (kind === "q") return ask(decodeURIComponent(arg));
+      if (kind === "q") return ask(arg, false);
       $("#abook").value = ""; welcome();
     }
   };

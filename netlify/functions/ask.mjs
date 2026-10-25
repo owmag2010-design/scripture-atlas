@@ -3,6 +3,7 @@
 // asks the model to answer ONLY from those numbered sources in five labelled sections, then drops any
 // statement that fails the citation check (public/js/ai-core.js). Model access: Netlify AI Gateway.
 import Anthropic from "@anthropic-ai/sdk";
+import { check, readBody, withinBudget, reply as send } from "../lib/guard.mjs";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { BOOKS, NAMES, fileId } from "../../public/js/books.js";
@@ -72,7 +73,7 @@ const STOP = new Set("what does about when where which with from that this have 
 const LEVEL = { beginner: "Write for a newcomer: plain words, short sentences, no jargon.", intermediate: "Write for a regular Bible reader: clear and precise.", academic: "Write for a student of theology: precise, and name scholarly positions where the sources support it." };
 
 function systemPrompt(level) {
-  return `You are the Ereunia research assistant. Answer ONLY from the numbered SOURCES provided. ${LEVEL[level] || LEVEL.intermediate}
+  return `You are the Ereunia research assistant. Answer ONLY from the numbered SOURCES provided. ${Object.hasOwn(LEVEL, level) ? LEVEL[level] : LEVEL.intermediate}
 Return a single JSON object with exactly these keys: ${SECTIONS.map(s => `"${s[0]}" (${s[2]})`).join(", ")}.
 Each key holds an array of statements: {"text": "...", "cites": ["S1", ...]}.
 Rules:
@@ -88,17 +89,18 @@ Reply with the JSON object only.`;
 }
 
 export default async (req) => {
-  if (req.method !== "POST") return Response.json({ error: "Use POST." }, { status: 405 });
-  let body;
-  try { body = await req.json(); } catch { return Response.json({ error: "Send JSON with a question." }, { status: 400 }); }
+  const refused = check(req); if (refused) return refused;
+  const body = await readBody(req);
+  if (!body) return send({ error: "Send JSON with a question." }, 400);
   const question = String(body.question || "").trim().slice(0, 600);
-  if (question.length < 5) return Response.json({ error: "Ask a question of at least a few words." }, { status: 400 });
-  if (!base) return Response.json({ error: "Bible data is not available to the assistant." }, { status: 500 });
-  if (!process.env.ANTHROPIC_BASE_URL && !process.env.ANTHROPIC_API_KEY) return Response.json({ error: "The AI Gateway is not active for this site yet." }, { status: 503 });
+  if (question.length < 5) return send({ error: "Ask a question of at least a few words." }, 400);
+  if (!base) return send({ error: "Bible data is not available to the assistant." }, 500);
+  if (!process.env.ANTHROPIC_BASE_URL && !process.env.ANTHROPIC_API_KEY) return send({ error: "The AI Gateway is not active for this site yet." }, 503);
 
   const { sources, refs } = gather(question, body.ref);
-  if (!sources.length) return Response.json({ sections: { uncertainty: [{ text: "No Bible passages matched this question. Try naming a passage, such as John 3:16, or using different words.", cites: [] }] }, sources: [], dropped: [], refs: [] });
+  if (!sources.length) return send({ sections: { uncertainty: [{ text: "No Bible passages matched this question. Try naming a passage, such as John 3:16, or using different words.", cites: [] }] }, sources: [], dropped: [], refs: [] });
 
+  if (!(await withinBudget("ask", Number(process.env.AI_DAILY_ASK || 1500)))) return send({ error: "The assistant has reached today's limit. Please try again tomorrow." }, 429);
   const client = new Anthropic();
   let reply;
   try {
@@ -108,12 +110,12 @@ export default async (req) => {
     });
     reply = msg.content.map(c => c.text || "").join("");
   } catch (e) {
-    return Response.json({ error: "The assistant could not answer just now. Try again in a minute." , detail: String(e?.status || "") }, { status: 502 });
+    return send({ error: "The assistant could not answer just now. Try again in a minute." }, 502);
   }
   const parsed = parseModelJson(reply);
   const { sections, dropped } = verifyAnswer(parsed, sources);
   if (isEmpty(sections)) sections.uncertainty.push({ text: "No statement passed the citation check, so nothing is shown. Try a narrower question or name a passage.", cites: [] });
-  return Response.json({ sections, sources, dropped, refs: refs.map(r => formatRef(r.book, r.chapter, r.verse, r.verseEnd)), model: MODEL });
+  return send({ sections, sources, dropped, refs: refs.map(r => formatRef(r.book, r.chapter, r.verse, r.verseEnd)), model: MODEL });
 };
 
 export const config = { path: "/api/ask", rateLimit: { windowLimit: 12, windowSize: 60, aggregateBy: ["ip", "domain"] } };

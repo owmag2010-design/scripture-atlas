@@ -86,6 +86,7 @@ export function validate(d, ctx) {
   if ((d.kind === "method") !== (d.status === "method")) e.push("methods, and only methods, have status method");
   if (!Array.isArray(d.sources) || d.sources.length < 2) e.push("needs at least two sources");
   (d.sources || []).forEach(s => { if (!/^https:\/\/[^\s]+$/.test(s.url || "")) e.push(`bad source url ${s.url}`); if (!s.title || !s.publisher) e.push("source needs title and publisher"); if (/wikipedia\.org/.test(s.url || "")) e.push("Wikipedia is not a citable source"); });
+  if (d.image?.local) { for (const k of ["licenceUrl", "source"]) if (d.image[k] && !/^https:\/\/[^\s]+$/.test(d.image[k])) e.push(`bad image ${k} ${d.image[k]}`); if (!d.image.licence || !d.image.author) e.push("image needs licence and author"); }
   (d.passages || []).forEach(r => { if (!parseRange(r, ctx.bookIndex)) e.push(`bad passage ${r}`); });
   if (ctx.people) (d.people || []).forEach(p => { if (!ctx.people.has(p)) e.push(`unknown person ${p}`); });
   if (ctx.places && d.location?.placeSlug && !ctx.places.has(d.location.placeSlug)) e.push(`unknown place ${d.location.placeSlug}`);

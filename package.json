@@ -14,6 +14,7 @@
     "build:kjvs": "node scripts/build-kjvs.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "0.133.0"
+    "@anthropic-ai/sdk": "0.133.0",
+    "@netlify/blobs": "11.1.6"
   }
 }

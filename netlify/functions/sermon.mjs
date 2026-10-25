@@ -2,6 +2,7 @@
 // The model may only quote the transcript word for word (checked) and may only list real Bible references
 // (checked). Everything returned is labelled as AI-generated in the interface. Model access: Netlify AI Gateway.
 import Anthropic from "@anthropic-ai/sdk";
+import { check, readBody, withinBudget, reply as send } from "../lib/guard.mjs";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { parseReference, formatRef } from "../../public/js/ref.js";
@@ -23,15 +24,16 @@ Reply with one JSON object only:
 {"title": "", "bigIdea": "one sentence", "summary": "3-5 sentences", "points": [{"heading": "", "summary": "1-3 sentences", "quote": ""}], "scriptures": [""], "questions": ["discussion questions for a small group, 3-5"], "application": ["practical responses the speaker urged, 2-4"]}`;
 
 export default async (req) => {
-  if (req.method !== "POST") return Response.json({ error: "Use POST." }, { status: 405 });
-  let body;
-  try { body = await req.json(); } catch { return Response.json({ error: "Send JSON with a transcript." }, { status: 400 }); }
-  const transcript = String(body.transcript || "").replace(/\s+/g, " ").trim().slice(0, 60000);
-  if (transcript.split(" ").length < 60) return Response.json({ error: "The transcript is too short to outline. Record or paste at least a few paragraphs." }, { status: 400 });
-  if (!base) return Response.json({ error: "Bible data is not available." }, { status: 500 });
-  if (!process.env.ANTHROPIC_BASE_URL && !process.env.ANTHROPIC_API_KEY) return Response.json({ error: "The AI Gateway is not active for this site yet." }, { status: 503 });
+  const refused = check(req); if (refused) return refused;
+  const body = await readBody(req);
+  if (!body) return send({ error: "Send JSON with a transcript." }, 400);
+  const transcript = String(body.transcript || "").replace(/\s+/g, " ").trim().slice(0, 45000);
+  if (transcript.split(" ").length < 60) return send({ error: "The transcript is too short to outline. Record or paste at least a few paragraphs." }, 400);
+  if (!base) return send({ error: "Bible data is not available." }, 500);
+  if (!process.env.ANTHROPIC_BASE_URL && !process.env.ANTHROPIC_API_KEY) return send({ error: "The AI Gateway is not active for this site yet." }, 503);
 
   const found = sermonRefs(transcript, chapters).map(r => formatRef(r.book, r.chapter, r.verse, r.verseEnd));
+  if (!(await withinBudget("sermon", Number(process.env.AI_DAILY_SERMON || 200)))) return send({ error: "The assistant has reached today's limit. Please try again tomorrow." }, 429);
   const client = new Anthropic();
   let reply;
   try {
@@ -41,11 +43,11 @@ export default async (req) => {
     });
     reply = msg.content.map(c => c.text || "").join("");
   } catch (e) {
-    return Response.json({ error: "The outline could not be made just now. Try again in a minute.", detail: String(e?.status || "") }, { status: 502 });
+    return send({ error: "The outline could not be made just now. Try again in a minute." }, 502);
   }
   const { outline, dropped } = checkOutline(parseModelJson(reply), transcript, r => !!parseReference(r, chapters));
-  if (!outline) return Response.json({ error: "The outline could not be read. Try again." }, { status: 502 });
-  return Response.json({ outline, dropped, refs: found, model: MODEL });
+  if (!outline) return send({ error: "The outline could not be read. Try again." }, 502);
+  return send({ outline, dropped, refs: found, model: MODEL });
 };
 
 export const config = { path: "/api/sermon", rateLimit: { windowLimit: 6, windowSize: 60, aggregateBy: ["ip", "domain"] } };
