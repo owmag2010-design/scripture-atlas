@@ -1,7 +1,10 @@
 // Builds public/data from the raw public-domain sources in raw/.
-// KJV: raw/kjv.json (thiagobodruk/bible, cleaned). WEB: raw/web/*.json (TehShrike/world-english-bible).
+// KJV: raw/kjvs/*.usfm (eBible.org eng-kjv2006, 1769 text; the same file supplies Strong's numbers to build-kjvs).
+// WEB: raw/web/*.json (TehShrike/world-english-bible).
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
+import { readdirSync } from "node:fs";
+import { parseUsfmBook, tokensText } from "./usfm.mjs";
 import { BOOKS, NAMES, fileId } from "../public/js/books.js";
 
 const out = new URL("../public/data/", import.meta.url);
@@ -34,8 +37,9 @@ export function buildWebBook(items) {
 }
 
 function main() {
-  const kjvRaw = readFileSync(new URL("kjv.json", raw), "utf8");
-  const kjv = JSON.parse(kjvRaw);
+  const usfm = readdirSync(new URL("kjvs/", raw)).filter(f => f.endsWith(".usfm") && ((+f.slice(0, 2) >= 2 && +f.slice(0, 2) <= 40) || (+f.slice(0, 2) >= 70 && +f.slice(0, 2) <= 96))).sort();
+  const kjvRaw = usfm.map(f => readFileSync(new URL(`kjvs/${f}`, raw), "utf8").normalize("NFC")).join("");
+  const kjv = usfm.map((f, i) => [NAMES[i], parseUsfmBook(readFileSync(new URL(`kjvs/${f}`, raw), "utf8").normalize("NFC")).map(c => c.verses.map(tokensText))]);
   if (kjv.length !== 66) throw new Error("KJV must have 66 books");
   mkdirSync(new URL("kjv/", out), { recursive: true });
   mkdirSync(new URL("web/", out), { recursive: true });
@@ -57,7 +61,7 @@ function main() {
     generated: new Date().toISOString().slice(0, 10),
     books: books.map(({ name, osis, verses }) => ({ name, osis, verses })),
     translations: [
-      { id: "kjv", name: "King James Version", short: "KJV", year: "1611 (1769 text)", licence: "Public domain (Crown patent applies in the United Kingdom)", source: "thiagobodruk/bible on GitHub", url: "https://github.com/thiagobodruk/bible", checksum: sha(kjvRaw) },
+      { id: "kjv", name: "King James Version", short: "KJV", year: "1611 (1769 text)", licence: "Public domain (Crown patent applies in the United Kingdom)", source: "eBible.org (eng-kjv2006, from the CrossWire Bible Society)", url: "https://ebible.org/kjv/", checksum: sha(kjvRaw) },
       { id: "web", name: "World English Bible", short: "WEB", year: "2000, updated", licence: "Public domain", source: "eBible.org via TehShrike/world-english-bible on GitHub", url: "https://github.com/TehShrike/world-english-bible", checksum: sha(webHashes.join("")) }
     ]
   };

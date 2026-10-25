@@ -26,7 +26,8 @@ const jobs = [
   ...["ne_50m_land", "ne_50m_rivers_lake_centerlines", "ne_50m_lakes"].map(f => [`${GH}/nvkelso/natural-earth-vector/master/geojson/${f}.geojson`, `ne/${f}.geojson`]),
   ["https://a.openbible.info/data/cross-references.zip", "xref/cross-references.zip"],
   [`${GH}/thiagobodruk/bible/master/json/en_kjv.json`, "kjv-source.json"],
-  ["https://ebible.org/Scriptures/translations.csv", "ebible/translations.csv"]
+  ["https://ebible.org/Scriptures/translations.csv", "ebible/translations.csv"],
+  ["https://ebible.org/Scriptures/eng-kjv2006_usfm.zip", "kjvs/kjv.zip"]
 ];
 
 async function get(url, dest, tries = 3) {
@@ -47,6 +48,7 @@ for (let i = 0; i < jobs.length; i += 8) n += (await Promise.all(jobs.slice(i, i
 
 // Derived inputs: cross references unzipped; KJV compacted (drops the source's {italic} braces).
 if (!existsSync(new URL("xref/cross_references.txt", raw))) execFileSync("unzip", ["-o", "-q", new URL("xref/cross-references.zip", raw).pathname, "-d", new URL("xref/", raw).pathname]);
+if (!existsSync(new URL("kjvs/02-GENeng-kjv2006.usfm", raw))) execFileSync("unzip", ["-o", "-q", new URL("kjvs/kjv.zip", raw).pathname, "-d", new URL("kjvs/", raw).pathname]);
 if (!existsSync(new URL("kjv.json", raw))) {
   const src = JSON.parse(readFileSync(new URL("kjv-source.json", raw), "utf8").replace(/^﻿/, ""));
   writeFileSync(new URL("kjv.json", raw), JSON.stringify(src.map(b => [b.name, b.chapters.map(ch => ch.map(v => v.replace(/\{([^}]*)\}/g, "$1")))])));
