@@ -65,61 +65,6 @@
   ]
  },
  {
-  "id": "isaiah-bulla",
-  "name": "'Isaiah' bulla (Ophel)",
-  "kind": "seal",
-  "summary": "A damaged clay seal impression bearing the name Yesha'yah[u] (Isaiah) and the letters nvy, found near Hezekiah's bulla; whether it names the prophet is disputed.",
-  "objectDate": {
-   "text": "8th century BC",
-   "sort": -700
-  },
-  "found": {
-   "year": 2009,
-   "by": "Ophel excavation directed by Eilat Mazar; recovered by wet-sifting",
-   "where": "Ophel, south of the Temple Mount, Jerusalem"
-  },
-  "location": {
-   "lat": 31.7755,
-   "lon": 35.2362,
-   "placeSlug": "ophel_910"
-  },
-  "heldAt": {
-   "institution": "",
-   "ref": ""
-  },
-  "language": "Hebrew (Old Hebrew script)",
-  "description": "A bulla about half an inch across, in three registers: a grazing doe at the top, the name Yesha'yah[u] in the middle, and the letters nvy below. The top is missing and the left side is damaged. It came from Iron Age debris outside a royal building, less than 10 feet from the Hezekiah bulla.",
-  "connection": "Eilat Mazar proposed the reading 'belonging to Isaiah the prophet', linking it to Isaiah son of Amoz, who the Bible says advised King Hezekiah (2 Kings 19–20; Isaiah 37–39). That reading needs a letter (aleph) that is not preserved.",
-  "establishes": "A person named Isaiah (Yesha'yahu) sealed documents in Jerusalem's royal quarter in the 8th century BC.",
-  "limits": "The word nvy may be incomplete; without an aleph it could be a personal name (Navi) rather than 'prophet'. Christopher Rollston notes the definite article expected in 'the prophet' is also absent, and that the name was common. Mazar herself acknowledged 'major obstacles' to the reading.",
-  "status": "debated",
-  "passages": [
-   "Isa.1.1-1.1",
-   "2Kgs.20.1-20.11",
-   "Isa.37.21-37.21"
-  ],
-  "people": [
-   "isaiah_617",
-   "hezekiah_1512"
-  ],
-  "dating": [
-   "stratigraphy",
-   "palaeography"
-  ],
-  "sources": [
-   {
-    "title": "Prophet Isaiah's signature in Jerusalem? (Bible History Daily)",
-    "publisher": "Biblical Archaeology Society (Bible History Daily)",
-    "url": "https://www.biblicalarchaeology.org/daily/news/prophet-isaiah-signature-jerusalem/"
-   },
-   {
-    "title": "Prophet Isaiah seal impression report (February 2018)",
-    "publisher": "National Geographic",
-    "url": "https://www.nationalgeographic.com/history/article/prophet-isaiah-jerusalem-seal-archaeology-bible"
-   }
-  ]
- },
- {
   "id": "gemaryahu-son-of-shaphan-bulla",
   "name": "Bulla of Gemaryahu son of Shaphan",
   "kind": "seal",
@@ -368,7 +313,7 @@
   },
   "found": {
    "year": 1932,
-   "by": "Wellcome-Marston expedition under James Leslie Starkey (1932–1938); later Yohanan Aharoni and David Ussishkin (Tel Aviv University, 1973–1987)",
+   "by": "Wellcome-Marston expedition under James Leslie Starkey (1932–1938); Yohanan Aharoni (1966–1968); David Ussishkin, Tel Aviv University (1973–1987)",
    "where": "Judean Shephelah, southwest of Jerusalem"
   },
   "location": {
@@ -487,8 +432,8 @@
    "sort": -1000
   },
   "found": {
-   "year": 2008,
-   "by": "Excavation directed by Yosef Garfinkel (Hebrew University) and Saar Ganor; ostracon found by volunteer Oded Yair",
+   "year": 2007,
+   "by": "Excavations directed by Yosef Garfinkel (Hebrew University) and Saar Ganor (Israel Antiquities Authority), 2007–2013; the ostracon was found in 2008 by volunteer Oded Yair",
    "where": "Khirbet Qeiyafa, above the Elah Valley, Judean Shephelah"
   },
   "location": {
@@ -561,7 +506,7 @@
   "description": "The shrine stood within a Judahite fortress in the Negev. Two limestone monoliths thought to be incense altars had dark residue on their tops. Laboratory analysis found frankincense mixed with animal fat on the larger altar and cannabis mixed with dung on the smaller.",
   "connection": "The Bible describes incense offerings and condemns worship at sanctuaries outside Jerusalem; Hezekiah and Josiah are said to have removed such 'high places' and altars (2 Kings 18:4, 22; 23:8). Arad shows a Judahite sanctuary of this period outside the capital.",
   "establishes": "A Judahite shrine with incense altars operated at Arad in the 8th century BC, and frankincense and cannabis were burned on them.",
-  "limits": "The finds do not show who ended the shrine's use or whether this followed a royal reform. The residues show what was burned, not the meaning of the rituals.",
+  "limits": "The finds do not show who ended the shrine's use or whether this followed a royal reform. The residues show what was burned, not the meaning of the rituals. The shrine's dates are disputed: Aharoni placed its founding in the late 10th century BC and its burial in Josiah's reign, while later studies date it to the 8th century BC or later.",
   "status": "consistent",
   "passages": [
    "2Kgs.18.4-18.4",

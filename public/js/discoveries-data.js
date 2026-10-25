@@ -1011,7 +1011,7 @@ export const DISCOVERIES = [
   "description": "A large stele that mainly celebrates Merneptah's victory over the Libyans. Near the end it lists places and peoples in Canaan he claims to have defeated. One line reads: 'Israel is wasted, its seed is not.' A duplicate copy stood at Karnak.",
   "connection": "The stele shows that a group called Israel was present in or near Canaan by the late 13th century BC. It also names Gezer and Ashkelon, cities that appear in Joshua and Judges. This is the period the Bible assigns to Israel's early life in the land.",
   "establishes": "By about 1208 BC Egyptians knew of a people called Israel in the Canaan region. The name is written with the sign for a people, while Ashkelon and Gezer carry the sign for a place.",
-  "limits": "It says nothing about the exodus, the conquest or Israel's origins. Scholars still debate how large or settled this 'Israel' was, and how much weight one line can bear.",
+  "limits": "It says nothing about the exodus, the conquest or Israel's origins. Israel carries the sign for a people rather than a land, but determinatives were not fully standardised, and scholars debate what kind of group this was (tribal, pastoral or settled), where exactly it lived, and how much weight one line can bear.",
   "status": "corroborates",
   "passages": [
    "Josh.16.10-16.10",
@@ -1070,7 +1070,7 @@ export const DISCOVERIES = [
   "language": "Egyptian (hieroglyphic)",
   "description": "On the south wall of the Bubastite Portal, Shoshenq I is shown before the god Amun, who hands him rows of captives. Each captive carries a name-ring for a town. About 175 names were listed; about 127 can still be read, and fewer can be identified with confidence.",
   "connection": "1 Kings and 2 Chronicles say that Shishak king of Egypt came against Jerusalem in Rehoboam's fifth year and took the temple and palace treasures. 1 Kings also says Jeroboam fled to Shishak. Most scholars identify Shishak with Shoshenq I.",
-  "establishes": "An Egyptian king of the late 10th century BC claimed a campaign into the southern Levant, naming places such as Megiddo, Rehov, Taanach, Gezer and Arad.",
+  "establishes": "An Egyptian king of the late 10th century BC claimed a campaign into the southern Levant, with a list that includes places such as Megiddo, Taanach, Rehov and Arad.",
   "limits": "The cited sources do not show Jerusalem in the readable list. The relief is a statement of divine favour rather than a precise campaign report, and scholars disagree on the route, the scale of the campaign, and on using it to date destruction layers.",
   "status": "corroborates",
   "passages": [
@@ -1346,7 +1346,7 @@ export const DISCOVERIES = [
   },
   "found": {
    "year": null,
-   "by": "Several texts: palace inscriptions at Nimrud (some recorded in 1853–1854 only by squeezes, now lost); a stele said to come from western Iran",
+   "by": "Several texts: palace inscriptions at Nimrud, some known only from squeezes and copies made by the 19th-century excavators (now lost); a stele said to come from western Iran",
    "where": "Nimrud (Kalhu) and western Iran"
   },
   "location": {
@@ -1415,7 +1415,7 @@ export const DISCOVERIES = [
   },
   "found": {
    "year": null,
-   "by": "",
+   "by": "Fragments of inscribed prisms excavated at Nimrud, published by C. J. Gadd (Iraq 16, 1954); annals from Khorsabad",
    "where": "Nimrud (Nimrud Prism) and Khorsabad (annals), northern Iraq"
   },
   "location": {
@@ -1424,11 +1424,11 @@ export const DISCOVERIES = [
    "placeSlug": "calah_268"
   },
   "heldAt": {
-   "institution": "British Museum, London (Nimrud Prism)",
+   "institution": "",
    "ref": ""
   },
   "language": "Akkadian (cuneiform)",
-  "description": "Sargon II claims that he took Samaria, deported 27,290 of its people, and resettled it with people from other conquered lands. He says he appointed his own official as governor and counted the settlers as Assyrians. The phrase 'I settled Samaria again, more than before' appears in the Khorsabad annals and a Nimrud prism.",
+  "description": "Sargon II claims that he took Samaria, deported 27,290 of its people, and resettled it with people from other conquered lands. He says he appointed his own official as governor and counted the settlers as Assyrians. A translation of a Nimrud prism reads: 'I repopulated Samaria more than before'.",
   "connection": "2 Kings 17 describes the fall of Samaria, the deportation of Israelites, and the settling of foreigners in the cities of Samaria. Isaiah 20:1 is the only biblical verse that names Sargon.",
   "establishes": "An Assyrian king named Sargon claimed the conquest and repopulation of Samaria around 720 BC.",
   "limits": "2 Kings 17:3 and 18:9 name Shalmaneser as the king who came against Hoshea and besieged Samaria, and scholars debate how the credit is shared between Shalmaneser V and Sargon II. Royal inscriptions present the governor's work as the king's own.",
@@ -1529,7 +1529,7 @@ export const DISCOVERIES = [
   },
   "found": {
    "year": null,
-   "by": "British excavations at Nineveh in the mid-19th century (the British Museum lists H. Rassam, H. C. Rawlinson, W. K. Loftus and J. G. Taylor)",
+   "by": "Austen Henry Layard, with Hormuzd Rassam, in excavations of the South-West Palace at Nineveh (1847–1851)",
    "where": "South-West Palace, Nineveh, Room XXXVI"
   },
   "location": {
@@ -1862,7 +1862,7 @@ export const DISCOVERIES = [
    "ref": "125701 (1959,0711.1) for Letter I"
   },
   "language": "Hebrew (Old Hebrew script)",
-  "description": "Twenty-one ostraca, mostly letters, of which about a third are well enough preserved to read throughout. Many are from Hoshayahu to his superior Yaush. Letter 4 says the writer is watching for the signal fires of Lachish. Letter 6 complains of words from Jerusalem that weaken morale.",
+  "description": "Twenty-one ostraca, mostly letters, of varying legibility. Many are from Hoshayahu to his superior Yaush. Letter 4 says the writer is watching for the signal fires of Lachish. Letter 6 complains of words from Jerusalem that weaken morale.",
   "connection": "Jeremiah 34:7 says that when Babylon's army attacked Jerusalem, Lachish and Azekah were the last fortified cities of Judah still standing. The letters show the military communication of that late period.",
   "establishes": "Officers in Judah's army wrote to one another in Hebrew in the tense period before the Babylonian conquest.",
   "limits": "Some read Letter 4 as saying Azekah had already fallen because its signals could no longer be seen, but many scholars reject this. Proposed links between named persons and people in Jeremiah are uncertain.",
@@ -1917,7 +1917,7 @@ export const DISCOVERIES = [
    "ref": ""
   },
   "language": "Hebrew (Old Hebrew script)",
-  "description": "Ink inscriptions on pottery, many from one archive of military letters addressed to Eliashib about supplies and troop movements. Some letters show concern about the nearby Edomites. Arad 18 briefly mentions a shrine: 'the house of the Lord is well. It remains.'",
+  "description": "Ink inscriptions on pottery, many from one archive of military letters addressed to Eliashib about supplies and troop movements. Some letters show concern about the nearby Edomites. Arad 18 includes the phrase 'the house of the Lord is well. It remains.'",
   "connection": "The ostraca come from a Judahite fortress in the last decades of the kingdom of Judah, the period of 2 Kings 23–25. A study of 16 of them found at least six different writers, suggesting that writing reached down the military ranks.",
   "establishes": "Judah's army ran a written supply and command system in the Negev around 600 BC.",
   "limits": "It is unclear whether 'house of the LORD' in Arad 18 refers to the Jerusalem temple. The ostraca do not name any biblical king or event, and wider claims about literacy and the writing of biblical books are debated.",
@@ -1970,8 +1970,8 @@ export const DISCOVERIES = [
   "language": "Early Hebrew or Canaanite (debated)",
   "description": "A soft limestone tablet listing agricultural tasks: two months each of olive harvest, sowing and late sowing, then flax, barley harvest, harvest and feasting, vine-tending and summer fruit. A partly preserved name is reconstructed as Abiyah.",
   "connection": "It reflects the farming year assumed by biblical laws and festivals, such as the feast of harvest. Gezer is the city that 1 Kings 9 says Solomon fortified.",
-  "establishes": "Alphabetic writing was in use at Gezer in the 10th century BC, recording the agricultural calendar of the region.",
-  "limits": "It names no king or event. Scholars debate whether its script is Phoenician or early Hebrew, whether its language is Hebrew, and whether it was an almanac, a writing exercise or something else.",
+  "establishes": "Alphabetic writing was used at Gezer to record the region's agricultural year, probably in the 10th century BC.",
+  "limits": "It names no king or event. Scholars debate whether its script is Phoenician or early Hebrew, whether its language is Hebrew, and whether it was an almanac, a writing exercise or something else. It was not found in a secure stratigraphic context, so its date rests on the letter forms.",
   "status": "consistent",
   "passages": [
    "Exod.23.16-23.16",
@@ -1979,8 +1979,7 @@ export const DISCOVERIES = [
   ],
   "people": [],
   "dating": [
-   "palaeography",
-   "stratigraphy"
+   "palaeography"
   ],
   "sources": [
    {
@@ -2021,7 +2020,7 @@ export const DISCOVERIES = [
   "description": "Two small silver sheets, rolled up and worn as amulets, found in a rock-cut tomb. Once unrolled at the Israel Museum laboratories, they were found to carry benediction formulas in Old Hebrew script that include the divine name YHWH.",
   "connection": "The blessing closely matches Numbers 6:24–26: 'The LORD bless thee, and keep thee...'. It shows this blessing was in use in Judah before the Babylonian exile.",
   "establishes": "A form of the Priestly Blessing was written and used in Jerusalem around 600 BC, centuries before the Dead Sea Scrolls.",
-  "limits": "The amulets are not a copy of the book of Numbers; the blessing may have circulated as a liturgical text on its own. The text is tiny and damaged, so its readings depend on close study.",
+  "limits": "The amulets are not a copy of the book of Numbers; the blessing may have circulated as a liturgical text on its own. The text is tiny and damaged, so its readings depend on close study. Their date was once disputed, with some scholars proposing a later date; a 2003 re-study using new imaging dated them to the end of the 7th or start of the 6th century BC.",
   "status": "corroborates",
   "passages": [
    "Num.6.24-6.26"
@@ -2041,6 +2040,11 @@ export const DISCOVERIES = [
     "title": "Silver Scroll Amulets from Ketef Hinnom, c. 600 BCE",
     "publisher": "Center for Online Judaic Studies",
     "url": "https://cojs.org/?p=7652"
+   },
+   {
+    "title": "The challenges of Ketef Hinnom: Using advanced technologies to reclaim the earliest biblical texts and their context (Barkay, Lundberg, Vaughn, Zuckerman and Zuckerman, Near Eastern Archaeology 66.4, 2003)",
+    "publisher": "Bar-Ilan University research portal",
+    "url": "https://cris.biu.ac.il/en/publications/the-challenges-of-ketef-hinnom-using-advanced-technologies-to-rec/"
    }
   ]
  },
@@ -2125,7 +2129,7 @@ export const DISCOVERIES = [
    "ref": ""
   },
   "language": "Aramaic",
-  "description": "Contracts, letters and lists of a Jewish garrison that served the Persians at Elephantine and had its own temple of Yaho (YHW). After the temple was destroyed in 410 BC, the community petitioned the governor of Judah, Bagavahya (Bagoas), in year 17 of Darius (407 BC). The letter says they had already written to 'the high priest Johanan' in Jerusalem and to 'Delaiah and Shelemiah, the sons of Sanballat the governor of Samaria'.",
+  "description": "Contracts, letters and lists of a Jewish garrison that served the Persians at Elephantine and had its own temple of Yaho (YHW). After the temple was destroyed in 410 BC, the community petitioned the governor of Judah, Bagavahya (Bagoas), in year 17 of Darius (407 BC). The letter says that after the destruction they had written to 'Johanan the high priest' in Jerusalem, and that they were now also setting out the matter in a letter to 'Delaiah and Shelemiah, the sons of Sanballat the governor of Samaria'.",
   "connection": "Nehemiah names Sanballat as Nehemiah's chief opponent, and Nehemiah 12–13 lists the high priestly line of Eliashib, Joiada and Johanan. The papyri date Sanballat and a high priest Johanan to the late 5th century BC.",
   "establishes": "A Sanballat was governor of Samaria and a Johanan was high priest in Jerusalem in the late 5th century BC, and Jews in Egypt worshipped YHW at their own temple.",
   "limits": "The papyri do not mention Nehemiah or Ezra. Identifying this Johanan with the Johanan of Nehemiah 12 is a scholarly inference from the order of names, and the Elephantine temple and its practice differ from the Jerusalem-centred religion of Ezra–Nehemiah.",
@@ -2219,61 +2223,6 @@ export const DISCOVERIES = [
     "title": "Seal Impression of King Hezekiah found with the Assistance of the Sifting Project",
     "publisher": "Temple Mount Sifting Project",
     "url": "https://tmsifting.org/en/2015/12/02/seal-impression-of-king-hezekiah-found-with-the-assistance-of-the-sifting-project/"
-   }
-  ]
- },
- {
-  "id": "isaiah-bulla",
-  "name": "'Isaiah' bulla (Ophel)",
-  "kind": "seal",
-  "summary": "A damaged clay seal impression bearing the name Yesha'yah[u] (Isaiah) and the letters nvy, found near Hezekiah's bulla; whether it names the prophet is disputed.",
-  "objectDate": {
-   "text": "8th century BC",
-   "sort": -700
-  },
-  "found": {
-   "year": 2009,
-   "by": "Ophel excavation directed by Eilat Mazar; recovered by wet-sifting",
-   "where": "Ophel, south of the Temple Mount, Jerusalem"
-  },
-  "location": {
-   "lat": 31.7755,
-   "lon": 35.2362,
-   "placeSlug": "ophel_910"
-  },
-  "heldAt": {
-   "institution": "",
-   "ref": ""
-  },
-  "language": "Hebrew (Old Hebrew script)",
-  "description": "A bulla about half an inch across, in three registers: a grazing doe at the top, the name Yesha'yah[u] in the middle, and the letters nvy below. The top is missing and the left side is damaged. It came from Iron Age debris outside a royal building, less than 10 feet from the Hezekiah bulla.",
-  "connection": "Eilat Mazar proposed the reading 'belonging to Isaiah the prophet', linking it to Isaiah son of Amoz, who the Bible says advised King Hezekiah (2 Kings 19–20; Isaiah 37–39). That reading needs a letter (aleph) that is not preserved.",
-  "establishes": "A person named Isaiah (Yesha'yahu) sealed documents in Jerusalem's royal quarter in the 8th century BC.",
-  "limits": "The word nvy may be incomplete; without an aleph it could be a personal name (Navi) rather than 'prophet'. Christopher Rollston notes the definite article expected in 'the prophet' is also absent, and that the name was common. Mazar herself acknowledged 'major obstacles' to the reading.",
-  "status": "debated",
-  "passages": [
-   "Isa.1.1-1.1",
-   "2Kgs.20.1-20.11",
-   "Isa.37.21-37.21"
-  ],
-  "people": [
-   "isaiah_617",
-   "hezekiah_1512"
-  ],
-  "dating": [
-   "stratigraphy",
-   "palaeography"
-  ],
-  "sources": [
-   {
-    "title": "Prophet Isaiah's signature in Jerusalem? (Bible History Daily)",
-    "publisher": "Biblical Archaeology Society (Bible History Daily)",
-    "url": "https://www.biblicalarchaeology.org/daily/news/prophet-isaiah-signature-jerusalem/"
-   },
-   {
-    "title": "Prophet Isaiah seal impression report (February 2018)",
-    "publisher": "National Geographic",
-    "url": "https://www.nationalgeographic.com/history/article/prophet-isaiah-jerusalem-seal-archaeology-bible"
    }
   ]
  },
@@ -2526,7 +2475,7 @@ export const DISCOVERIES = [
   },
   "found": {
    "year": 1932,
-   "by": "Wellcome-Marston expedition under James Leslie Starkey (1932–1938); later Yohanan Aharoni and David Ussishkin (Tel Aviv University, 1973–1987)",
+   "by": "Wellcome-Marston expedition under James Leslie Starkey (1932–1938); Yohanan Aharoni (1966–1968); David Ussishkin, Tel Aviv University (1973–1987)",
    "where": "Judean Shephelah, southwest of Jerusalem"
   },
   "location": {
@@ -2645,8 +2594,8 @@ export const DISCOVERIES = [
    "sort": -1000
   },
   "found": {
-   "year": 2008,
-   "by": "Excavation directed by Yosef Garfinkel (Hebrew University) and Saar Ganor; ostracon found by volunteer Oded Yair",
+   "year": 2007,
+   "by": "Excavations directed by Yosef Garfinkel (Hebrew University) and Saar Ganor (Israel Antiquities Authority), 2007–2013; the ostracon was found in 2008 by volunteer Oded Yair",
    "where": "Khirbet Qeiyafa, above the Elah Valley, Judean Shephelah"
   },
   "location": {
@@ -2719,7 +2668,7 @@ export const DISCOVERIES = [
   "description": "The shrine stood within a Judahite fortress in the Negev. Two limestone monoliths thought to be incense altars had dark residue on their tops. Laboratory analysis found frankincense mixed with animal fat on the larger altar and cannabis mixed with dung on the smaller.",
   "connection": "The Bible describes incense offerings and condemns worship at sanctuaries outside Jerusalem; Hezekiah and Josiah are said to have removed such 'high places' and altars (2 Kings 18:4, 22; 23:8). Arad shows a Judahite sanctuary of this period outside the capital.",
   "establishes": "A Judahite shrine with incense altars operated at Arad in the 8th century BC, and frankincense and cannabis were burned on them.",
-  "limits": "The finds do not show who ended the shrine's use or whether this followed a royal reform. The residues show what was burned, not the meaning of the rituals.",
+  "limits": "The finds do not show who ended the shrine's use or whether this followed a royal reform. The residues show what was burned, not the meaning of the rituals. The shrine's dates are disputed: Aharoni placed its founding in the late 10th century BC and its burial in Josiah's reign, while later studies date it to the 8th century BC or later.",
   "status": "consistent",
   "passages": [
    "2Kgs.18.4-18.4",
