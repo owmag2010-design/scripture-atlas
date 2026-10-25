@@ -218,7 +218,9 @@ export function mountMap(el, { base, places, focus = null, onPick = () => {}, sh
     setPeriod(period) {
       const g = el.querySelector(".periods");
       g.innerHTML = period ? period.powers.map(pw => {
-        const poly = pw.polygon ? `<path class="pw ${pw.precision || ""}" style="--pc:${pw.colour}" d="${pw.polygon.map(([lo, la], i) => { const [x, y] = project(lo, la); return `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`; }).join("")}Z"/>` : "";
+        const ring = r => r.map(([lo, la], i) => { const [x, y] = project(lo, la); return `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`; }).join("") + "Z";
+        const rings = [pw.polygon, ...(pw.extraPolygons || [])].filter(Boolean);
+        const poly = rings.length ? `<path class="pw ${pw.precision || ""}" style="--pc:${pw.colour}" d="${rings.map(ring).join("")}"><title>${pw.name}</title></path>` : "";
         const [lx, ly] = pw.label ? project(pw.label[0], pw.label[1]) : [0, 0];
         const cap = pw.capital ? (() => { const [cx, cy] = project(pw.capital.lon, pw.capital.lat); return `<g class="cap"><circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}"/><text x="${cx.toFixed(1)}" y="${cy.toFixed(1)}" dx="0.5em" dy="0.35em">${pw.capital.name}</text></g>`; })() : "";
         return `${poly}${pw.label ? `<text class="pwl" style="--pc:${pw.colour}" x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle">${pw.name}</text>` : ""}${cap}`;

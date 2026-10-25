@@ -971,8 +971,8 @@ body.atlasmode main#view { max-width: none; padding: 0; margin: 0; }
 .atlas .dm { fill: #F2C14E; stroke: #15120E; stroke-width: 1.2; vector-effect: non-scaling-stroke; cursor: pointer; }
 .atlas .dm.dim { opacity: .3; } .atlas .dm.hot { fill: #FFD966; stroke-width: 2; }
 .atlas .dm:focus { outline: none; stroke: var(--rubric); stroke-width: 3; }
-.atlas .periods .pw { fill: color-mix(in srgb, var(--pc) 22%, transparent); stroke: var(--pc); stroke-width: 1.6; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
-.atlas .periods .pw.schematic { stroke-dasharray: 5 4; fill: color-mix(in srgb, var(--pc) 14%, transparent); }
+.atlas .periods .pw { fill: color-mix(in srgb, var(--pc) 34%, transparent); stroke: var(--pc); stroke-width: 2.2; fill-rule: evenodd; mix-blend-mode: multiply; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.atlas .periods .pw.schematic { stroke-dasharray: 6 4; fill: color-mix(in srgb, var(--pc) 26%, transparent); }
 @media (prefers-reduced-motion: no-preference) { .atlas .periods .pw { animation: fadein .6s ease; } }
 .atlas .periods .pwl { font-family: var(--serif); font-size: calc(15px / var(--s, 1)); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; fill: color-mix(in srgb, var(--pc) 75%, #15120E); paint-order: stroke; stroke: rgba(250, 246, 238, .85); stroke-width: 3px; vector-effect: non-scaling-stroke; pointer-events: none; }
 .atlas .periods .cap circle { r: calc(2.8px / var(--s, 1)); fill: #15120E; stroke: #F2C14E; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
@@ -1009,7 +1009,7 @@ body.atlasmode main#view { max-width: none; padding: 0; margin: 0; }
 .adict summary { cursor: pointer; font-weight: 600; } .adict p { font-size: .9rem; }
 .ajourneys { display: flex; flex-wrap: wrap; gap: 6px; } .ajourneys a { padding: 6px 11px; border-radius: 99px; border: 1px solid var(--line); border-left: 4px solid var(--c, var(--gold)); text-decoration: none; color: var(--ink); font-size: .85rem; font-weight: 600; }
 .ajourneys.big { display: grid; } .ajourneys.big a { display: grid; gap: 2px; border-radius: 12px; padding: 10px 14px; } .ajourneys.big span { font-size: .8rem; color: var(--muted); font-weight: 500; }
-.apowers { list-style: none; padding: 0; display: grid; gap: 8px; } .apowers li { display: grid; grid-template-columns: 16px 1fr; gap: 2px 8px; align-items: center; } .apowers i { width: 14px; height: 14px; border-radius: 3px; background: color-mix(in srgb, var(--pc) 35%, transparent); border: 2px solid var(--pc); } .apowers i.schematic { border-style: dashed; } .apowers .small { grid-column: 2; }
+.apowers { list-style: none; padding: 0; display: grid; gap: 8px; } .apowers li { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 8px; align-items: start; } .apowers li i { margin-top: 4px; } .apowers .small { display: block; margin-top: 2px; } .apowers i { width: 14px; height: 14px; border-radius: 3px; background: color-mix(in srgb, var(--pc) 35%, transparent); border: 2px solid var(--pc); } .apowers i.schematic { border-style: dashed; } .apowers .small { grid-column: 2; }
 .aai { padding-left: 18px; display: grid; gap: 6px; } .aai sup { font-size: .65rem; color: var(--gilt); font-weight: 700; margin-left: 2px; }
 .atl-time { position: absolute; left: 12px; right: 408px; bottom: 12px; z-index: 3; display: flex; gap: 6px; align-items: stretch; overflow-x: auto; scrollbar-width: none; padding: 6px; border-radius: 14px; background: color-mix(in srgb, var(--lapis-deep) 88%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: var(--shadow); }
 .atl-tlabel { flex: none; align-self: center; font: 700 .7rem var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--gold); padding: 0 6px; }

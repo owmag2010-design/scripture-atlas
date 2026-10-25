@@ -42,7 +42,7 @@ async function mount(ctx) {
   let showApprox = true, showDisc = true;
   const map = mountMap($("#amap"), {
     base, places, relief: true, regionLabels: true, fill: true,
-    credit: periodsData?.credit ? `Period layers: ${periodsData.credit}` : "",
+    credit: periodsData?.credit ? "Period layers: historical-basemaps (GPL-3.0), Pleiades, Natural Earth; details in the panel." : "",
     onPick: s => { location.hash = s.startsWith("d:") ? `#/discoveries/${s.slice(2)}` : `#/atlas/place/${s}`; }
   });
   map.setDiscoveries(drows);
@@ -134,7 +134,7 @@ async function mount(ctx) {
     open(`<span class="eyebrow">Period · ${esc(per.range || `${ctx.yearText(per.from)} – ${ctx.yearText(per.to)}`)}</span><h1>${esc(per.name)}</h1>
       ${per.summary ? `<p>${esc(per.summary)}</p>` : ""}
       ${per.debate ? `<div class="textnote"><b>Debated</b><br>${esc(per.debate)}</div>` : ""}
-      ${(per.powers || []).length ? `<h3>Powers on the map</h3><ul class="apowers">${per.powers.map(pw => `<li><i style="--pc:${pw.colour}" class="${esc(pw.precision || "")}"></i><b>${esc(pw.name)}</b>${pw.capital ? ` · capital ${esc(pw.capital.name)}` : ""}<span class="small">${esc(pw.note || "")}${pw.precision === "schematic" ? " Drawn schematically: the shape follows natural limits named in the sources, not a surveyed border." : pw.precision === "approximate" ? " Approximate extent." : ""}</span></li>`).join("")}</ul>` : `<p class="small">Period boundaries are being researched; for now this shows the places of the events dated to this period.</p>`}
+      ${(per.powers || []).length ? `<h3>Powers on the map</h3><ul class="apowers">${per.powers.map(pw => `<li><i style="--pc:${pw.colour}" class="${esc(pw.precision || "")}"></i><div><b>${esc(pw.name)}</b>${pw.capital ? ` · capital ${esc(pw.capital.name)}` : ""}<span class="small">${esc(pw.note || "")}${pw.precision === "schematic" ? " Drawn schematically: the shape follows natural limits named in the sources, not a surveyed border." : pw.precision === "approximate" ? " Approximate extent." : ""}</span></div></li>`).join("")}</ul>` : `<p class="small">Period boundaries are being researched; for now this shows the places of the events dated to this period.</p>`}
       ${(per.passages || []).length ? `<h3>Read</h3><p>${per.passages.map(r => `<a href="${ctx.rangeHref(r)}">${esc(ctx.rangeLabel(r))}</a>`).join(" · ")}</p>` : ""}
       ${evRows.length ? `<h3>${evRows.length} dated event${evRows.length === 1 ? "" : "s"}</h3><ol class="aevents">${evRows.slice(0, 40).map(e => `<li><span class="yr">${esc(ctx.yearText(e.year))}</span> ${esc(e.title)}${e.places[0] && mapped(e.places[0]) ? ` · <a href="#/atlas/place/${e.places[0]}">${pname(e.places[0])}</a>` : ""}</li>`).join("")}</ol><p class="small">Event dates follow the Theographic dataset's traditional chronology; see the timeline for how firm each date is.</p>` : ""}
       ${(per.sources || []).length ? `<h3>Sources</h3><ol class="dsrc">${per.sources.map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.title)}</a> <span class="small">${esc(s.publisher)} · opens in a new tab</span></li>`).join("")}</ol>` : ""}`);
