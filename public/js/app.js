@@ -1775,6 +1775,9 @@ async function renderSermon(openId) {
 }
 
 /* ---------- kids: animated Bible stories ---------- */
+// Extra illustrated pages per story (Magnific, AI illustrations): page index -> img/kids/<id>-<page>.webp
+const KID_SCENES = { creation: [2, 3], noah: [2, 4], joseph: [3, 4], moses: [1, 3], david: [1, 2], daniel: [2, 3], jonah: [1, 2], storm: [2, 3] };
+const sceneArt = (id, page) => { const k = (KID_SCENES[id] || []).filter(n => n <= page).pop(); return k == null ? id : `${id}-${k}`; };
 const kidImg = (id, cls = "") => `<img class="${cls}" src="img/kids/${id}-sm.webp" srcset="img/kids/${id}-sm.webp 720w, img/kids/${id}.webp 1600w" sizes="(max-width: 760px) 100vw, 60vw" alt="" decoding="async">`;
 function renderKids() {
   setNav("kids"); setTitle("Kids");
@@ -1801,7 +1804,7 @@ function renderStory(id) {
     <div class="pagecard" id="pagecard" aria-live="polite"></div>
     <div class="storyctl"><div class="dots" id="dots">${s.scenes.map((_, k) => `<button type="button" data-k="${k}" aria-label="Page ${k + 1}"></button>`).join("")}<button type="button" data-k="${N}" aria-label="Quiz" class="qdot">?</button></div>
       <button class="btn gold" type="button" id="readme">Read to me</button></div>
-    ${s.note ? `<p class="small kidsnote"><b>For grown-ups:</b> ${esc(s.note)}</p>` : ""}
+    <p class="small kidsnote">${s.note ? `<b>For grown-ups:</b> ${esc(s.note)} ` : ""}Pictures are illustrations made for Scripture Atlas with an AI image tool, not historical images.</p>
   </div>`;
   const art = $(".st-art"), card = $("#pagecard");
   const synth = window.speechSynthesis;
@@ -1820,6 +1823,9 @@ function renderStory(id) {
     if (!auto) stop();
     view.querySelectorAll("#dots button").forEach(b => b.classList.toggle("on", +b.dataset.k === i));
     $("#sprev").disabled = i === 0; $("#snext").disabled = i === N;
+    const want = sceneArt(s.id, Math.min(i, N - 1));
+    if (art.dataset.k !== want) { art.dataset.k = want; art.src = `img/kids/${want}-sm.webp`; art.srcset = `img/kids/${want}-sm.webp 720w, img/kids/${want}.webp 1600w`; }
+    const nxt = sceneArt(s.id, Math.min(i + 1, N - 1)); if (nxt !== want) { const pre = new Image(); pre.src = `img/kids/${nxt}-sm.webp`; }
     art.style.transformOrigin = origins[i % origins.length];
     art.classList.remove("kb"); void art.offsetWidth; art.classList.add("kb");
     if (i < N) {
