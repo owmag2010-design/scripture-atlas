@@ -437,3 +437,4 @@ ol.lessons b { display: block; font-family: var(--serif); font-size: 1.2rem; fon
 .dist rect.ot { fill: var(--gilt); } .dist rect.nt { fill: var(--lapis); } .dist .sep { stroke: var(--line); stroke-dasharray: 2 2; }
 .distlab { position: relative; display: flex; justify-content: space-between; } .distlab span:nth-child(2) { position: absolute; left: 59%; }
 @media (max-width: 720px) { .kgraph { max-height: none; } .kgraph .gn text { font-size: 19px; } .kgraph .gct { font-size: 17px; } }
+.mscard p { margin: 6px 0; }

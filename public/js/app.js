@@ -7,17 +7,17 @@
 //   #/learn  #/learn/<course>  #/learn/<course>/<lesson>
 //   #/languages  #/study  #/library  #/soon/<section>
 //   #/research[/<OSIS>|/topic/<q>|/person/<slug>|/place/<slug>]  knowledge graph and topic research
-import { BOOKS, NAMES, GROUPS, groupOf, testamentOf, fileId, blbCode, bibleHubSlug, sefariaName } from "./books.js";
+import { BOOKS, NAMES, GROUPS, groupOf, testamentOf, fileId } from "./books.js";
 import { parseReference, formatRef, toOsis, fromOsis } from "./ref.js";
 import { parseQuery, searchCorpus, highlightTerms, escapeHtml as esc } from "./search.js";
 import { createStore, exportMarkdown } from "./store.js";
 import { CONTEXT } from "./context.js";
-import { DAILY, QUESTIONS, TEXT_NOTES, SOURCES, LIBRARY, SOON } from "./content.js";
+import { DAILY, QUESTIONS, TEXT_NOTES, SOURCES, MANUSCRIPTS, SOON } from "./content.js";
 import { yearText, dateCertainty, PRECISION, inMapBox } from "./history.js";
 import { mountMap } from "./atlas-map.js";
 import { COURSES, PLANNED, STATUS } from "./courses.js";
 import { SECTIONS } from "./ai-core.js";
-import { HISTORY, NOT_HOSTED, readElsewhere } from "./translations-info.js";
+import { HISTORY, NOT_HOSTED } from "./translations-info.js";
 import { stem, glossStems, distribution, sharedStrongs, radialLayout, NODE_TYPES, clip } from "./research.js";
 import { repeatedWords, keyLemmas, mergeCrossRefs, interpretQuestions, guideMarkdown, OBSERVE, APPLY } from "./guide.js";
 import { describeMorph, languageOf, normaliseStrong, shardOf, displayStrong, isGrammaticalStrong, editionNote } from "./lang.js";
@@ -106,7 +106,7 @@ function setNav(key) {
 }
 function setTitle(s) { document.title = s ? `${s} · Scripture Atlas` : "Scripture Atlas · Owen Magocha"; }
 const readUrl = (t, book, chapter, verse) => `#/read/${t}/${toOsis(book, chapter, verse)}`;
-const extLink = (title, desc, href) => `<li><a href="${href}" target="_blank" rel="noopener"><span><span class="t">${title}</span><span class="d">${desc}</span></span><span class="arr" aria-hidden="true">↗</span></a></li>`;
+const inLink = (title, desc, target, tab = false) => `<li><a href="${tab ? "#" : target}" ${tab ? `data-gotab="${target}"` : ""}><span><span class="t">${title}</span><span class="d">${desc}</span></span><span class="arr" aria-hidden="true">›</span></a></li>`;
 async function copyText(s) {
   try { await navigator.clipboard.writeText(s); toast("Copied"); }
   catch { toast("Copy is blocked here; select the text instead"); }
@@ -210,21 +210,21 @@ function backgroundPane() {
     <div class="timeline"><span class="eyebrow">Range of proposed composition dates</span>${timelineSvg(x)}</div>
     <p class="small">Scripture Atlas editorial note. Where tradition and academic scholarship differ, both are given; neither is presented as settled.</p>
     <ul class="linklist">
-      ${extLink(`Bible Odyssey on ${NAMES[R.book]}`, "External · Society of Biblical Literature scholars", `https://www.bibleodyssey.org/search/?q=${encodeURIComponent(NAMES[R.book])}`)}
-      ${extLink("NET Bible notes", "External · translators' notes, chapter by chapter", `https://netbible.org/bible/${encodeURIComponent(NAMES[R.book])}+${R.chapter}`)}
-      ${extLink("Chapter summaries", "External · Bible Hub outline", `https://biblehub.com/summary/${bibleHubSlug(R.book)}/${R.chapter}.htm`)}
+      ${inLink(`Study guide for ${formatRef(R.book, R.chapter)}`, "Observe, key words, connections, questions", `#/guide/${BOOKS[R.book].osis}.${R.chapter}`)}
+      ${inLink("People, places and events in this chapter", "From the History data", "people", true)}
+      ${inLink(`${NAMES[R.book]} on the timeline`, "When it happened, and how sure we are", "#/history/timeline")}
     </ul></div>`;
 }
 
 async function versePane() {
-  if (!R.verse) return `<div class="pane"><h2>Choose a verse</h2><p class="small">Tap or click any verse to see it in both translations, research it in the original languages and commentaries, highlight it, bookmark it, or write a note.</p><details open><summary>Questions to bring to any passage</summary><ol>${QUESTIONS.map(q => `<li>${q}</li>`).join("")}</ol></details></div>`;
+  if (!R.verse) return `<div class="pane"><h2>Choose a verse</h2><p class="small">Tap or click any verse to see it in both translations, research it in the original languages, see its connections, highlight it, bookmark it, or write a note.</p><details open><summary>Questions to bring to any passage</summary><ol>${QUESTIONS.map(q => `<li>${q}</li>`).join("")}</ol></details></div>`;
   const osis = toOsis(R.book, R.chapter, R.verse);
   const other = compareWith() && compareWith() !== R.t ? compareWith() : (R.t === "kjv" ? "web" : "kjv");
   const [mine, theirs] = await Promise.all([verseText(R.t, osis), verseText(other, osis)]);
-  const s = bibleHubSlug(R.book), c = R.chapter, v = R.verse;
+  const c = R.chapter, v = R.verse;
   const note = TEXT_NOTES[osis];
   const noteHtml = note === "absent"
-    ? `<div class="textnote"><b>Textual note</b><br>The KJV includes this verse from the Textus Receptus. The World English Bible follows a Greek text in which it is absent. See the NET Bible notes below for the manuscript evidence.</div>`
+    ? `<div class="textnote"><b>Textual note</b><br>The KJV includes this verse from the Textus Receptus. The World English Bible follows a Greek text in which it is absent; it is missing from the oldest manuscripts. See <a href="#/library">Manuscripts</a> for how the texts differ.</div>`
     : note === "doxology"
       ? `<div class="textnote"><b>Textual note</b><br>Manuscripts place the closing doxology of Romans in different positions. The KJV prints it at 16:25–27; the World English Bible prints it at 14:24–26.</div>` : "";
   const hl = store.highlight(osis), bm = store.isBookmarked(osis);
@@ -245,13 +245,11 @@ async function versePane() {
       <span class="small" id="saved">Saved on this device as you type.</span></div>
     <div><h3>Research this verse</h3>
     <ul class="linklist">
-      ${extLink("Hebrew or Greek interlinear", "External · Bible Hub, with Strong's numbers", `https://biblehub.com/interlinear/${s}/${c}-${v}.htm`)}
-      ${extLink("Word study and lexicon", "External · Blue Letter Bible", `https://www.blueletterbible.org/kjv/${blbCode(R.book)}/${c}/${v}/`)}
-      ${extLink("Classic commentaries", "External · Matthew Henry, Barnes, Gill, Ellicott and others", `https://biblehub.com/commentaries/${s}/${c}-${v}.htm`)}
-      ${extLink("Cross references", "External · Treasury of Scripture Knowledge", `https://biblehub.com/tsk/${s}/${c}-${v}.htm`)}
-      ${extLink("Compare translations", "External · parallel versions", `https://biblehub.com/${s}/${c}-${v}.htm`)}
-      ${extLink("Translation and manuscript notes", "External · NET Bible", `https://netbible.org/bible/${encodeURIComponent(NAMES[R.book])}+${c}`)}
-      ${R.book < 39 ? extLink("Hebrew text and Jewish commentary", "External · Sefaria (Hebrew verse numbers can differ)", `https://www.sefaria.org/${sefariaName(R.book)}.${c}.${v}`) : ""}
+      ${inLink(R.book < 39 ? "Hebrew words of this verse" : "Greek words of this verse", "Each word with its grammar, dictionary entry and other uses", "words", true)}
+      ${inLink("Cross references", "The passages readers most often link to this verse", "xref", true)}
+      ${inLink("Connections", "Words, people, places and linked verses as a graph", `#/research/${osis}`)}
+      ${inLink("This verse in every translation", `All ${allTranslations().length} Bibles, side by side`, `#/compare/${osis}`)}
+      ${inLink("People and places", "Who and where this verse mentions", "people", true)}
     </ul>
     <p class="small">Strong's numbers are an index to words, not full definitions. Use the Hebrew-Greek tab for the words of this verse.</p></div>
     <div class="actions"><a class="btn" href="#/research/${osis}">Explore connections</a><a class="btn" href="#/ai/${osis}">Ask the research assistant</a><a class="btn" href="#/guide/${BOOKS[R.book].osis}.${c}">Study guide for this chapter</a></div>
@@ -406,6 +404,7 @@ async function renderMargin() {
   try {
     pane.innerHTML = R.tab === "bg" ? backgroundPane() : R.tab === "words" ? await wordsPane() : R.tab === "xref" ? await xrefPane() : R.tab === "people" ? await peoplePane() : await versePane();
   } catch { pane.innerHTML = `<div class="pane"><p class="small">This could not load. Check your connection and try again.</p></div>`; }
+  pane.querySelectorAll("[data-gotab]").forEach(a => a.addEventListener("click", e => { e.preventDefault(); R.tab = a.dataset.gotab; renderMargin(); }));
   if (R.tab === "verse" && R.verse) wireVersePane();
 }
 
@@ -635,9 +634,7 @@ async function renderWord(key, page = 0) {
   <div class="two">
     <section class="card"><h2 style="font-size:1.4rem">Lexicon entry</h2><div class="lexdef">${e.def || "<p class='small'>No definition recorded.</p>"}</div>
       <p class="small">Source: STEPBible Translators Brief Lexicon (${greek ? "TBESG, based on Abbott-Smith" : "TBESH, based on BDB"}), CC BY 4.0. A lexicon gives a word's range of meaning; context decides which sense applies in a given verse.</p>
-      <ul class="linklist">${greek ? `` : ``}
-        <li><a href="https://www.blueletterbible.org/lexicon/${(k[0] + String(+k.slice(1, 5))).toLowerCase()}/kjv/${greek ? "tr" : "wlc"}/0-1/" target="_blank" rel="noopener"><span><span class="t">Blue Letter Bible lexicon</span><span class="d">External · Strong's, Thayer's or Gesenius, concordance</span></span><span class="arr">↗</span></a></li>
-        <li><a href="https://www.stepbible.org/?q=strong=${k}" target="_blank" rel="noopener"><span><span class="t">STEP Bible</span><span class="d">External · Tyndale House tools for this word</span></span><span class="arr">↗</span></a></li></ul></section>
+      <div class="actions"><a class="btn" href="#/research/topic/${encodeURIComponent(e.gloss.split(/[:;,]/)[0].replace(/^to /, ""))}">Related words in the ${greek ? "Hebrew" : "Greek"} and ${greek ? "Greek" : "Hebrew"}</a></div></section>
     <section class="card"><h2 style="font-size:1.4rem">Where it appears</h2><p class="small">Verses ${page * PAGE + 1}–${page * PAGE + refs.length} of ${e.refs.length.toLocaleString()}, KJV text shown. The English word may differ from verse to verse.</p>
       <div class="results">${rows.join("")}</div>
       ${pages > 1 ? `<div class="chapnav"><button class="btn" type="button" id="pp" ${page === 0 ? "disabled" : ""}>‹ Previous</button><span class="small">Page ${page + 1} of ${pages}</span><button class="btn" type="button" id="pn" ${page >= pages - 1 ? "disabled" : ""}>Next ›</button></div>` : ""}</section>
@@ -959,11 +956,11 @@ async function renderTranslations() {
   await getIndex();
   const list = allTranslations(), langs = new Set(list.map(t => t.languageEn));
   view.innerHTML = `<div class="pagehead"><span class="eyebrow">Bibles</span><h1>${list.length} complete Bibles in ${langs.size} languages, with the story behind each.</h1>
-    <p class="small" style="max-width:72ch">Every Bible here is complete and may be freely shared: public domain or an open Creative Commons licence, each checked against its publisher's own licence page. Popular modern translations such as the NIV and ESV are copyrighted, so they are described at the end with links to read them on the publisher's partner sites.</p>
+    <p class="small" style="max-width:72ch">Every Bible here is complete and may be freely shared: public domain or an open Creative Commons licence, each checked against its publisher's own licence page. Popular modern translations such as the NIV and ESV are copyrighted, so they are described at the end but not included.</p>
     <form class="minisearch" id="tf" style="max-width:420px"><label class="sr" for="tq">Filter</label><input id="tq" placeholder="Filter by language or name, e.g. Swahili" autocomplete="off"></form></div>
   <div id="tlist"></div>
-  <section class="card" style="margin-top:22px"><h2 style="font-size:1.5rem">Well-known translations under copyright</h2><p class="small">Not hosted here. Their history, and a link to read them.</p>
-    <div class="tgrid">${NOT_HOSTED.map(t => `<article class="tcard"><b>${esc(t.name)}</b><span class="small">${esc(t.year)} · ${esc(t.owner)}</span><p>${esc(t.history)}</p><a class="small" href="${readElsewhere(t.code)}" target="_blank" rel="noopener">Read John 3:16 in the ${esc(t.code)} on BibleGateway ↗</a></article>`).join("")}</div></section>`;
+  <section class="card" style="margin-top:22px"><h2 style="font-size:1.5rem">Well-known translations under copyright</h2><p class="small">Not hosted here, because their publishers do not allow free redistribution. Their history is given for reference.</p>
+    <div class="tgrid">${NOT_HOSTED.map(t => `<article class="tcard"><b>${esc(t.name)}</b><span class="small">${esc(t.year)} · ${esc(t.owner)}</span><p>${esc(t.history)}</p></article>`).join("")}</div></section>`;
   const draw = q => {
     q = q.trim().toLowerCase();
     const groups = new Map();
@@ -985,7 +982,7 @@ async function renderTranslation(id) {
   view.innerHTML = `<div class="pagehead"><span class="eyebrow"><a href="#/bibles">Bibles</a> · ${esc(t.languageEn)}</span><h1>${esc(t.name)}</h1>
     ${t.title && t.title !== t.name ? `<p style="margin:0;font-size:1.2rem" dir="${t.dir}" lang="${t.code}">${esc(t.title)}</p>` : ""}
     <div class="actions"><span class="chip">${esc(t.licence)}</span><span class="small">${esc(t.language)}${t.copyright ? " · " + esc(t.copyright) : ""}</span></div>
-    <div class="actions"><a class="btn pri" href="#/read/${id}/John.1">Read this Bible</a><a class="btn" href="#/read/${id}/John.3.16" id="cmpk">Compare with the KJV</a></div></div>
+    <div class="actions"><a class="btn pri" href="#/read/${id}/John.1">Read this Bible</a><a class="btn" href="#/read/${id}/John.3.16" id="cmpk">Compare with the KJV</a><a class="btn" href="#/compare/John.3.16">John 3:16 in every Bible</a></div></div>
   <div class="two">
     <section class="card"><h2 style="font-size:1.4rem">History and origin</h2>
       <dl class="facts" style="grid-template-columns:110px minmax(0,1fr);margin:10px 0">
@@ -993,7 +990,7 @@ async function renderTranslation(id) {
         ${t.numbering ? `<dt>Numbering</dt><dd>${esc(t.numbering)}</dd>` : ""}${t.extraBooks ? `<dt>Books</dt><dd>${esc(t.extraBooks)}</dd>` : ""}
       </dl>
       <p class="dict">${esc(h.history || "No history note has been written for this edition yet.")}</p>
-      <p class="small">Scripture Atlas editorial note. Text source: <a href="${t.source}" target="_blank" rel="noopener">${id === "kjv" ? "thiagobodruk/bible" : "eBible.org"}</a>${t.details ? ` · <a href="${t.details}" target="_blank" rel="noopener">publisher</a>` : ""}.</p></section>
+      <p class="small">Scripture Atlas editorial note. Text source: ${id === "kjv" ? "thiagobodruk/bible on GitHub" : "eBible.org"}, <span class="mono">${esc(t.source)}</span>. ${esc(t.licence)}.</p></section>
     <section class="card"><h2 style="font-size:1.4rem">A taste of this translation</h2>
       ${samples.map(([o, txt]) => `<figure class="reading"><figcaption><b>${labelOf(o)}</b></figcaption><p class="vtext" dir="${t.dir}" lang="${t.code}">${txt ? esc(txt) : "<em>Not found at this reference; numbering may differ.</em>"}</p></figure>`).join("")}</section>
   </div>`;
@@ -1229,26 +1226,54 @@ async function renderTopic(raw) {
 
 function renderLibrary() {
   setNav("library"); setTitle("Library");
-  view.innerHTML = `<div class="pagehead"><span class="eyebrow">Library</span><h1>Sources and licences</h1>
-    <p class="small" style="max-width:70ch">Every text and note in Scripture Atlas names where it came from and the terms it is used under. Scripture text is kept exactly as published; external research opens on the publisher's own site and is never copied here.</p></div>
-    <div class="card" style="margin-bottom:18px"><h2 style="font-size:1.5rem;margin-bottom:8px">Source register</h2><div class="tablewrap"><table class="reg">
+  const credit = (name, url) => `${esc(name)}<br><span class="mono small">${esc(url || "")}</span>`;
+  const msLink = m => (m.see[0].startsWith("#") ? m.see[0] : `#/read/kjv/${m.see[0]}`);
+  view.innerHTML = `<div class="pagehead"><span class="eyebrow">Library</span><h1>The manuscripts behind the text, and where every source comes from.</h1>
+    <p class="small" style="max-width:72ch">Scripture Atlas is self-contained: everything you read here is hosted here. Sources are credited below as their licences require.</p></div>
+    <section><h2 style="font-size:1.6rem;margin:0 0 10px">Manuscripts and editions</h2>
+      <p class="small" style="max-width:72ch">No original manuscript of any biblical book survives. What we have are copies, and copies of copies, which scholars compare to recover the earliest text. Dates are estimates; where they are debated a range is given.</p>
+      <div class="grid3">${MANUSCRIPTS.map(m => `<article class="card mscard"><span class="eyebrow">${esc(m.lang)}</span><h3 style="font-size:1.3rem;margin:4px 0">${esc(m.name)}</h3>
+        <p class="small"><b>${esc(m.date)}</b> · ${esc(m.where)}</p><p>${esc(m.about)}</p><a class="small" href="${msLink(m)}">${esc(m.see[1])} ›</a></article>`).join("")}</div>
+      <p class="small">Scripture Atlas editorial summaries of widely published scholarship.</p></section>
+    <div class="card" style="margin:22px 0 18px"><h2 style="font-size:1.5rem;margin-bottom:8px">Source register</h2><div class="tablewrap"><table class="reg">
       <thead><tr><th>Source</th><th>Type</th><th>Owner</th><th>Licence</th><th>How it is used</th></tr></thead>
-      <tbody>${SOURCES.map(s => `<tr><td>${s.url ? `<a href="${s.url}" target="_blank" rel="noopener">${s.name}</a>` : s.name}</td><td>${s.type}</td><td>${s.owner}</td><td>${s.licence}</td><td>${s.use}</td></tr>`).join("")}
-      <tr><td><a href="https://github.com/robertrouse/theographic-bible-metadata" target="_blank" rel="noopener">Theographic Bible Metadata</a></td><td>People, places, events</td><td>Robert Rouse</td><td>CC BY-SA 4.0 (derived data shared alike)</td><td>Family links, place coordinates (from OpenBible.info, CC BY), events and dates on a traditional chronology</td></tr>
+      <tbody>${SOURCES.map(s => `<tr><td>${credit(s.name, s.url)}</td><td>${s.type}</td><td>${s.owner}</td><td>${s.licence}</td><td>${s.use}</td></tr>`).join("")}
+      <tr><td>${credit("54 Bibles from eBible.org", "https://ebible.org/")}</td><td>Scripture · translations</td><td>Each translation's publisher</td><td>Public domain, CC BY, CC BY-SA or CC BY-ND, shown on each Bible's page</td><td>Full text, unchanged</td></tr>
+      <tr><td>${credit("Theographic Bible Metadata", "https://github.com/robertrouse/theographic-bible-metadata")}</td><td>People, places, events</td><td>Robert Rouse</td><td>CC BY-SA 4.0 (derived data shared alike)</td><td>Family trees, map, timeline and verse tagging</td></tr>
       <tr><td>Easton's Bible Dictionary</td><td>Historic reference</td><td>M. G. Easton, 1897</td><td>Public domain</td><td>Entries on people and places, labelled as historic</td></tr>
-      <tr><td><a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a></td><td>Base map</td><td>Natural Earth</td><td>Public domain</td><td>Coastlines, rivers and lakes</td></tr>
-      ${(INDEX?.language?.sources || []).map(s => `<tr><td><a href="${s.url}" target="_blank" rel="noopener">${s.name}</a></td><td>Original language data</td><td>${s.owner}</td><td>${s.licence}</td><td>Word tagging, lexicons or cross references, shown in the reader</td></tr>`).join("")}</tbody></table></div></div>
-    <div class="two">
-      <section class="card"><h2 style="font-size:1.5rem">Manuscripts and scholarship</h2><ul class="linklist">${LIBRARY.map(l => extLink(l[0], l[1], l[2])).join("")}</ul></section>
-      <section class="card"><h2 style="font-size:1.5rem">How to read the labels</h2>
-        <dl class="facts" style="margin-top:10px;grid-template-columns:110px minmax(0,1fr)">
-          <dt>Scripture</dt><dd>The Bible text itself, in a named translation.</dd>
-          <dt>Translation</dt><dd>How another translation renders the same verse.</dd>
-          <dt>Editorial</dt><dd>Scripture Atlas notes on history and dating, showing each scholarly view.</dd>
-          <dt>External</dt><dd>A link to a publisher's site; their content and terms apply there.</dd>
-        </dl>
-        <p class="small">Translation versions in use: ${INDEX ? INDEX.translations.map(t => `${t.short} (checksum ${t.checksum})`).join(", ") : "loading"}.</p></section>
-    </div>`;
+      <tr><td>${credit("Natural Earth", "https://www.naturalearthdata.com/")}</td><td>Base map</td><td>Natural Earth</td><td>Public domain</td><td>Coastlines, rivers and lakes</td></tr>
+      ${(INDEX?.language?.sources || []).map(s => `<tr><td>${credit(s.name, s.url)}</td><td>Original language data</td><td>${s.owner}</td><td>${s.licence}</td><td>Word tagging, lexicons or cross references</td></tr>`).join("")}</tbody></table></div></div>
+    <section class="card"><h2 style="font-size:1.5rem">How to read the labels</h2>
+      <dl class="facts" style="margin-top:10px;grid-template-columns:110px minmax(0,1fr)">
+        <dt>Scripture</dt><dd>The Bible text itself, in a named translation.</dd>
+        <dt>Translation</dt><dd>How another translation renders the same verse.</dd>
+        <dt>Editorial</dt><dd>Scripture Atlas notes on history and dating, showing each scholarly view.</dd>
+        <dt>AI</dt><dd>Generated by the research assistant, with every claim tied to a cited source.</dd>
+      </dl>
+      <p class="small">Translation versions in use: ${INDEX ? INDEX.translations.map(t => `${t.short} (checksum ${t.checksum})`).join(", ") : "loading"}.</p></section>`;
+}
+
+/* ---------- one verse in every translation ---------- */
+async function renderCompare(osis) {
+  await getIndex();
+  const r = fromOsis(osis || ""); if (!r) { location.replace("#/bibles"); return; }
+  const v = r.verse || 1, label = formatRef(r.book, r.chapter, v), o = toOsis(r.book, r.chapter, v);
+  setNav("bibles"); setTitle(`${label} in every translation`);
+  const list = allTranslations();
+  const groups = new Map();
+  for (const t of list) { if (!groups.has(t.languageEn)) groups.set(t.languageEn, []); groups.get(t.languageEn).push(t); }
+  const order = [...groups.keys()].sort((a, b) => (a === "English" ? -1 : b === "English" ? 1 : a.localeCompare(b)));
+  view.innerHTML = `<div class="pagehead"><span class="eyebrow">Bibles · compare</span><h1>${esc(label)} in ${list.length} Bibles</h1>
+    <div class="actions">${v > 1 ? `<a class="btn" href="#/compare/${toOsis(r.book, r.chapter, v - 1)}">‹ Previous verse</a>` : ""}<a class="btn" href="#/compare/${toOsis(r.book, r.chapter, v + 1)}">Next verse ›</a><a class="btn" href="#/read/kjv/${o}">Open in the reader</a><a class="btn" href="#/research/${o}">Connections</a></div>
+    <p class="small" style="max-width:72ch">Each translation keeps its own verse numbering, so a few (Psalms especially) may show a neighbouring verse; the Bible's page explains its numbering.</p></div>
+    ${order.map(l => `<section class="tlang"><h2>${esc(l)}</h2><div class="results">${groups.get(l).map(t => `<div class="hit"><span class="meta"><a class="ref" href="#/translation/${t.id}">${esc(t.name)}</a><span class="chip ext">${esc(t.licence.replace(" (text shown unchanged)", ""))}</span></span><span class="tx" dir="${t.dir}" lang="${t.code}" data-cmp="${t.id}"><span class="loading small">Loading…</span></span></div>`).join("")}</div></section>`).join("")}`;
+  // load a few at a time so the page fills in progressively
+  const ids = order.flatMap(l => groups.get(l).map(t => t.id));
+  for (let i = 0; i < ids.length; i += 6) await Promise.all(ids.slice(i, i + 6).map(async id => {
+    const el = view.querySelector(`[data-cmp="${id}"]`); if (!el) return;
+    const txt = await verseText(id, o).catch(() => "");
+    el.innerHTML = txt ? esc(txt) : `<em class="small">Not in this translation at this reference.</em>`;
+  }));
 }
 
 function renderSoon(key) {
@@ -1257,7 +1282,7 @@ function renderSoon(key) {
   setNav(key); setTitle(s.title);
   view.innerHTML = `<div class="pagehead soon"><span class="eyebrow">${s.title} · arrives in Phase ${s.phase}</span><h1>${s.lead}</h1></div>
     <div class="two"><section class="card soon"><h2 style="font-size:1.4rem">What it will do</h2><ul>${s.items.map(i => `<li>${i}</li>`).join("")}</ul></section>
-    <section class="card"><h2 style="font-size:1.4rem">Available now</h2><p class="small">Open any verse in the reader for background, the other translation, and research links to interlinears, lexicons, commentaries and manuscripts.</p><a class="btn pri" href="#/read">Open the reader</a></section></div>`;
+    <section class="card"><h2 style="font-size:1.4rem">Available now</h2><p class="small">Open any verse in the reader for background, other translations, the Hebrew or Greek, cross references and connections.</p><a class="btn pri" href="#/read">Open the reader</a></section></div>`;
 }
 
 /* ---------- router ---------- */
@@ -1274,6 +1299,7 @@ async function route() {
     else if (head === "bibles") await renderTranslations();
     else if (head === "guide") await renderGuide(rest[0]);
     else if (head === "translation") await renderTranslation(rest[0]);
+    else if (head === "compare") await renderCompare(rest[0]);
     else if (head === "history") await renderHistory(rest[0] || "map");
     else if (head === "learn") { if (rest[1]) await renderLesson(rest[0], rest[1]); else if (rest[0]) renderCourse(rest[0]); else renderLearn(); }
     else if (head === "person") await renderPerson(rest[0]);

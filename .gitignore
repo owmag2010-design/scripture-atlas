@@ -1,4 +1,4 @@
 node_modules
 .netlify
-raw/
-public/data/
+raw
+public/data

@@ -73,4 +73,3 @@ export const NOT_HOSTED = [
   { name: "Revised Standard Version (RSV)", year: "1946 (NT); 1952 (complete)", owner: "National Council of Churches", history: "A major revision of the ASV in the tradition of the KJV, influential across Protestant and later Catholic churches.", code: "RSV" }
 ];
 
-export const readElsewhere = (code, ref = "John 3:16") => `https://www.biblegateway.com/passage/?search=${encodeURIComponent(ref)}&version=${encodeURIComponent(code)}`;
