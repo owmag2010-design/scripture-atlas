@@ -787,3 +787,84 @@ body.kidsmode main { max-width: 1180px; }
 .tile.t-kids::after { background: linear-gradient(180deg, rgba(60, 20, 110, 0) 35%, rgba(60, 20, 110, .82) 100%); } .tile.t-kids .tcap b { font-family: "Fredoka", var(--sans); font-size: 1.5rem; }
 .mono { overflow-wrap: anywhere; word-break: break-word; } .credits li, .reg td { overflow-wrap: anywhere; }
 @media (max-width: 720px) { .brand .logo-full { height: 34px; } }
+
+/* ---------- picture shelves (swipeable rows) ---------- */
+.shelf { margin-top: 36px; }
+.seeall { margin-left: auto; font-weight: 600; color: var(--gilt); text-decoration: none; }
+.snap { display: grid; grid-auto-flow: column; grid-auto-columns: clamp(200px, 22vw, 260px); gap: 14px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: 2px; padding: 2px 2px 12px; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+.snap.portrait { grid-auto-columns: clamp(150px, 16vw, 190px); }
+.scard { scroll-snap-align: start; position: relative; display: block; border-radius: var(--r); overflow: hidden; background: var(--lapis-deep); color: #fff; text-decoration: none; isolation: isolate; aspect-ratio: 4 / 5; box-shadow: var(--shadow); }
+.snap.portrait .scard { aspect-ratio: 3 / 4; }
+.scard .simg, .scard .simg img, .sfall { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; display: block; }
+.sfall, .bimg .sfall { background: var(--hero); }
+.scard .simg img { transition: transform .6s cubic-bezier(.2, .7, .2, 1); filter: sepia(.18) contrast(1.05); }
+.scard::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(11, 9, 7, 0) 45%, rgba(11, 9, 7, .9)); }
+.scard .scap { position: absolute; left: 14px; right: 14px; bottom: 12px; display: grid; gap: 2px; }
+.scard .scap b { font: 700 1.15rem/1.15 var(--sans); letter-spacing: -.01em; }
+.scard .scap span { font-size: .8rem; color: rgba(255,255,255,.75); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.scard:hover .simg img { transform: scale(1.05); }
+.scard:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+/* ---------- books gallery ---------- */
+.bookgroup { margin-bottom: 30px; }
+.bookgroup h2 { display: flex; align-items: baseline; gap: 12px; font-size: 1.35rem; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--gold); }
+.bookgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+.bookcard { position: relative; display: grid; grid-template-rows: auto 1fr; border-radius: var(--r); overflow: hidden; background: var(--page); border: 1px solid var(--line); text-decoration: none; color: var(--ink); box-shadow: var(--shadow); transition: transform .2s ease, box-shadow .2s ease; }
+.bookcard:hover { transform: translateY(-3px); box-shadow: 0 16px 34px -18px rgba(21, 18, 14, .5); }
+.bookcard .bimg { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden; background: var(--lapis-deep); }
+.bookcard .bimg img, .bookcard .bimg .sfall { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; filter: sepia(.15); }
+.bookcard .bcap { display: grid; gap: 3px; padding: 10px 12px 12px; }
+.bookcard .bcap b { font: 700 1.05rem var(--sans); }
+.bookcard .bcap span { font-size: .8rem; color: var(--muted); line-height: 1.35; }
+
+/* ---------- reader book banner ---------- */
+.bookban { position: relative; margin: -8px 0 18px; border-radius: var(--r); overflow: hidden; background: var(--lapis-deep); aspect-ratio: 21 / 8; }
+.bookban.slim { aspect-ratio: 21 / 4; }
+.bookban img { width: 100%; height: 100%; object-fit: cover; display: block; filter: sepia(.2) contrast(1.05); }
+.bookban::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11, 9, 7, 0) 50%, rgba(11, 9, 7, .55)); pointer-events: none; }
+.bookban figcaption { position: absolute; right: 12px; bottom: 7px; z-index: 1; font-size: .7rem; color: rgba(255,255,255,.8); max-width: 80%; text-align: right; }
+
+/* ---------- phone tab bar and "More" sheet ---------- */
+.tabbar, .sheet { display: none; }
+@media (max-width: 720px) {
+  nav.main { display: none; }
+  .tabbar { display: grid; grid-template-columns: repeat(6, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; background: color-mix(in srgb, var(--lapis-deep) 92%, transparent); -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4); border-top: 1px solid rgba(255,255,255,.08); padding: 6px max(6px, env(safe-area-inset-right, 0px)) max(6px, env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px)); }
+  .tabbar a, .tabbar button { all: unset; cursor: pointer; display: grid; justify-items: center; gap: 3px; padding: 5px 0 3px; border-radius: 10px; color: rgba(255,255,255,.62); font: 600 .66rem var(--sans); letter-spacing: .01em; -webkit-tap-highlight-color: transparent; }
+  .tabbar svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .tabbar .on { color: var(--gold); } .tabbar .on svg { stroke-width: 2.1; }
+  .tabbar .tkids.on { color: #FF9EDB; }
+  .tabbar :focus-visible { outline: 2px solid var(--gold); }
+  body { padding-bottom: calc(66px + env(safe-area-inset-bottom, 0px)); }
+  .toast { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+  body.focus .tabbar { display: none; }
+  .sheet:not([hidden]) { display: grid; align-items: end; position: fixed; inset: 0; z-index: 45; background: rgba(11, 9, 7, .5); animation: fadein .18s ease; }
+  .sheetin { background: var(--page); border-radius: 20px 20px 0 0; padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(18px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); max-height: 80vh; overflow: auto; animation: sheetup .24s cubic-bezier(.2, .8, .2, 1); }
+  .sheethead { display: flex; align-items: center; justify-content: space-between; padding: 6px 0 12px; } .sheethead b { font-size: 1.1rem; }
+  .sheetclose { all: unset; cursor: pointer; font-size: 1.6rem; line-height: 1; padding: 4px 10px; color: var(--muted); }
+  .sheetlinks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .sheetlinks a { padding: 14px; border-radius: 12px; background: var(--soft); color: var(--ink); text-decoration: none; font-weight: 600; }
+  .sheetlinks a.on { background: var(--gold); color: var(--ink); }
+  /* phone-first image layouts */
+  .pagehead.art { padding: 0 18px 20px; }
+  .pagehead.art > img.headart { position: relative; inset: auto; display: block; width: calc(100% + 36px); max-width: none; margin: 0 -18px 4px; height: 220px; opacity: 1; -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent); mask-image: linear-gradient(180deg, #000 55%, transparent); }
+  .pagehead.art .headcredit { top: 8px; bottom: auto; }
+  .bookban { aspect-ratio: 16 / 9; margin: -4px -4px 16px; } .bookban.slim { aspect-ratio: 3 / 1; }
+  .snap { grid-auto-columns: 62vw; margin-inline: -16px; padding-inline: 16px; scroll-padding-inline: 16px; }
+  .snap.portrait { grid-auto-columns: 42vw; }
+  .bookgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .bookcard .bcap { padding: 8px 10px 10px; } .bookcard .bcap span { display: none; }
+  .ribbon-track { grid-auto-columns: 62vw; }
+  .readtools .allbooks { order: -1; }
+  .readtools { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: -16px; padding: 2px 16px 6px; scroll-snap-type: x proximity; -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
+  .readtools::-webkit-scrollbar { display: none; }
+  .readtools > * { flex: none; } .readtools .grow { display: none; }
+  .readtools select, .readtools .trsel { max-width: 170px; }
+}
+@media (max-width: 520px) {
+  .mosaic { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 168px; gap: 10px; }
+  .tile.t-big { grid-column: span 2; grid-row: span 2; }
+  .tile .tcap { left: 12px; right: 12px; bottom: 10px; } .tile .tcap b { font-size: 1.02rem; } .tile .tcap span { display: none; } .tile.t-big .tcap span { display: block; font-size: .85rem; }
+  .tile.t-kids .tcap b { font-size: 1.15rem; }
+}
+@keyframes sheetup { from { transform: translateY(100%); } }
+@keyframes fadein { from { opacity: 0; } }

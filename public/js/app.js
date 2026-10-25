@@ -36,6 +36,28 @@ function pic(slot, { cls = "", sizes = "100vw", eager = false } = {}) {
 const artHead = slot => (IMAGES[slot] ? `<div class="pagehead art">${pic(slot, { cls: "headart", sizes: "(max-width: 720px) 100vw, 62vw", eager: true })}` : `<div class="pagehead">`);
 const credit = slot => { const m = IMAGES[slot]; return m ? `${esc(m.artist)}, ${esc(m.title)}${m.date ? ` (${esc(m.date)})` : ""}` : ""; };
 
+// Gustave Doré's Bible engravings (1866, public domain), one per book and for major people, from art.js when present.
+let BOOK_ART = {}, PEOPLE_ART = {};
+const artReady = import("./art.js").then(m => { BOOK_ART = m.BOOK_ART || {}; PEOPLE_ART = m.PEOPLE_ART || {}; }).catch(() => {});
+function artImg(kind, key, { cls = "", sizes = "100vw", eager = false } = {}) {
+  const m = (kind === "books" ? BOOK_ART : PEOPLE_ART)[key]; if (!m) return "";
+  const big = m.large !== false;
+  return `<img class="${cls}" src="img/${kind}/${key}-sm.webp" ${big ? `srcset="img/${kind}/${key}-sm.webp 600w, img/${kind}/${key}.webp 1400w" sizes="${sizes}"` : ""} alt="${esc(m.alt || m.title)}" width="${m.w}" height="${m.h}" style="object-position:${m.focus || "50% 40%"}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+}
+const bookArt = (i, o) => artImg("books", BOOKS[i].osis, o);
+const personArt = (slug, o) => artImg("people", slug, o);
+const artCredit = (kind, key) => { const m = (kind === "books" ? BOOK_ART : PEOPLE_ART)[key]; return m ? `Gustave Doré, ${esc(m.title)} (1866)${m.related && m.note ? `. ${esc(m.note)}` : ""}` : ""; };
+// A horizontal, swipeable row of picture cards. items: [{ href, img, title, sub }]
+const carousel = (label, items, cls = "") => items.length ? `<div class="snap ${cls}" role="list" aria-label="${esc(label)}">${items.map(c => `<a class="scard" role="listitem" href="${c.href}"><span class="simg">${c.img || `<span class="sfall"></span>`}</span><span class="scap"><b>${c.title}</b>${c.sub ? `<span>${c.sub}</span>` : ""}</span></a>`).join("")}</div>` : "";
+
+function renderBooks() {
+  setNav("read"); setTitle("Books of the Bible");
+  view.innerHTML = `<div class="pagehead"><span class="eyebrow">Read · All 66 books</span><h1>Books of the Bible</h1>
+    <p class="small">Each book is shown with one of Gustave Doré's engravings for La Grande Bible de Tours (1866). Where Doré made no plate for a book, a related plate is used and the caption says how it relates.</p></div>
+    ${GROUPS.map(([g, a, z]) => `<section class="bookgroup"><h2><span>${g}</span><span class="small">${z - a + 1} book${z === a ? "" : "s"}</span></h2>
+      <div class="bookgrid">${NAMES.slice(a, z + 1).map((n, k) => { const i = a + k; return `<a class="bookcard" href="#/read/kjv/${BOOKS[i].osis}.1"><span class="bimg">${bookArt(i, { sizes: "(max-width: 520px) 50vw, 220px" }) || `<span class="sfall"></span>`}</span><span class="bcap"><b>${esc(n)}</b><span>${esc((CONTEXT[i]?.[5] || "").split(",").slice(0, 3).join(","))}</span></span></a>`; }).join("")}</div></section>`).join("")}`;
+}
+
 let storage = null;
 try { storage = window.localStorage; } catch { storage = null; }
 const store = createStore(storage);
@@ -126,8 +148,19 @@ function toast(msg) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 2200);
 }
 function setNav(key) {
-  document.querySelectorAll("nav.main a").forEach(a => a.classList.toggle("on", a.dataset.nav === key));
+  document.querySelectorAll("nav.main a, nav.tabbar a").forEach(a => a.classList.toggle("on", a.dataset.nav === key));
+  const inBar = [...document.querySelectorAll("nav.tabbar a")].some(a => a.dataset.nav === key);
+  document.querySelector("#morebtn")?.classList.toggle("on", !inBar && key !== "home");
 }
+// Phone "More" sheet: the full section list, as large picture-free tiles.
+function closeMore() { const s = document.querySelector("#moresheet"); if (s && !s.hidden) { s.hidden = true; document.querySelector("#morebtn")?.setAttribute("aria-expanded", "false"); } }
+(function wireTabbar() {
+  const btn = document.querySelector("#morebtn"), sheet = document.querySelector("#moresheet"); if (!btn || !sheet) return;
+  sheet.querySelector(".sheetlinks").innerHTML = [...document.querySelectorAll("nav.main a")].map(a => `<a href="${a.getAttribute("href")}" data-nav="${a.dataset.nav}">${a.textContent}</a>`).join("") + `<a href="#/books" data-nav="read">All 66 books</a>`;
+  btn.addEventListener("click", () => { const open = sheet.hidden; sheet.hidden = !open; btn.setAttribute("aria-expanded", String(open)); });
+  sheet.addEventListener("click", e => { if (e.target === sheet || e.target.closest("a, .sheetclose")) closeMore(); });
+  addEventListener("keydown", e => { if (e.key === "Escape") closeMore(); });
+})();
 function setTitle(s) { document.title = s ? `${s} · Scripture Atlas` : "Scripture Atlas · Owen Magocha"; }
 const readUrl = (t, book, chapter, verse) => `#/read/${t}/${toOsis(book, chapter, verse)}`;
 const inLink = (title, desc, target, tab = false) => `<li><a href="${tab ? "#" : target}" ${tab ? `data-gotab="${target}"` : ""}><span><span class="t">${title}</span><span class="d">${desc}</span></span><span class="arr" aria-hidden="true">›</span></a></li>`;
@@ -203,6 +236,12 @@ async function renderHome() {
     ${tile("#/research", "vaticanus", "Research", "Follow a verse into its words, people, places and links")}
     ${tile("#/library", "isaiah-scroll", "The manuscripts", "From the Dead Sea Scrolls to the printed page")}
   </section>
+
+  ${Object.keys(BOOK_ART).length ? `<section class="shelf"><div class="ribbon-head"><h2>The library of 66 books</h2><a class="seeall" href="#/books">See all 66 ›</a></div>
+    ${carousel("Books of the Bible", BOOKS.map((b, i) => ({ i, b })).filter(({ b }) => BOOK_ART[b.osis] && !BOOK_ART[b.osis].related).map(({ b, i }) => ({ href: `#/read/kjv/${b.osis}.1`, img: bookArt(i, { sizes: "260px" }), title: esc(NAMES[i]), sub: esc(groupOf(i)) })))}</section>` : ""}
+
+  ${Object.keys(PEOPLE_ART).length ? `<section class="shelf"><div class="ribbon-head"><h2>People of the Bible</h2><a class="seeall" href="#/history/people">All 3,000+ people ›</a></div>
+    ${carousel("People of the Bible", Object.keys(PEOPLE_ART).map(s => ({ href: `#/person/${s}`, img: personArt(s, { sizes: "200px" }), title: esc(PEOPLE_ART[s].name || s.replace(/_\d+$/, "").replace(/^./, c => c.toUpperCase())), sub: esc(PEOPLE_ART[s].title) })), "portrait")}</section>` : ""}
 
   ${ms.length ? `<section class="ribbon"><div class="ribbon-head"><h2>From scroll to screen</h2><p class="small">No original manuscript of any biblical book survives. These copies, oldest first, are how the text reached us.</p></div>
     <ol class="ribbon-track">${ms.map(m => `<li><a href="#/library"><span class="rimg">${pic(m.img, { sizes: "220px" })}</span><span class="rdate">${esc(m.date.replace(/^about /, "c. "))}</span><b>${esc(m.name)}</b></a></li>`).join("")}</ol></section>` : ""}`;
@@ -594,6 +633,7 @@ async function renderRead(t, osis) {
   const lastBook = R.book === 65 && R.chapter === chapterCount(65), firstBook = R.book === 0 && R.chapter === 1;
   view.innerHTML = `
   <div class="readtools">
+    <a class="btn allbooks" href="#/books" title="All 66 books, with pictures">Books</a>
     <label class="sr" for="bk">Book</label><select id="bk">${GROUPS.map(([g, a, z]) => `<optgroup label="${g}">${NAMES.slice(a, z + 1).map((n, k) => `<option value="${a + k}" ${a + k === R.book ? "selected" : ""}>${n}</option>`).join("")}</optgroup>`).join("")}</select>
     <label class="sr" for="cp">Chapter</label><select id="cp">${Array.from({ length: chapterCount(R.book) }, (_, k) => `<option value="${k + 1}" ${k + 1 === R.chapter ? "selected" : ""}>${R.book === 18 ? "Psalm" : "Chapter"} ${k + 1}</option>`).join("")}</select>
     <label class="sr" for="trsel">Translation</label><select id="trsel" class="trsel">${translationOptions(R.t)}</select>
@@ -609,6 +649,7 @@ async function renderRead(t, osis) {
   </div>
   <div class="reader">
     <article class="page" aria-labelledby="chh">
+      ${BOOK_ART[BOOKS[R.book].osis] ? `<figure class="bookban ${R.chapter === 1 ? "" : "slim"}"><a href="#/books" aria-label="All books of the Bible">${bookArt(R.book, { sizes: "(max-width: 960px) 100vw, 760px", eager: true })}</a><figcaption>${artCredit("books", BOOKS[R.book].osis)}</figcaption></figure>` : ""}
       <div class="runhead"><div><span class="eyebrow">${testamentOf(R.book)} · ${groupOf(R.book)}</span><h1 id="chh">${R.book === 18 ? "Psalm" : NAMES[R.book]} <span class="cn">${R.chapter}</span></h1></div>
       <span class="chip scripture">${inter ? `Scripture · ${TR[R.t]} with ${R.book < 39 ? "Hebrew" : "Greek"}` : parallel ? `Scripture · ${TR[R.t]} and ${TR[parallel]}` : `Scripture · ${TR[R.t]}`}</span></div>
       ${R.t === "kjv" ? `<p class="originhint"><span class="ew oh demo">Underlined</span> words come from a ${R.book < 39 ? "Hebrew" : "Greek"} word. Tap one to see it. <i class="add">Italic</i> words were added by the translators.</p>` : ""}
@@ -905,7 +946,8 @@ async function renderPerson(slug) {
   let cur = p;
   for (let i = 0; i < 30 && cur?.father?.[0]; i++) { const f = cur.father[0]; if (ancestors.includes(f)) break; ancestors.push(f); cur = await H.person(f); }
   const born = p.born != null ? `${yearText(p.born)} ${certChip(p.born)}` : "", died = p.died != null ? `${yearText(p.died)}` : "";
-  view.innerHTML = `<div class="pagehead"><span class="eyebrow">History · Person</span><h1>${esc(p.name)}</h1>
+  const portrait = personArt(slug, { cls: "headart", sizes: "(max-width: 720px) 100vw, 62vw", eager: true });
+  view.innerHTML = `<div class="pagehead ${portrait ? "art" : ""}">${portrait}<span class="eyebrow">History · Person</span><h1>${esc(p.name)}</h1>
     <p style="margin:0;font-size:1.1rem">${esc(p.desc || "")}${p.also ? ` <span class="small">also called ${esc(p.also)}</span>` : ""}</p>
     <div class="actions">${p.groups.map(g => `<span class="chip ext">${esc(g)}</span>`).join("")}<span class="small">Mentioned in ${p.verses.length.toLocaleString()} verse${p.verses.length === 1 ? "" : "s"}</span><a class="btn" href="#/research/person/${slug}">See connections</a></div></div>
   ${p.note ? `<div class="textnote" style="margin-bottom:16px"><b>Two accounts</b><br>${esc(p.note)}</div>` : ""}
@@ -1454,6 +1496,7 @@ const collLoad = () => { try { return JSON.parse(localStorage.getItem(COLL_KEY) 
 const collSave = c => { try { localStorage.setItem(COLL_KEY, JSON.stringify(c)); return true; } catch { return false; } };
 const bookIndex = code => BOOKS.findIndex(b => b.osis === code);
 async function renderLens(osis, modeArg) {
+  setNav("lens");
   await getIndex();
   const r = fromOsis(osis || "") || fromOsis("John.1.1"); const v = r.verse || 1;
   const o = toOsis(r.book, r.chapter, v), label = formatRef(r.book, r.chapter, v);
@@ -1815,7 +1858,8 @@ function renderStory(id) {
 
 /* ---------- router ---------- */
 async function route() {
-  await imagesReady;
+  await Promise.all([imagesReady, artReady]);
+  closeMore();
   const h = decodeURIComponent(location.hash.replace(/^#\/?/, "").split("#")[0]);
   const [head, ...rest] = h.split("/");
   document.body.classList.remove("focus", "kidsmode"); window.speechSynthesis?.cancel(); document.querySelector(".exitfocus")?.remove();
@@ -1840,6 +1884,7 @@ async function route() {
     else if (head === "sermon") await renderSermon(rest[0]);
     else if (head === "kids") await (rest[0] ? renderStory(rest[0]) : renderKids());
     else if (head === "soon") renderSoon(rest[0]);
+    else if (head === "books") { await getIndex(); renderBooks(); }
     else await renderHome();
   } catch (e) {
     console.error(e);
