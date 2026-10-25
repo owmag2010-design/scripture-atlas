@@ -1,4 +1,4 @@
-// Scripture Atlas Kids — the stage: sky, weather, water, boats, shore, characters and camera, all animated every frame.
+// Ereunia Kids — the stage: sky, weather, water, boats, shore, characters and camera, all animated every frame.
 // Built from reusable parts: the water and weather engine serves every lake and sea story (Noah, the Red Sea, Jonah,
 // the storm); the boat, shore and crowd are shared scenery. Scenes are named presets; changing scene blends every
 // colour and level over about two seconds, so the picture evolves rather than cutting between stills.

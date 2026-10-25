@@ -1,9 +1,9 @@
-/* Scripture Atlas — "illuminated atlas" design system.
+/* Ereunia — "illuminated atlas" design system.
    Lapis (the scribes' most precious blue) frames the site; gold leaf marks the original languages and every
    connection between texts; vermilion rubric marks references and the words of Jesus. Scripture is set in
    EB Garamond; the interface in Schibsted Grotesk, so the text of the Bible never looks like interface. */
 :root {
-  /* brand: ink #15120E, cream #F5EFE6, marigold #F2C14E (Scripture Atlas logo pack) */
+  /* brand: ink #15120E, cream #F5EFE6, marigold #F2C14E (Ereunia logo pack) */
   --bg: #F5EFE6; --page: #FFFCF7; --ink: #15120E; --muted: #675F54; --line: #E3DACB; --soft: #EEE6D8;
   --lapis-deep: #15120E; --lapis-ink: #0B0907; --lapis: #2E2820; --lapis-soft: #F1E7D2;
   --gilt: #8A6408; --gold: #F2C14E; --rubric: #B5321C; --sel: #FBEAB8;
@@ -51,9 +51,9 @@ header.site { background: var(--lapis-deep); color: #fff; position: sticky; top:
 header.site .bar { max-width: 1240px; height: auto; margin: 0 auto; display: flex; align-items: center; gap: 14px; padding-block: 10px; background: none; border-radius: 0; overflow: visible; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; white-space: nowrap; }
 .brand .logo-full { height: 40px; width: auto; display: block; }
-.footlogo { height: 30px; width: auto; display: block; margin-bottom: 10px; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .footlogo { content: url("brand/logo-horizontal-for-dark-bg.svg"); } }
-:root[data-theme="dark"] .footlogo { content: url("brand/logo-horizontal-for-dark-bg.svg"); }
+.footlogo { height: 42px; width: auto; display: block; margin-bottom: 10px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .footlogo { content: url("brand/ereunia-horizontal-for-dark-bg.svg"); } }
+:root[data-theme="dark"] .footlogo { content: url("brand/ereunia-horizontal-for-dark-bg.svg"); }
 .brand .wm { font: 700 1.28rem/1 var(--sans); letter-spacing: -.02em; }
 .brand .wm small { display: block; font: 500 .7rem/1.3 var(--sans); letter-spacing: 0; color: color-mix(in srgb, var(--gold) 80%, #fff); margin-top: 3px; }
 .gsearch { flex: 1; display: flex; min-width: 0; max-width: 560px; margin-left: auto; }

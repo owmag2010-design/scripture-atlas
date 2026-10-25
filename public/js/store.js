@@ -107,7 +107,7 @@ export function createStore(storage) {
 export function exportMarkdown(store, { order, label, text, date = new Date().toISOString().slice(0, 10) }) {
   const sort = arr => arr.slice().sort((a, b) => order(a.osis) - order(b.osis));
   const quote = osis => { const t = text(osis); return t ? `> ${t.replace(/\n/g, " ")}\n` : ""; };
-  let md = `# My Scripture Atlas study notes\n\nExported ${date}\n`;
+  let md = `# My Ereunia study notes\n\nExported ${date}\n`;
   const notes = sort(store.notes());
   md += `\n## Notes (${notes.length})\n`;
   notes.forEach(n => { md += `\n### ${label(n.osis)}\n\n${quote(n.osis)}\n${n.text.trim()}\n`; });

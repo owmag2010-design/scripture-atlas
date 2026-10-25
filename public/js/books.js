@@ -1,4 +1,4 @@
-// Canonical book list for Scripture Atlas (Protestant 66-book canon, English versification).
+// Canonical book list for Ereunia (Protestant 66-book canon, English versification).
 // Index 0–65 is the canonical order used by every data file.
 
 export const BOOKS = [

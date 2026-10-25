@@ -65,6 +65,6 @@ ${l.ref}${l.translation ? `, ${l.translation}` : ""}
 > ${l.text}
 ${l.bigIdea ? `\n**Big idea:** ${l.bigIdea}\n` : ""}${sec("Observe", l.observe)}${sec("Key words", l.words)}${sec("Connect", l.refs)}${sec("Discuss", l.discuss)}${sec("Apply", l.apply)}${l.notes ? `\n## Notes\n\n${l.notes}\n` : ""}
 ---
-Prepared with Scripture Atlas. Sources: KJV with Strong's numbers (public domain); STEPBible (CC BY 4.0); OpenBible.info cross references (CC BY).
+Prepared with Ereunia. Sources: KJV with Strong's numbers (public domain); STEPBible (CC BY 4.0); OpenBible.info cross references (CC BY).
 `;
 }

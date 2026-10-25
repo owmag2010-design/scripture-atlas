@@ -1,6 +1,6 @@
-// Kids: illustrated, animated Bible stories. Retellings written for Scripture Atlas, kept close to the text,
+// Kids: illustrated, animated Bible stories. Retellings written for Ereunia, kept close to the text,
 // with the passage given for every scene so families can read the Bible's own words together.
-// Illustrations: generated for Scripture Atlas with Magnific (Recraft V4.1), October 2026.
+// Illustrations: generated for Ereunia with Magnific (Recraft V4.1), October 2026.
 
 export const KID_STORIES = [
   {

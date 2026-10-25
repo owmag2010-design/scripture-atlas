@@ -49,7 +49,7 @@ export function gather(question, refText) {
     const found = r.verse ? forVerse(DISCOVERIES, r.book, r.chapter, r.verse, bi) : forChapter(DISCOVERIES, r.book, r.chapter, bi);
     for (const d of found.slice(0, 3)) addDiscovery(add, d);
     const c = CONTEXT[r.book];
-    add("editorial", `Scripture Atlas book background: ${NAMES[r.book]}`, `Author: ${c[0]} Date: ${c[1]}. Setting: ${c[4]} Themes: ${c[5]}.`);
+    add("editorial", `Ereunia book background: ${NAMES[r.book]}`, `Author: ${c[0]} Date: ${c[1]}. Setting: ${c[4]} Themes: ${c[5]}.`);
   }
   // Discoveries named in the question (e.g. "What is the Tel Dan Stele?"), by name or id.
   const ql = question.toLowerCase();
@@ -64,7 +64,7 @@ export function gather(question, refText) {
   return { sources, refs };
 }
 function addDiscovery(add, d) {
-  add("archaeology", `Discovery: ${d.name} (Scripture Atlas summary of ${d.sources.map(s => s.publisher).join("; ")}; evidence status: ${STATUS[d.status].label})`,
+  add("archaeology", `Discovery: ${d.name} (Ereunia summary of ${d.sources.map(s => s.publisher).join("; ")}; evidence status: ${STATUS[d.status].label})`,
     `${d.description} Date: ${d.objectDate?.text || "n/a"}. Biblical connection: ${d.connection || "n/a"} What it establishes: ${d.establishes} Limits and debate: ${d.limits}`);
 }
 const STOP = new Set("what does about when where which with from that this have will would could should there their they them were been into than then also mean means explain tell bible verse verses passage".split(" "));
@@ -72,7 +72,7 @@ const STOP = new Set("what does about when where which with from that this have 
 const LEVEL = { beginner: "Write for a newcomer: plain words, short sentences, no jargon.", intermediate: "Write for a regular Bible reader: clear and precise.", academic: "Write for a student of theology: precise, and name scholarly positions where the sources support it." };
 
 function systemPrompt(level) {
-  return `You are the Scripture Atlas research assistant. Answer ONLY from the numbered SOURCES provided. ${LEVEL[level] || LEVEL.intermediate}
+  return `You are the Ereunia research assistant. Answer ONLY from the numbered SOURCES provided. ${LEVEL[level] || LEVEL.intermediate}
 Return a single JSON object with exactly these keys: ${SECTIONS.map(s => `"${s[0]}" (${s[2]})`).join(", ")}.
 Each key holds an array of statements: {"text": "...", "cites": ["S1", ...]}.
 Rules:

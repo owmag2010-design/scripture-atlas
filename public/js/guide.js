@@ -94,6 +94,6 @@ ${q(g.interpret, "i")}
 
 ${q(APPLY, "a")}
 ---
-Built with Scripture Atlas. Sources: ${g.sources}.
+Built with Ereunia. Sources: ${g.sources}.
 `;
 }

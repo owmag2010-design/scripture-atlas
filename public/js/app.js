@@ -1,4 +1,4 @@
-// Scripture Atlas — Phases 1–2. Hash routes:
+// Ereunia — Phases 1–2. Hash routes:
 //   #/                      home
 //   #/read/<t>/<OSIS>       reader, e.g. #/read/kjv/John.3.16
 //   #/search/<query>        search
@@ -94,7 +94,7 @@ async function renderDiscoveries(id) {
   ${datable.length ? `<section class="shelf"><div class="ribbon-head"><h2>Through time</h2><p class="small">Ordered by the date of the object or site, not the date it was found.</p></div>
     <ol class="dtime">${datable.map(d => `<li><a href="#/discoveries/${d.id}"><span class="dty">${esc(yearText(d.objectDate.sort))}</span><b>${esc(d.name)}</b>${dChip(d)}</a></li>`).join("")}</ol></section>` : ""}
   ${DISCOVERIES.some(d => d.location) ? `<section class="shelf"><div class="ribbon-head"><h2>Where they were found</h2><p class="small">Tap a marker to open the discovery.</p></div><div id="dmap" class="dmapbox"><p class="loading">Loading the map…</p></div></section>` : ""}
-  <p class="small dnote">Sources open the museum, excavation or journal page in a new tab. Scripture Atlas summaries are editorial; where specialists disagree, the entry says so. Photographs are credited on each page.</p>`;
+  <p class="small dnote">Sources open the museum, excavation or journal page in a new tab. Ereunia summaries are editorial; where specialists disagree, the entry says so. Photographs are credited on each page.</p>`;
   const draw = () => {
     const list = discFilter(DISCOVERIES, st).sort((a, b) => (a.kind === "method") - (b.kind === "method") || (a.objectDate?.sort ?? 0) - (b.objectDate?.sort ?? 0));
     $("#dgrid").innerHTML = list.map(d => discCard(d)).join("") || `<p class="empty">No discoveries match. Clear the filters to see all ${DISCOVERIES.length}.</p>`;
@@ -129,7 +129,7 @@ async function renderDiscovery(id) {
       <div class="two dweigh"><section class="card est"><h2>What it establishes</h2><p>${esc(d.establishes)}</p></section>
         <section class="card lim"><h2>Limits and debate</h2><p>${esc(d.limits)}</p></section></div>
       <section class="card"><h2>Sources</h2><ol class="dsrc">${(d.sources || []).map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.title)}</a> <span class="small">${esc(s.publisher)} · opens in a new tab</span></li>`).join("")}</ol>
-        <p class="small">Summary written by Scripture Atlas from these sources. If you spot an error, the sources above are the authority.</p></section>
+        <p class="small">Summary written by Ereunia from these sources. If you spot an error, the sources above are the authority.</p></section>
     </div>
     <aside class="dside">
       <section class="card"><h2>At a glance</h2><dl class="dfacts">
@@ -268,7 +268,7 @@ function closeMore() { const s = document.querySelector("#moresheet"); if (s && 
   sheet.addEventListener("click", e => { if (e.target === sheet || e.target.closest("a, .sheetclose")) closeMore(); });
   addEventListener("keydown", e => { if (e.key === "Escape") closeMore(); });
 })();
-function setTitle(s) { document.title = s ? `${s} · Scripture Atlas` : "Scripture Atlas · Owen Magocha"; }
+function setTitle(s) { document.title = s ? `${s} · Ereunia` : "Ereunia · Bible research"; }
 const readUrl = (t, book, chapter, verse) => `#/read/${t}/${toOsis(book, chapter, verse)}`;
 const inLink = (title, desc, target, tab = false) => `<li><a href="${tab ? "#" : target}" ${tab ? `data-gotab="${target}"` : ""}><span><span class="t">${title}</span><span class="d">${desc}</span></span><span class="arr" aria-hidden="true">›</span></a></li>`;
 async function copyText(s) {
@@ -431,7 +431,7 @@ function backgroundPane() {
       <dt>Key text</dt><dd><a href="${readUrl(R.t, R.book, kc, kv)}">${formatRef(R.book, kc, kv)}</a></dd>
     </dl>
     <div class="timeline"><span class="eyebrow">Range of proposed composition dates</span>${timelineSvg(x)}</div>
-    <p class="small">Scripture Atlas editorial note. Where tradition and academic scholarship differ, both are given; neither is presented as settled.</p>
+    <p class="small">Ereunia editorial note. Where tradition and academic scholarship differ, both are given; neither is presented as settled.</p>
     <ul class="linklist">
       ${inLink(`Study guide for ${formatRef(R.book, R.chapter)}`, "Observe, key words, connections, questions", `#/guide/${BOOKS[R.book].osis}.${R.chapter}`)}
       ${inLink("People, places and events in this chapter", "From the History data", "people", true)}
@@ -1123,7 +1123,7 @@ function renderLearn() {
   view.innerHTML = `${artHead("era-patriarchs")}<span class="eyebrow">Learn</span><h1>Structured study, from first steps to deeper reading.</h1>
     <p class="small" style="max-width:70ch">Each lesson has goals, Bible readings shown in full, teaching, questions to discuss and a short quiz. Your progress is saved on this device.</p>
     <div class="actions">${familyToggle()}</div></div>
-  <div class="textnote" style="margin-bottom:16px"><b>Editorial status</b><br>These first courses are drafts written with AI assistance. They are labelled as drafts until the Scripture Atlas editor has reviewed them. Bible readings are shown from the KJV text itself, never retyped.</div>
+  <div class="textnote" style="margin-bottom:16px"><b>Editorial status</b><br>These first courses are drafts written with AI assistance. They are labelled as drafts until the Ereunia editor has reviewed them. Bible readings are shown from the KJV text itself, never retyped.</div>
   <form class="card guidebuild" id="gb"><div><h2 style="font-size:1.4rem">Build a study guide for any passage</h2><p class="small">Read, background, observe, key Hebrew or Greek words, cross references, interpret and apply, with space for your answers. Download or print it for a group.</p></div>
     <div class="minisearch"><label class="sr" for="gbq">Passage</label><input id="gbq" placeholder="e.g. Psalm 23, John 15:1-17"><button class="btn pri">Build guide</button></div></form>
   <div class="streak card"><div><span class="big">${streak}</span><span class="small">day study streak</span></div><div><span class="big">${days}</span><span class="small">day${days === 1 ? "" : "s"} studied</span></div><div><span class="big">${COURSES.reduce((n, c) => n + store.courseProgress(c.id, c.lessons.map(l => l.id)), 0)}</span><span class="small">lessons completed</span></div></div>
@@ -1253,7 +1253,7 @@ async function renderGuide(spec) {
     ${box("c0", "How do these passages shed light on this one?")}</section>
   <section class="gsec"><h2><span class="gn">6</span> Interpret</h2><p class="small">Questions suited to ${groupOf(g.book).toLowerCase()}.</p>${interpret.map((q, i) => box("i" + i, q)).join("")}</section>
   <section class="gsec"><h2><span class="gn">7</span> Apply</h2>${APPLY.map((q, i) => box("a" + i, q)).join("")}</section>
-  <p class="small">Built from the Bible text, Scripture Atlas book notes, STEPBible language data, OpenBible.info cross references and the Theographic dataset. The questions guide your own study; they are not answers.</p>
+  <p class="small">Built from the Bible text, Ereunia book notes, STEPBible language data, OpenBible.info cross references and the Theographic dataset. The questions guide your own study; they are not answers.</p>
   </article>`;
   let tmr;
   view.querySelectorAll("[data-ans]").forEach(el => el.addEventListener("input", () => { clearTimeout(tmr); tmr = setTimeout(() => { store.setGuideAnswer(key, el.dataset.ans, el.value); $("#gsv").textContent = "Saved"; }, 400); }));
@@ -1309,7 +1309,7 @@ async function renderTranslation(id) {
         ${t.numbering ? `<dt>Numbering</dt><dd>${esc(t.numbering)}</dd>` : ""}${t.extraBooks ? `<dt>Books</dt><dd>${esc(t.extraBooks)}</dd>` : ""}
       </dl>
       <p class="dict">${esc(h.history || "No history note has been written for this edition yet.")}</p>
-      <p class="small">Scripture Atlas editorial note. Text source: ${id === "kjv" ? "thiagobodruk/bible on GitHub" : "eBible.org"}, <span class="mono">${esc(t.source)}</span>. ${esc(t.licence)}.</p></section>
+      <p class="small">Ereunia editorial note. Text source: ${id === "kjv" ? "thiagobodruk/bible on GitHub" : "eBible.org"}, <span class="mono">${esc(t.source)}</span>. ${esc(t.licence)}.</p></section>
     <section class="card"><h2 style="font-size:1.4rem">A taste of this translation</h2>
       ${samples.map(([o, txt]) => `<figure class="reading"><figcaption><b>${labelOf(o)}</b></figcaption><p class="vtext" dir="${t.dir}" lang="${t.code}">${txt ? esc(txt) : "<em>Not found at this reference; numbering may differ.</em>"}</p></figure>`).join("")}</section>
   </div>`;
@@ -1548,12 +1548,12 @@ function renderLibrary() {
   const credit = (name, url) => `${esc(name)}<br><span class="mono small">${esc(url || "")}</span>`;
   const msLink = m => (m.see[0].startsWith("#") ? m.see[0] : `#/read/kjv/${m.see[0]}`);
   view.innerHTML = `${artHead("isaiah-scroll")}<span class="eyebrow">Library</span><h1>The manuscripts behind the text, and where every source comes from.</h1>
-    <p class="small" style="max-width:72ch">Scripture Atlas is self-contained: everything you read here is hosted here. Sources are credited below as their licences require.</p></div>
+    <p class="small" style="max-width:72ch">Ereunia is self-contained: everything you read here is hosted here. Sources are credited below as their licences require.</p></div>
     <section><h2 style="font-size:1.6rem;margin:0 0 10px">Manuscripts and editions</h2>
       <p class="small" style="max-width:72ch">No original manuscript of any biblical book survives. What we have are copies, and copies of copies, which scholars compare to recover the earliest text. Dates are estimates; where they are debated a range is given.</p>
       <div class="grid3">${MANUSCRIPTS.map(m => `<article class="card mscard">${IMAGES[m.img] ? `<span class="msimg">${pic(m.img, { sizes: "(max-width: 760px) 100vw, 400px" })}</span>` : ""}<span class="eyebrow">${esc(m.lang)}</span><h3 style="font-size:1.3rem;margin:4px 0">${esc(m.name)}</h3>
         <p class="small"><b>${esc(m.date)}</b> · ${esc(m.where)}</p><p>${esc(m.about)}</p><a class="small" href="${msLink(m)}">${esc(m.see[1])} ›</a></article>`).join("")}</div>
-      <p class="small">Scripture Atlas editorial summaries of widely published scholarship.</p></section>
+      <p class="small">Ereunia editorial summaries of widely published scholarship.</p></section>
     <div class="card" style="margin:22px 0 18px"><h2 style="font-size:1.5rem;margin-bottom:8px">Source register</h2><div class="tablewrap"><table class="reg">
       <thead><tr><th>Source</th><th>Type</th><th>Owner</th><th>Licence</th><th>How it is used</th></tr></thead>
       <tbody>${SOURCES.map(s => `<tr><td>${credit(s.name, s.url)}</td><td>${s.type}</td><td>${s.owner}</td><td>${s.licence}</td><td>${s.use}</td></tr>`).join("")}
@@ -1570,7 +1570,7 @@ function renderLibrary() {
       <dl class="facts" style="margin-top:10px;grid-template-columns:110px minmax(0,1fr)">
         <dt>Scripture</dt><dd>The Bible text itself, in a named translation.</dd>
         <dt>Translation</dt><dd>How another translation renders the same verse.</dd>
-        <dt>Editorial</dt><dd>Scripture Atlas notes on history and dating, showing each scholarly view.</dd>
+        <dt>Editorial</dt><dd>Ereunia notes on history and dating, showing each scholarly view.</dd>
         <dt>AI</dt><dd>Generated by the research assistant, with every claim tied to a cited source.</dd>
       </dl>
       <p class="small">Translation versions in use: ${INDEX ? INDEX.translations.map(t => `${t.short} (checksum ${t.checksum})`).join(", ") : "loading"}.</p></section>`;
@@ -1906,7 +1906,7 @@ function renderKids() {
       <div class="kh-copy"><h1>Bible stories, told and drawn for you.</h1><p>Pick a story. Tap the arrows to turn the page, or press <b>Read to me</b> and listen.</p></div></section>
     <div class="shelf">${KID_STORIES.map((s, i) => `<a class="book" href="#/kids/${s.id}" style="--c:${s.colour};--tilt:${[-2, 1.5, -1, 2, -1.5, 1, -2, 1.5][i % 8]}deg">
       <span class="cover">${kidImg(s.id)}</span><span class="spine"><b>${esc(s.title)}</b><span>${esc(s.range)} · ${s.scenes.length} pages</span></span></a>`).join("")}</div>
-    <p class="small kidsnote">Stories retold for children by Scripture Atlas, keeping close to the Bible text; each page shows where to read it. Pictures made for Scripture Atlas with an AI image tool. <a href="#/learn">Family mode</a> in Courses has more for parents and children together.</p>`;
+    <p class="small kidsnote">Stories retold for children by Ereunia, keeping close to the Bible text; each page shows where to read it. Pictures made for Ereunia with an AI image tool. <a href="#/learn">Family mode</a> in Courses has more for parents and children together.</p>`;
 }
 
 let storyTimer = null;
@@ -1924,7 +1924,7 @@ function renderStory(id) {
     <div class="pagecard" id="pagecard" aria-live="polite"></div>
     <div class="storyctl"><div class="dots" id="dots">${s.scenes.map((_, k) => `<button type="button" data-k="${k}" aria-label="Page ${k + 1}"></button>`).join("")}<button type="button" data-k="${N}" aria-label="Quiz" class="qdot">?</button></div>
       <button class="btn gold" type="button" id="readme">Read to me</button></div>
-    <p class="small kidsnote">${s.note ? `<b>For grown-ups:</b> ${esc(s.note)} ` : ""}Pictures are illustrations made for Scripture Atlas with an AI image tool, not historical images.</p>
+    <p class="small kidsnote">${s.note ? `<b>For grown-ups:</b> ${esc(s.note)} ` : ""}Pictures are illustrations made for Ereunia with an AI image tool, not historical images.</p>
   </div>`;
   const art = $(".st-art"), card = $("#pagecard");
   const synth = window.speechSynthesis;

@@ -1,4 +1,4 @@
-// History and origin of each Bible translation. Scripture Atlas editorial notes, kept to well-established facts;
+// History and origin of each Bible translation. Ereunia editorial notes, kept to well-established facts;
 // where an edition's history is not documented here, the page says so and links to the publisher's own page.
 // Keys match translation ids (kjv, web, and eBible.org ids in data/bible/catalogue.json).
 

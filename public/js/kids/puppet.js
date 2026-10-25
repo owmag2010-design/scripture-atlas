@@ -1,4 +1,4 @@
-// Scripture Atlas Kids — the shared character rig.
+// Ereunia Kids — the shared character rig.
 // One parameterised puppet (skin, hair, beard, robe, sash, head cloth, height) serves every human character in every
 // story, so a cast stays consistent across the library. Joints: hips (lean, crouch, lie), neck (tilt), shoulders and
 // elbows (both arms), plus a face with blinking eyes, brows and mouth shapes. Motion = an action's target pose, eased,

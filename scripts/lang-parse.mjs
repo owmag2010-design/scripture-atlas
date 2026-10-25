@@ -1,7 +1,7 @@
 // Parsers for STEPBible TAHOT / TAGNT / TBESH / TBESG and OpenBible cross references.
 // Pure functions so they can be unit-tested (test/lang.test.mjs).
 
-// STEPBible book abbreviations in canonical order (index = Scripture Atlas book index)
+// STEPBible book abbreviations in canonical order (index = Ereunia book index)
 export const STEP_BOOKS = "Gen Exo Lev Num Deu Jos Jdg Rut 1Sa 2Sa 1Ki 2Ki 1Ch 2Ch Ezr Neh Est Job Psa Pro Ecc Sng Isa Jer Lam Ezk Dan Hos Jol Amo Oba Jon Mic Nam Hab Zep Hag Zec Mal Mat Mrk Luk Jhn Act Rom 1Co 2Co Gal Eph Php Col 1Th 2Th 1Ti 2Ti Tit Phm Heb Jas 1Pe 2Pe 1Jn 2Jn 3Jn Jud Rev".split(" ");
 const STEP_INDEX = new Map(STEP_BOOKS.map((b, i) => [b, i]));
 

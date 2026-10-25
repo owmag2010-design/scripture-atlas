@@ -4,7 +4,7 @@
 
 export const STATUS = {
   draft: { label: "Draft · written with AI assistance, awaiting editorial review", short: "AI-assisted draft" },
-  reviewed: { label: "Reviewed by the Scripture Atlas editor", short: "Reviewed" }
+  reviewed: { label: "Reviewed by the Ereunia editor", short: "Reviewed" }
 };
 
 export const COURSES = [

@@ -26,11 +26,11 @@ export const TEXT_NOTES = {
 export const SOURCES = [
   { name: "King James Version, with Strong's numbers", type: "Scripture · translation", owner: "CrossWire Bible Society and eBible.org", licence: "Public domain (Crown patent in the United Kingdom)", use: "Full text, word origins, translators' additions, marginal notes", url: "https://ebible.org/kjv/" },
   { name: "World English Bible", type: "Scripture · translation", owner: "eBible.org", licence: "Public domain", use: "Full text with paragraphs and poetry lines", url: "https://ebible.org/web/" },
-  { name: "Book background notes", type: "Scripture Atlas editorial", owner: "Scripture Atlas", licence: "Original work", use: "Authorship, dating, setting and themes for 66 books, with traditional and critical views", url: null },
+  { name: "Book background notes", type: "Ereunia editorial", owner: "Ereunia", licence: "Original work", use: "Authorship, dating, setting and themes for 66 books, with traditional and critical views", url: null },
 ];
 
 // Key manuscripts and editions behind the text. Dates are scholarly estimates; where they are debated a range is given.
-// Each links to a passage inside Scripture Atlas where the manuscript matters.
+// Each links to a passage inside Ereunia where the manuscript matters.
 export const MANUSCRIPTS = [
   { name: "Dead Sea Scrolls", img: "isaiah-scroll", date: "about 250 BC – AD 68", lang: "Hebrew, Aramaic, Greek", where: "Found 1947–1956 in caves near Qumran; mostly in Jerusalem",
     about: "Fragments of every book of the Hebrew Bible except Esther, about a thousand years older than the oldest complete Hebrew manuscripts. The Great Isaiah Scroll contains the whole of Isaiah and is close to the later Masoretic text, with many small differences.",
@@ -51,13 +51,13 @@ export const MANUSCRIPTS = [
     about: "The oldest complete New Testament. Constantin von Tischendorf brought it to Europe from St Catherine's Monastery in the 1840s and 1850s.",
     see: ["John.7.53", "John 7:53–8:11, not in Sinaiticus"] },
   { name: "Latin Vulgate", img: "amiatinus", date: "about AD 382–405", lang: "Latin", where: "Translated by Jerome, mainly in Bethlehem",
-    about: "Jerome's Latin translation, much of it from the Hebrew, became the Bible of the Western church for over a thousand years. Scripture Atlas hosts the Clementine edition of 1592.",
+    about: "Jerome's Latin translation, much of it from the Hebrew, became the Bible of the Western church for over a thousand years. Ereunia hosts the Clementine edition of 1592.",
     see: ["#/translation/latVUC", "Read the Vulgate here"] },
   { name: "Aleppo Codex", img: "aleppo", date: "about AD 930", lang: "Hebrew", where: "Israel Museum, Jerusalem",
     about: "The most authoritative Masoretic manuscript, with vowels and accents added under Aaron ben Asher in Tiberias. About 40 percent, including most of the Torah, was lost after riots in Aleppo in 1947.",
     see: ["Deut.6.4", "Deuteronomy 6:4, in the section that survives"] },
   { name: "Leningrad Codex", img: "leningrad", date: "AD 1008", lang: "Hebrew", where: "National Library of Russia, St Petersburg",
-    about: "The oldest complete manuscript of the Hebrew Bible, copied in Cairo. Modern scholarly editions are based on it, and so is the Hebrew text in Scripture Atlas.",
+    about: "The oldest complete manuscript of the Hebrew Bible, copied in Cairo. Modern scholarly editions are based on it, and so is the Hebrew text in Ereunia.",
     see: ["Gen.1.1", "Genesis 1:1 in the Hebrew, word by word"] },
   { name: "Textus Receptus", img: "erasmus", date: "1516 onwards", lang: "Greek", where: "First printed by Erasmus in Basel; later editions by Stephanus and Beza",
     about: "The first printed Greek New Testaments, made from a small number of late medieval manuscripts. They underlie the King James Version's New Testament.",

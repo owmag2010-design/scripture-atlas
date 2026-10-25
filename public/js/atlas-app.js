@@ -1,5 +1,5 @@
 // The Atlas: a full-screen map of the biblical world, built on the shared map engine (atlas-map.js) and the
-// same data as the rest of Scripture Atlas (Theographic places, people and events; journeys; discoveries; period layers).
+// same data as the rest of Ereunia (Theographic places, people and events; journeys; discoveries; period layers).
 // Routes: #/atlas, #/atlas/place/<slug>, #/atlas/journey/<id>, #/atlas/period/<id>, #/atlas/book/<OSIS>,
 //         #/atlas/person/<slug>, #/atlas/q/<question>
 import { mountMap } from "./atlas-map.js";

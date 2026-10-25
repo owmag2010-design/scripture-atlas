@@ -1,6 +1,6 @@
-# Scripture Atlas: Discoveries research brief (shared by all researchers)
+# Ereunia: Discoveries research brief (shared by all researchers)
 
-Scripture Atlas (repo /home/claude/scripture-atlas, web root public/) is a Bible study site with strict rules:
+Ereunia (repo /home/claude/scripture-atlas, web root public/) is a Bible study site with strict rules:
 no invented citations, artefacts, scholars, dates, museum numbers or quotes; sources visible; interpretation kept apart from fact.
 You are adding entries to a new "Discoveries" section: archaeology, inscriptions, manuscripts and scientific methods
 that bear on the Bible. Accuracy beats quantity. A short list of solid entries is far better than a long list with one error.
