@@ -86,6 +86,11 @@ main:focus { outline: none; }
 .loading { color: var(--muted); font-style: italic; }
 footer.site { max-width: 1240px; margin: 0 auto; padding-block: 28px 44px; border-top: 1px solid var(--line); color: var(--muted); font-size: .88rem; }
 footer.site p { max-width: 80ch; margin: 6px 0; }
+@media (min-width: 900px) {
+  footer.site { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); column-gap: 56px; align-items: start; }
+  footer.site > :not(.fcred) { grid-column: 1; }
+  footer.site .fcred { grid-column: 2; grid-row: 1 / span 4; margin-top: 4px; font-size: .82rem; line-height: 1.6; }
+}
 .motto { font-family: var(--serif); font-size: 1.15rem; color: var(--ink) !important; }
 
 /* shared */
@@ -277,6 +282,7 @@ table.reg th { font: 500 .85rem var(--sc); letter-spacing: .05em; text-transform
 
 /* ---------- Phase 4: history ---------- */
 .maplayout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; align-items: start; }
+.maplayout:not(.journey) { align-items: stretch; }
 @media (max-width: 900px) { .maplayout { grid-template-columns: minmax(0, 1fr); } }
 .mapcard { padding: 0; overflow: hidden; }
 .mapwrap { position: relative; }
@@ -401,6 +407,15 @@ ol.lessons b { display: block; font-family: var(--serif); font-size: 1.2rem; fon
 .trnote { margin: -12px 0 16px; }
 .tlang h2 { font-size: 1.45rem; margin: 22px 0 10px; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
 .tgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+/* Bibles page: languages with one or two Bibles sit side by side instead of leaving empty rows. */
+.tlangs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 12px; grid-auto-flow: row dense; align-items: stretch; }
+.tlangs .tlang { display: flex; flex-direction: column; min-width: 0; }
+.tlangs .tlang .tgrid { flex: 1; }
+.tlangs .tlang.n1 .tgrid { grid-template-columns: minmax(0, 1fr); }
+.tlangs .tlang.n2 { grid-column: span 2; } .tlangs .tlang.n2 .tgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tlangs .tlang.nfull { grid-column: 1 / -1; }
+@media (max-width: 1000px) { .tlangs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .tlangs { grid-template-columns: minmax(0, 1fr); } .tlangs .tlang.n2 { grid-column: auto; } .tlangs .tlang.n2 .tgrid { grid-template-columns: minmax(0, 1fr); } }
 .tcard { display: flex; flex-direction: column; gap: 4px; background: var(--page); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0; }
 .tcard > a { text-decoration: none; color: var(--ink); font-family: var(--serif); font-size: 1.15rem; }
 .tcard p { margin: 4px 0; font-size: .95rem; flex: 1; }
@@ -553,7 +568,7 @@ main:has(.hero2) { padding-top: 0; }
 .streak { margin: 6px 0 0; }
 @media (max-width: 860px) { .home-row { grid-template-columns: minmax(0, 1fr); } }
 
-.mosaic { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 220px; gap: 14px; }
+.mosaic { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 220px; grid-auto-flow: row dense; gap: 14px; }
 .tile { position: relative; overflow: hidden; border-radius: var(--r); background: var(--lapis-deep); color: #fff; text-decoration: none; isolation: isolate; }
 .tile.t-big { grid-column: span 2; grid-row: span 2; }
 .tile.t-tall { grid-row: span 2; }
@@ -604,13 +619,13 @@ main:has(.hero2) { padding-top: 0; }
 nav.main a.kidsnav { color: #FFD166; }
 body.kidsmode { --kbg: #EAF7FF; background: var(--kbg) radial-gradient(circle at 10% 0%, #FFE8F3 0, transparent 40%), radial-gradient(circle at 90% 20%, #FFF4C8 0, transparent 35%); background-attachment: fixed; }
 :root[data-theme="dark"] body.kidsmode, body.kidsmode:where(:root:not([data-theme="light"]) *) { }
-body.kidsmode main { max-width: 1180px; }
+body.kidsmode main { max-width: 1240px; }
 .kidshero { position: relative; isolation: isolate; overflow: hidden; border-radius: 28px; min-height: 340px; display: grid; align-items: end; padding: clamp(20px, 4vw, 40px); color: #fff; box-shadow: 0 20px 40px -24px rgba(60, 30, 120, .45); }
 .kidshero .kh-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
 .kidshero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(40, 20, 90, 0) 30%, rgba(40, 20, 90, .78) 100%); }
 .kidshero h1 { font: 700 clamp(2rem, 5vw, 3.4rem)/1.05 "Fredoka", var(--sans); letter-spacing: 0; max-width: 16ch; text-shadow: 0 2px 12px rgba(0,0,0,.3); }
 .kidshero p { font: 500 1.15rem/1.5 "Fredoka", var(--sans); margin: 10px 0 0; max-width: 46ch; }
-.shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 26px 22px; margin: 30px 0 18px; }
+.kshelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 26px 22px; margin: 30px 0 18px; }
 .book { display: grid; text-decoration: none; color: #24164a; background: #fff; border-radius: 22px; overflow: hidden; transform: rotate(var(--tilt)); box-shadow: 0 6px 0 var(--c), 0 18px 30px -18px rgba(40, 20, 90, .5); transition: transform .25s cubic-bezier(.3, 1.6, .5, 1); }
 .book:hover, .book:focus-visible { transform: rotate(0) translateY(-6px) scale(1.03); outline: none; }
 .book .cover { aspect-ratio: 16 / 10; overflow: hidden; }
@@ -903,6 +918,13 @@ body.kidsmode main { max-width: 1180px; }
 .dkinds { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 18px 0 14px; padding-bottom: 4px; }
 .dkinds .btn { flex: none; }
 .dgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+/* Related finds on person, place and discovery pages: one even row that scrolls sideways, so a fifth card never sits alone. */
+.shelf .dgrid { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: calc((100% - 48px) / 4); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; padding: 2px 2px 12px; }
+.shelf .dgrid > * { scroll-snap-align: start; }
+@media (max-width: 1000px) { .shelf .dgrid { grid-auto-columns: calc((100% - 32px) / 3); } }
+@media (max-width: 760px) { .shelf .dgrid { grid-auto-columns: 72%; } }
+/* Long verse lists flow in two columns on wide screens. */
+@media (min-width: 1000px) { .vcols .results { display: block; column-count: 2; column-gap: 40px; } .vcols .results .hit { break-inside: avoid; } }
 .dcard { display: grid; grid-template-rows: auto 1fr; border-radius: var(--r); overflow: hidden; background: var(--page); border: 1px solid var(--line); color: var(--ink); text-decoration: none; box-shadow: var(--shadow); transition: transform .2s ease, box-shadow .2s ease; }
 .dcard:hover { transform: translateY(-3px); box-shadow: 0 16px 34px -18px rgba(21, 18, 14, .5); }
 .dcard .dimg { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; background: var(--lapis-deep); }

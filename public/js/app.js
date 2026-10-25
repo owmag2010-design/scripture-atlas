@@ -343,6 +343,8 @@ async function renderHome() {
     ${tile("#/research", "vaticanus", "Research", "Follow a verse into its words, people, places and links")}
     ${tile("#/library", "isaiah-scroll", "The manuscripts", "From the Dead Sea Scrolls to the printed page")}
     ${DISCOVERIES.length ? tile("#/discoveries", "aleppo", "Discoveries", `${DISCOVERIES.length} finds from archaeology, inscriptions and science, each linked to its passages and sources`, "t-wide") : ""}
+    ${tile("#/atlas", "map-holyland", "Interactive atlas", "Places, journeys and periods on one map, with the finds made at each site")}
+    ${tile("#/learn", "era-exodus", "Courses", "Lessons with readings, questions and a short quiz")}
   </section>
 
   ${Object.keys(BOOK_ART).length ? `<section class="shelf"><div class="ribbon-head"><h2>The library of 66 books</h2><a class="seeall" href="#/books">See all 66 ›</a></div>
@@ -1081,9 +1083,9 @@ async function renderPerson(slug) {
       ${p.bornAt || p.diedAt ? `<p>${p.bornAt && lm.get(p.bornAt) ? `Born: <a href="#/place/${p.bornAt}">${esc(lm.get(p.bornAt)[1])}</a>. ` : ""}${p.diedAt && lm.get(p.diedAt) ? `Died: <a href="#/place/${p.diedAt}">${esc(lm.get(p.diedAt)[1])}</a>.` : ""}</p>` : ""}
       ${p.events.length ? `<h3>Events</h3><ul class="evlist">${p.events.map(i => em.get(i)).filter(Boolean).map(e => `<li><span class="yr">${yearText(e.year)}</span> <a href="#/history/timeline#e${e.id}">${esc(e.title)}</a></li>`).join("")}</ul>` : ""}
     </section>
-    <section class="card">${p.dict ? `<h2 style="font-size:1.4rem">Dictionary entry</h2><p class="dict">${esc(p.dict)}</p><p class="small">Easton's Bible Dictionary (1897), public domain. A historic reference: some views and archaeology are out of date.</p>` : ""}
-      <h2 style="font-size:1.4rem;margin-top:12px">Verses</h2><div id="pv"></div></section>
-  </div>`;
+    <section class="card">${p.dict ? `<h2 style="font-size:1.4rem">Dictionary entry</h2><p class="dict">${esc(p.dict)}</p><p class="small">Easton's Bible Dictionary (1897), public domain. A historic reference: some views and archaeology are out of date.</p>` : `<h2 style="font-size:1.4rem">About</h2><p class="small">No dictionary entry for ${esc(p.name)}. The verses below are every place the name appears.</p>`}</section>
+  </div>
+  <section class="card" style="margin-top:18px"><h2 style="font-size:1.4rem">Verses</h2><div id="pv" class="vcols"></div></section>`;
   const page = async n => { const r = await versesList(p.verses, n, page); $("#pv").innerHTML = r.html; r.wire($("#pv")); };
   page(0);
 }
@@ -1277,7 +1279,7 @@ async function renderTranslations() {
   view.innerHTML = `${artHead("gutenberg")}<span class="eyebrow">Bibles</span><h1>${list.length} complete Bibles in ${langs.size} languages, with the story behind each.</h1>
     <p class="small" style="max-width:72ch">Every Bible here is complete and may be freely shared: public domain or an open Creative Commons licence, each checked against its publisher's own licence page. Popular modern translations such as the NIV and ESV are copyrighted, so they are described at the end but not included.</p>
     <form class="minisearch" id="tf" style="max-width:420px"><label class="sr" for="tq">Filter</label><input id="tq" placeholder="Filter by language or name, e.g. Swahili" autocomplete="off"></form></div>
-  <div id="tlist"></div>
+  <div id="tlist" class="tlangs"></div>
   <section class="card" style="margin-top:22px"><h2 style="font-size:1.5rem">Well-known translations under copyright</h2><p class="small">Not hosted here, because their publishers do not allow free redistribution. Their history is given for reference.</p>
     <div class="tgrid">${NOT_HOSTED.map(t => `<article class="tcard"><b>${esc(t.name)}</b><span class="small">${esc(t.year)} · ${esc(t.owner)}</span><p>${esc(t.history)}</p></article>`).join("")}</div></section>`;
   const draw = q => {
@@ -1285,7 +1287,7 @@ async function renderTranslations() {
     const groups = new Map();
     list.filter(t => !q || [t.languageEn, t.language, t.name, t.title || ""].some(x => (x || "").toLowerCase().includes(q))).forEach(t => { if (!groups.has(t.languageEn)) groups.set(t.languageEn, []); groups.get(t.languageEn).push(t); });
     const order = [...groups.keys()].sort((a, b) => (a === "English" ? -1 : b === "English" ? 1 : a.localeCompare(b)));
-    $("#tlist").innerHTML = order.map(l => `<section class="tlang"><h2>${esc(l)}</h2><div class="tgrid">${groups.get(l).map(t => { const h = HISTORY[t.id] || {}; return `<article class="tcard"><a href="#/translation/${t.id}"><b>${esc(t.name)}</b></a><span class="small" dir="${t.dir}">${esc(t.title && t.title !== t.name ? t.title : t.language)}</span><span class="small">${esc(h.year || "")}</span><div class="actions"><span class="chip ${/Public/.test(t.licence) ? "" : "ext"}">${esc(t.licence.replace(" (text shown unchanged)", ""))}</span></div><div class="actions"><a class="btn pri" href="#/read/${t.id}/John.1">Read</a><a class="btn" href="#/translation/${t.id}">History</a></div></article>`; }).join("")}</div></section>`).join("") || `<p class="empty">No translation matches. Shona and Zulu have no complete Bible under an open licence yet.</p>`;
+    $("#tlist").innerHTML = order.map(l => `<section class="tlang ${groups.get(l).length >= 3 ? "nfull" : "n" + groups.get(l).length}"><h2>${esc(l)}</h2><div class="tgrid">${groups.get(l).map(t => { const h = HISTORY[t.id] || {}; return `<article class="tcard"><a href="#/translation/${t.id}"><b>${esc(t.name)}</b></a><span class="small" dir="${t.dir}">${esc(t.title && t.title !== t.name ? t.title : t.language)}</span><span class="small">${esc(h.year || "")}</span><div class="actions"><span class="chip ${/Public/.test(t.licence) ? "" : "ext"}">${esc(t.licence.replace(" (text shown unchanged)", ""))}</span></div><div class="actions"><a class="btn pri" href="#/read/${t.id}/John.1">Read</a><a class="btn" href="#/translation/${t.id}">History</a></div></article>`; }).join("")}</div></section>`).join("") || `<p class="empty">No translation matches. Shona and Zulu have no complete Bible under an open licence yet.</p>`;
   };
   draw("");
   $("#tq").addEventListener("input", e => draw(e.target.value));
@@ -1904,7 +1906,7 @@ function renderKids() {
   document.body.classList.add("kidsmode");
   view.innerHTML = `<section class="kidshero">${kidImg("hero", "kh-art")}
       <div class="kh-copy"><h1>Bible stories, told and drawn for you.</h1><p>Pick a story. Tap the arrows to turn the page, or press <b>Read to me</b> and listen.</p></div></section>
-    <div class="shelf">${KID_STORIES.map((s, i) => `<a class="book" href="#/kids/${s.id}" style="--c:${s.colour};--tilt:${[-2, 1.5, -1, 2, -1.5, 1, -2, 1.5][i % 8]}deg">
+    <div class="kshelf">${KID_STORIES.map((s, i) => `<a class="book" href="#/kids/${s.id}" style="--c:${s.colour};--tilt:${[-2, 1.5, -1, 2, -1.5, 1, -2, 1.5][i % 8]}deg">
       <span class="cover">${kidImg(s.id)}</span><span class="spine"><b>${esc(s.title)}</b><span>${esc(s.range)} · ${s.scenes.length} pages</span></span></a>`).join("")}</div>
     <p class="small kidsnote">Stories retold for children by Ereunia, keeping close to the Bible text; each page shows where to read it. Pictures made for Ereunia with an AI image tool. <a href="#/learn">Family mode</a> in Courses has more for parents and children together.</p>`;
 }
