@@ -9,6 +9,8 @@ import { BOOKS, NAMES, fileId } from "../../public/js/books.js";
 import { parseReference, formatRef } from "../../public/js/ref.js";
 import { searchCorpus } from "../../public/js/search.js";
 import { CONTEXT } from "../../public/js/context.js";
+import { DISCOVERIES } from "../../public/js/discoveries-data.js";
+import { forVerse, forChapter, STATUS } from "../../public/js/discoveries.js";
 import { findRefs, parseModelJson, verifyAnswer, isEmpty, SECTIONS } from "../../public/js/ai-core.js";
 
 const MODEL = process.env.ATLAS_MODEL || "claude-sonnet-5-5";
@@ -43,9 +45,15 @@ export function gather(question, refText) {
         if (ps.length || es.length) add("dataset", `People and events tagged in ${formatRef(r.book, r.chapter, r.verse)} (Theographic dataset)`, [ps.length ? "People: " + ps.join("; ") : "", es.length ? "Events: " + es.join("; ") : ""].filter(Boolean).join(". "));
       }
     }
+    const bi = code => BOOKS.findIndex(b => b.osis === code);
+    const found = r.verse ? forVerse(DISCOVERIES, r.book, r.chapter, r.verse, bi) : forChapter(DISCOVERIES, r.book, r.chapter, bi);
+    for (const d of found.slice(0, 3)) addDiscovery(add, d);
     const c = CONTEXT[r.book];
     add("editorial", `Scripture Atlas book background: ${NAMES[r.book]}`, `Author: ${c[0]} Date: ${c[1]}. Setting: ${c[4]} Themes: ${c[5]}.`);
   }
+  // Discoveries named in the question (e.g. "What is the Tel Dan Stele?"), by name or id.
+  const ql = question.toLowerCase();
+  for (const d of DISCOVERIES.filter(d => ql.includes(d.name.toLowerCase()) || ql.includes(d.id.replace(/-/g, " "))).slice(0, 3)) if (!sources.some(s => s.label.includes(d.name))) addDiscovery(add, d);
   if (!refs.length) {
     const words = question.toLowerCase().replace(/[^a-z' ]/g, " ").split(/\s+/).filter(w => w.length > 3 && !STOP.has(w)).slice(0, 4);
     const corpus = BOOKS.map(b => book("kjv", b.i));
@@ -54,6 +62,10 @@ export function gather(question, refText) {
     for (const h of hits.slice(0, 8)) add("scripture", `${formatRef(h.book, h.chapter, h.verse)} (KJV)`, h.text);
   }
   return { sources, refs };
+}
+function addDiscovery(add, d) {
+  add("archaeology", `Discovery: ${d.name} (Scripture Atlas summary of ${d.sources.map(s => s.publisher).join("; ")}; evidence status: ${STATUS[d.status].label})`,
+    `${d.description} Date: ${d.objectDate?.text || "n/a"}. Biblical connection: ${d.connection || "n/a"} What it establishes: ${d.establishes} Limits and debate: ${d.limits}`);
 }
 const STOP = new Set("what does about when where which with from that this have will would could should there their they them were been into than then also mean means explain tell bible verse verses passage".split(" "));
 
@@ -69,6 +81,7 @@ Rules:
 - Put a direct quotation in double quotes only if it appears word for word in a cited source.
 - Never invent quotations, manuscripts, scholars, publications, dates or archaeological finds. Do not cite anything that is not in SOURCES.
 - Keep interpretation separate from what the text says, and name whose interpretation it is (e.g. "many Christian interpreters", "Jewish tradition", "historical-critical scholars"). Do not present a disputed view as settled.
+- "archaeology" sources are summaries of documented discoveries. Use them under "evidence", say exactly what they establish, and always carry their stated limits into "uncertainty". Never say archaeology proves a biblical or theological claim.
 - If the sources do not answer part of the question, say so under "uncertainty" and suggest what to read or look up.
 - Do not give personal spiritual direction or claim divine authority. 2 to 4 statements per section at most; omit a section by using an empty array.
 Reply with the JSON object only.`;

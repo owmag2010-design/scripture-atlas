@@ -24,6 +24,8 @@ import { sermonRefs, sermonMarkdown } from "./sermon.js";
 import { wordDiff, variantsFor, editionDifferences, lessonMarkdown } from "./lens.js";
 import { stem, glossStems, distribution, sharedStrongs, radialLayout, NODE_TYPES, clip } from "./research.js";
 import { repeatedWords, keyLemmas, mergeCrossRefs, interpretQuestions, guideMarkdown, OBSERVE, APPLY } from "./guide.js";
+import { KINDS, STATUS as DSTATUS, DATING, parseRange, forVerse as discForVerse, forChapter as discForChapter, forPerson as discForPerson, forPlace as discForPlace, inEra as discInEra, related as discRelated, filterList as discFilter } from "./discoveries.js";
+import { DISCOVERIES } from "./discoveries-data.js";
 import { describeMorph, languageOf, normaliseStrong, shardOf, displayStrong, isGrammaticalStrong, editionNote } from "./lang.js";
 
 // Images load from images.js when present (public domain, credited in the Library).
@@ -49,6 +51,110 @@ const personArt = (slug, o) => artImg("people", slug, o);
 const artCredit = (kind, key) => { const m = (kind === "books" ? BOOK_ART : PEOPLE_ART)[key]; return m ? `Gustave Doré, ${esc(m.title)} (1866)${m.related && m.note ? `. ${esc(m.note)}` : ""}` : ""; };
 // A horizontal, swipeable row of picture cards. items: [{ href, img, title, sub }]
 const carousel = (label, items, cls = "") => items.length ? `<div class="snap ${cls}" role="list" aria-label="${esc(label)}">${items.map(c => `<a class="scard" role="listitem" href="${c.href}"><span class="simg">${c.img || `<span class="sfall"></span>`}</span><span class="scap"><b>${c.title}</b>${c.sub ? `<span>${c.sub}</span>` : ""}</span></a>`).join("")}</div>` : "";
+
+/* ---------- discoveries: archaeology, inscriptions, manuscripts, science ---------- */
+const DISC = new Map(DISCOVERIES.map(d => [d.id, d]));
+const bIdx = code => BOOKS.findIndex(b => b.osis === code);
+function discImg(d, { cls = "", sizes = "100vw", eager = false } = {}) {
+  const m = d?.image; if (!m?.local) return "";
+  return `<img class="${cls}" src="img/disc/${d.id}-sm.webp" srcset="img/disc/${d.id}-sm.webp 640w, img/disc/${d.id}.webp 1400w" sizes="${sizes}" alt="${esc(m.alt || d.name)}" width="${m.w}" height="${m.h}" style="object-position:${m.focus || "50% 50%"}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+}
+const discCredit = d => d?.image?.local ? `Photo: ${esc(d.image.author || "unknown")}, ${esc(d.image.licence || "")}, via Wikimedia Commons` : "";
+const dChip = d => `<span class="dstat s-${d.status}" title="${esc(DSTATUS[d.status]?.note || "")}">${DSTATUS[d.status]?.label || d.status}</span>`;
+/** "2Kgs.9.14-9.29" → "2 Kings 9:14–29" */
+function rangeLabel(r) {
+  const p = parseRange(r, bIdx); if (!p) return r;
+  const [b, c1, v1] = [p.b, Math.floor(p.from / 1e3) % 1e3, p.from % 1e3], [c2, v2] = [Math.floor(p.to / 1e3) % 1e3, p.to % 1e3];
+  if (v2 === 999 && v1 === 1) return c1 === c2 ? formatRef(b, c1) : `${formatRef(b, c1)}–${c2}`;
+  return c1 === c2 ? formatRef(b, c1, v1, v2 !== v1 ? v2 : undefined) : `${formatRef(b, c1, v1)}–${c2}:${v2}`;
+}
+const rangeHref = r => { const p = parseRange(r, bIdx); return p ? readUrl("kjv", p.b, Math.floor(p.from / 1e3) % 1e3, p.from % 1e3 || null) : "#/"; };
+const discCard = (d, sizes = "(max-width: 520px) 100vw, 300px") => `<a class="dcard" href="#/discoveries/${d.id}"><span class="dimg">${discImg(d, { sizes }) || `<span class="dfall k-${d.kind}"><b>${esc(KINDS[d.kind] || "")}</b></span>`}</span>
+  <span class="dbody"><span class="dmeta">${dChip(d)}<span>${esc(KINDS[d.kind] || "")}</span>${d.objectDate?.text ? `<span>${esc(d.objectDate.text)}</span>` : ""}</span><b>${esc(d.name)}</b><span class="dsum">${esc(d.summary)}</span>
+  ${(d.passages || []).length ? `<span class="dpass">${d.passages.slice(0, 2).map(rangeLabel).join(" · ")}${d.passages.length > 2 ? ` +${d.passages.length - 2}` : ""}</span>` : ""}</span></a>`;
+/** A compact list of discoveries for side panels (Lens, reader, person, place). */
+const discMini = (list, title = "Archaeology and discoveries") => list.length ? `<section class="dmini"><h3>${title}</h3>${list.slice(0, 6).map(d => `<a href="#/discoveries/${d.id}"><span class="dthumb">${discImg(d, { sizes: "64px" }) || `<span class="dfall k-${d.kind}"></span>`}</span><span><b>${esc(d.name)}</b> ${dChip(d)}<span class="small">${esc(d.summary)}</span></span></a>`).join("")}${list.length > 6 ? `<a class="small" href="#/discoveries">${list.length - 6} more in Discoveries ›</a>` : ""}</section>` : "";
+
+async function renderDiscoveries(id) {
+  setNav("discoveries");
+  if (id) return renderDiscovery(id);
+  setTitle("Discoveries");
+  const st = { kind: "", status: "", q: "" };
+  const datable = DISCOVERIES.filter(d => d.kind !== "method" && d.objectDate).sort((a, b) => a.objectDate.sort - b.objectDate.sort);
+  const counts = k => DISCOVERIES.filter(d => d.kind === k).length;
+  view.innerHTML = `${artHead("isaiah-scroll")}<span class="eyebrow">Discoveries · Archaeology, manuscripts and science</span><h1>What the ground, the archives and the laboratory add to the Bible.</h1>
+    <p>${DISCOVERIES.length} documented finds: inscriptions naming biblical kings, excavated cities, ancient manuscripts and the scientific methods used to date them. Each one is linked to the passages it relates to, and each cites the museums, excavation teams or peer-reviewed studies behind it.</p>
+    <form class="minisearch rsearch" id="dsf" role="search"><label class="sr" for="dsq">Find a discovery</label><input id="dsq" type="search" placeholder="A king, a place or a find: Hezekiah, Lachish, scroll" autocomplete="off"></form></div>
+  <section class="card dstd"><h2>How to read the evidence</h2>
+    <p class="small">Archaeology can show that a person existed, that a city stood at a certain time, or that a text was copied by a certain date. It cannot show that a theological claim is true, and it rarely confirms every detail of a story. Every entry says what the find <b>establishes</b> and what it does <b>not</b>, and gives its status:</p>
+    <div class="dlegend">${Object.entries(DSTATUS).map(([k, v]) => `<button type="button" class="dlg" data-status="${k}" aria-pressed="false">${dChip({ status: k })}<span>${esc(v.note)}</span></button>`).join("")}</div></section>
+  <div class="dkinds" role="group" aria-label="Kind of discovery"><button type="button" class="btn on" data-kind="">All ${DISCOVERIES.length}</button>${Object.entries(KINDS).filter(([k]) => counts(k)).map(([k, l]) => `<button type="button" class="btn" data-kind="${k}">${l} <span class="small">${counts(k)}</span></button>`).join("")}</div>
+  <div id="dgrid" class="dgrid"></div>
+  ${datable.length ? `<section class="shelf"><div class="ribbon-head"><h2>Through time</h2><p class="small">Ordered by the date of the object or site, not the date it was found.</p></div>
+    <ol class="dtime">${datable.map(d => `<li><a href="#/discoveries/${d.id}"><span class="dty">${esc(yearText(d.objectDate.sort))}</span><b>${esc(d.name)}</b>${dChip(d)}</a></li>`).join("")}</ol></section>` : ""}
+  ${DISCOVERIES.some(d => d.location) ? `<section class="shelf"><div class="ribbon-head"><h2>Where they were found</h2><p class="small">Tap a marker to open the discovery.</p></div><div id="dmap" class="dmapbox"><p class="loading">Loading the map…</p></div></section>` : ""}
+  <p class="small dnote">Sources open the museum, excavation or journal page in a new tab. Scripture Atlas summaries are editorial; where specialists disagree, the entry says so. Photographs are credited on each page.</p>`;
+  const draw = () => {
+    const list = discFilter(DISCOVERIES, st).sort((a, b) => (a.kind === "method") - (b.kind === "method") || (a.objectDate?.sort ?? 0) - (b.objectDate?.sort ?? 0));
+    $("#dgrid").innerHTML = list.map(d => discCard(d)).join("") || `<p class="empty">No discoveries match. Clear the filters to see all ${DISCOVERIES.length}.</p>`;
+  };
+  view.querySelectorAll("[data-kind]").forEach(b => b.addEventListener("click", () => { st.kind = b.dataset.kind; view.querySelectorAll("[data-kind]").forEach(x => x.classList.toggle("on", x === b)); draw(); }));
+  view.querySelectorAll("[data-status]").forEach(b => b.addEventListener("click", () => { st.status = st.status === b.dataset.status ? "" : b.dataset.status; view.querySelectorAll("[data-status]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.status === st.status))); draw(); }));
+  $("#dsq").addEventListener("input", e => { st.q = e.target.value; draw(); });
+  $("#dsf").addEventListener("submit", e => e.preventDefault());
+  draw();
+  if ($("#dmap")) {
+    const base = await H.base();
+    const rows = DISCOVERIES.filter(d => d.location).map(d => [d.id, d.name, d.location.lat, d.location.lon, "Discovery", "located", 40]);
+    mountMap($("#dmap"), { base, places: rows, onPick: s => (location.hash = `#/discoveries/${s}`) }).fit(new Set(rows.map(r => r[0])));
+  }
+}
+
+async function renderDiscovery(id) {
+  const d = DISC.get(id);
+  if (!d) { view.innerHTML = `<p class="empty">No discovery found. <a href="#/discoveries">Browse all discoveries</a>.</p>`; return; }
+  setTitle(d.name);
+  const [pm, lm] = await Promise.all([H.peopleMap(), H.placeMap()]);
+  const photo = discImg(d, { cls: "headart", sizes: "(max-width: 720px) 100vw, 62vw", eager: true });
+  const fact = (k, v) => v ? `<div><dt>${k}</dt><dd>${v}</dd></div>` : "";
+  const rel = discRelated(DISCOVERIES, d, bIdx);
+  view.innerHTML = `<div class="pagehead ${photo ? "art" : ""}">${photo}<span class="eyebrow"><a href="#/discoveries">Discoveries</a> · ${esc(KINDS[d.kind] || "")}</span><h1>${esc(d.name)}</h1>
+    <p>${esc(d.summary)}</p><div class="actions">${dChip(d)}<span class="small">${esc(DSTATUS[d.status]?.note || "")}</span></div>${photo ? `<p class="headcredit">${discCredit(d)}</p>` : ""}</div>
+  <div class="dlayout">
+    <div class="dmain">
+      <section class="card"><h2>What it is</h2><p>${esc(d.description)}</p></section>
+      ${d.connection ? `<section class="card"><h2>${d.kind === "method" ? "How it is used" : "The biblical connection"}</h2><p>${esc(d.connection)}</p>
+        ${(d.passages || []).length ? `<div class="dverses" id="dverses">${d.passages.map(r => `<a class="dverse" href="${rangeHref(r)}"><b>${esc(rangeLabel(r))}</b><span class="tx" data-r="${esc(r)}">…</span></a>`).join("")}</div>` : ""}</section>` : ""}
+      <div class="two dweigh"><section class="card est"><h2>What it establishes</h2><p>${esc(d.establishes)}</p></section>
+        <section class="card lim"><h2>Limits and debate</h2><p>${esc(d.limits)}</p></section></div>
+      <section class="card"><h2>Sources</h2><ol class="dsrc">${(d.sources || []).map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.title)}</a> <span class="small">${esc(s.publisher)} · opens in a new tab</span></li>`).join("")}</ol>
+        <p class="small">Summary written by Scripture Atlas from these sources. If you spot an error, the sources above are the authority.</p></section>
+    </div>
+    <aside class="dside">
+      <section class="card"><h2>At a glance</h2><dl class="dfacts">
+        ${fact("Date of the object", esc(d.objectDate?.text || ""))}
+        ${fact("Found", d.found ? esc([d.found.year, d.found.by].filter(Boolean).join(", ")) : "")}
+        ${fact("Where found", d.location?.placeSlug && lm.get(d.location.placeSlug) ? `<a href="#/place/${d.location.placeSlug}">${esc(d.found?.where || lm.get(d.location.placeSlug)[1])}</a>` : esc(d.found?.where || ""))}
+        ${fact("Where it is now", esc([d.heldAt?.institution, d.heldAt?.ref].filter(Boolean).join(", ")))}
+        ${fact("Language", esc(d.language || ""))}
+        ${fact("Dated by", (d.dating || []).map(m => esc(DATING[m] || m)).join(", "))}
+      </dl></section>
+      ${(d.people || []).length ? `<section class="card"><h2>People</h2><div class="plist">${d.people.map(s => pm.get(s) ? `<a href="#/person/${s}"><b>${esc(pm.get(s)[1])}</b><span class="small">${esc(pm.get(s)[3] || "")}</span></a>` : "").join("")}</div></section>` : ""}
+      ${d.location ? `<section class="card"><h2>On the map</h2><div id="dpmap" class="dpmap"></div></section>` : ""}
+      ${(d.passages || []).length ? `<a class="btn pri" href="#/lens/${(() => { const p = parseRange(d.passages[0], bIdx); return toOsis(p.b, Math.floor(p.from / 1e3) % 1e3, p.from % 1e3 || 1); })()}/scholar">Study the passage in Scripture Lens</a>` : ""}
+    </aside>
+  </div>
+  ${rel.length ? `<section class="shelf"><div class="ribbon-head"><h2>Related discoveries</h2></div><div class="dgrid">${rel.map(x => discCard(x)).join("")}</div></section>` : ""}`;
+  view.querySelectorAll("#dverses .tx").forEach(async el => {
+    const p = parseRange(el.dataset.r, bIdx); if (!p) return;
+    const t = await verseText("kjv", toOsis(p.b, Math.floor(p.from / 1e3) % 1e3, p.from % 1e3 || 1)).catch(() => "");
+    el.textContent = t ? `${t}${p.to > p.from ? " …" : ""}` : "";
+  });
+  if (d.location && $("#dpmap")) {
+    const base = await H.base();
+    mountMap($("#dpmap"), { base, places: [[d.id, d.name, d.location.lat, d.location.lon, "Discovery", "located", 40], ...DISCOVERIES.filter(x => x.location && x.id !== d.id).map(x => [x.id, x.name, x.location.lat, x.location.lon, "Discovery", "located", 10])], focus: d.id, onPick: s => (location.hash = `#/discoveries/${s}`) }).focusOn(d.id, 10);
+  }
+}
 
 function renderBooks() {
   setNav("read"); setTitle("Books of the Bible");
@@ -235,6 +341,7 @@ async function renderHome() {
     ${tile("#/sermon", "era-gospels", "Sermon studio", "Record a sermon, catch every verse, make study notes")}
     ${tile("#/research", "vaticanus", "Research", "Follow a verse into its words, people, places and links")}
     ${tile("#/library", "isaiah-scroll", "The manuscripts", "From the Dead Sea Scrolls to the printed page")}
+    ${DISCOVERIES.length ? tile("#/discoveries", "aleppo", "Discoveries", `${DISCOVERIES.length} finds from archaeology, inscriptions and science, each linked to its passages and sources`, "t-wide") : ""}
   </section>
 
   ${Object.keys(BOOK_ART).length ? `<section class="shelf"><div class="ribbon-head"><h2>The library of 66 books</h2><a class="seeall" href="#/books">See all 66 ›</a></div>
@@ -566,6 +673,9 @@ async function renderMargin() {
   pane.innerHTML = '<p class="small" style="padding:16px 18px">Loading…</p>';
   try {
     pane.innerHTML = R.tab === "bg" ? backgroundPane() : R.tab === "words" ? await wordsPane() : R.tab === "xref" ? await xrefPane() : R.tab === "people" ? await peoplePane() : await versePane();
+    // Discoveries linked to the selected verse (Verse tab) or to this chapter (Book tab).
+    const dl = R.tab === "verse" && R.verse ? discForVerse(DISCOVERIES, R.book, R.chapter, R.verse, bIdx) : R.tab === "bg" ? discForChapter(DISCOVERIES, R.book, R.chapter, bIdx) : [];
+    if (dl.length) pane.querySelector(".pane")?.insertAdjacentHTML("beforeend", discMini(dl, R.tab === "bg" ? `Discoveries linked to ${formatRef(R.book, R.chapter)}` : "Archaeology and discoveries"));
   } catch { pane.innerHTML = `<div class="pane"><p class="small">This could not load. Check your connection and try again.</p></div>`; }
   pane.querySelectorAll("[data-gotab]").forEach(a => a.addEventListener("click", e => { e.preventDefault(); R.tab = a.dataset.gotab; renderMargin(); }));
   if (R.tab === "verse" && R.verse) wireVersePane();
@@ -654,6 +764,7 @@ async function renderRead(t, osis) {
       <span class="chip scripture">${inter ? `Scripture · ${TR[R.t]} with ${R.book < 39 ? "Hebrew" : "Greek"}` : parallel ? `Scripture · ${TR[R.t]} and ${TR[parallel]}` : `Scripture · ${TR[R.t]}`}</span></div>
       ${R.t === "kjv" ? `<p class="originhint"><span class="ew oh demo">Underlined</span> words come from a ${R.book < 39 ? "Hebrew" : "Greek"} word. Tap one to see it. <i class="add">Italic</i> words were added by the translators.</p>` : ""}
       <p class="small trnote"><a href="#/translation/${R.t}">About the ${esc(META[R.t].name)}</a> · ${esc(META[R.t].licence)}${META[R.t].numbering ? ` · ${esc(META[R.t].numbering)}` : ""}</p>
+      ${(() => { const dl = discForChapter(DISCOVERIES, R.book, R.chapter, bIdx); return dl.length ? `<div class="dstrip"><span class="eyebrow">Discoveries for this chapter</span>${dl.slice(0, 5).map(d => `<a href="#/discoveries/${d.id}">${esc(d.name)}</a>`).join("")}</div>` : ""; })()}
       <div id="text" class="text"><p class="loading">Opening the text…</p></div>
       <nav class="chapnav" aria-label="Chapters">
         <button class="btn" type="button" id="prev" ${firstBook ? "disabled" : ""}>‹ Previous</button>
@@ -851,7 +962,7 @@ const COURSE_ART = { foundations: "gutenberg", genesis: "creation-light", jesus:
 async function renderHistory(tab = "map", sub = "") {
   setNav("history"); setTitle("History");
   view.innerHTML = `${artHead(tab === "timeline" ? "era-exodus" : tab === "people" ? "era-patriarchs" : "map-holyland")}<span class="eyebrow">History</span><h1>Where and when the story happened, and how sure we are.</h1>
-    <div class="tabsrow">${[["map", "Map"], ["journeys", "Journeys"], ["timeline", "Timeline"], ["people", "People"]].map(([k, l]) => `<a class="btn ${k === tab ? "on" : ""}" href="#/history/${k}">${l}</a>`).join("")}</div></div><div id="hist"><p class="loading">Loading…</p></div>`;
+    <div class="tabsrow">${[["map", "Map"], ["journeys", "Journeys"], ["timeline", "Timeline"], ["people", "People"]].map(([k, l]) => `<a class="btn ${k === tab ? "on" : ""}" href="#/history/${k}">${l}</a>`).join("")}${DISCOVERIES.length ? `<a class="btn" href="#/discoveries">Discoveries</a>` : ""}</div></div><div id="hist"><p class="loading">Loading…</p></div>`;
   const box = $("#hist");
   if (tab === "timeline") return renderTimeline(box);
   if (tab === "people") return renderPeopleList(box);
@@ -910,7 +1021,7 @@ async function renderTimeline(box) {
     <div class="legendrow"><span>${certChip(-1500)} ${dateCertainty(-1500).note}</span><span>${certChip(-700)} ${dateCertainty(-700).note}</span><span>${certChip(30)} ${dateCertainty(30).note}</span></div>
     <p class="small">Dates come from the Theographic dataset, which follows a traditional chronology close to Archbishop Ussher's (for example, the Exodus in 1490 BC). Many scholars place the Exodus around 1446 BC or in the 13th century BC, and treat earlier dates as unknowable.</p></div>
     <nav class="eranav" aria-label="Eras">${groups.map((g, i) => `<a class="btn" href="#/history/timeline#era${i}">${g.name}</a>`).join("")}</nav>
-    ${groups.map((g, i) => `<section class="era" id="era${i}">${(() => { const slot = ERA_ART[ERAS.findIndex(e => e[0] === g.name)]; return IMAGES[slot] ? `<figure class="eraban">${pic(slot, { sizes: "(max-width: 760px) 100vw, 900px" })}<figcaption>${credit(slot)}</figcaption></figure>` : ""; })()}<h2>${g.name} <span class="small">${yearText(g.items[0].year)} – ${yearText(g.items.at(-1).year)}</span></h2>
+    ${groups.map((g, i) => `<section class="era" id="era${i}">${(() => { const slot = ERA_ART[ERAS.findIndex(e => e[0] === g.name)]; return IMAGES[slot] ? `<figure class="eraban">${pic(slot, { sizes: "(max-width: 760px) 100vw, 900px" })}<figcaption>${credit(slot)}</figcaption></figure>` : ""; })()}<h2>${g.name} <span class="small">${yearText(g.items[0].year)} – ${yearText(g.items.at(-1).year)}</span></h2>${(() => { const e = ERAS.find(x => x[0] === g.name), dl = e ? discInEra(DISCOVERIES, e[1], e[2]) : []; return dl.length ? `<div class="dstrip"><span class="eyebrow">Discoveries from this era</span>${dl.map(d => `<a href="#/discoveries/${d.id}">${esc(d.name)} <span class="small">${esc(d.objectDate.text)}</span></a>`).join("")}</div>` : ""; })()}
       <ol class="tl">${g.items.map(e => { const f = e.first != null ? unpackRef(e.first) : null; return `<li id="e${e.id}"><span class="yr">${yearText(e.year)}</span><div><b>${esc(e.title)}</b> ${certChip(e.year)}
         <div class="tlmeta">${e.places.map(s => lm.get(s)).filter(Boolean).map(r => `<a class="chip ext" href="#/place/${r[0]}">${esc(r[1])}</a>`).join(" ")} ${e.people.map(s => pm.get(s)).filter(Boolean).filter(r => !["god_1324", "holy_spirit_7400", "jesus_905"].includes(r[0]) || e.year > -10).filter(r => r[0] !== "god_1324").slice(0, 4).map(r => `<a class="chip" href="#/person/${r[0]}">${esc(r[1])}</a>`).join(" ")}
         ${f ? `<a class="small" href="${readUrl("kjv", f.book, f.chapter, f.verse)}">${formatRef(f.book, f.chapter, f.verse)}</a>` : ""}</div></div></li>`; }).join("")}</ol></section>`).join("")}`;
@@ -954,6 +1065,7 @@ async function renderPerson(slug) {
     <p style="margin:0;font-size:1.1rem">${esc(p.desc || "")}${p.also ? ` <span class="small">also called ${esc(p.also)}</span>` : ""}</p>
     <div class="actions">${p.groups.map(g => `<span class="chip ext">${esc(g)}</span>`).join("")}<span class="small">Mentioned in ${p.verses.length.toLocaleString()} verse${p.verses.length === 1 ? "" : "s"}</span><a class="btn" href="#/research/person/${slug}">See connections</a></div></div>
   ${p.note ? `<div class="textnote" style="margin-bottom:16px"><b>Two accounts</b><br>${esc(p.note)}</div>` : ""}
+  ${(() => { const dl = discForPerson(DISCOVERIES, slug); return dl.length ? `<section class="shelf" style="margin:0 0 20px"><div class="ribbon-head"><h2>Outside the Bible</h2><p class="small">Inscriptions, records and finds that relate to ${esc(p.name)}.</p></div><div class="dgrid">${dl.map(d => discCard(d)).join("")}</div></section>` : ""; })()}
   <div class="two">
     <section class="card"><h2 style="font-size:1.4rem">Family</h2>
       <div class="tree">
@@ -984,6 +1096,7 @@ async function renderPlace(slug) {
   view.innerHTML = `<div class="pagehead"><span class="eyebrow">History · Place</span><h1>${esc(p.name)}</h1>
     <p style="margin:0" class="small">${esc([p.type, p.sub].filter(Boolean).join(" · "))}${p.other ? ` · also ${esc(p.other)}` : ""}${p.comment ? ` · ${esc(p.comment)}` : ""}</p>
     <div class="actions"><a class="btn" href="#/research/place/${slug}">See connections</a><span class="prec ${p.cls}">${PRECISION[p.cls].label}</span><span class="small">${PRECISION[p.cls].note}${p.lat != null && p.cls !== "unknown" ? ` (${p.lat.toFixed(2)}°, ${p.lon.toFixed(2)}°)` : ""}</span></div></div>
+  ${(() => { const dl = discForPlace(DISCOVERIES, slug); return dl.length ? `<section class="shelf" style="margin:0 0 20px"><div class="ribbon-head"><h2>Found here</h2><p class="small">Excavations and finds from this place.</p></div><div class="dgrid">${dl.map(d => discCard(d)).join("")}</div></section>` : ""; })()}
   <div class="two">
     <section class="card">${plotted ? `<div id="pmap"></div>` : `<p class="small">This place is not shown on the map.</p>`}
       ${p.events.length ? `<h3>Events here</h3><ul class="evlist">${p.events.map(i => em.get(i)).filter(Boolean).map(e => `<li><span class="yr">${yearText(e.year)}</span> <a href="#/history/timeline#e${e.id}">${esc(e.title)}</a></li>`).join("")}</ul>` : ""}
@@ -1585,6 +1698,7 @@ async function renderLens(osis, modeArg) {
         <div class="lverse text origins" id="lverse"><span class="v sel" data-v="${v}" data-t="kjv">${tokensHtml(toks) || esc(kjvText)}</span></div>
         <p class="small">King James Version. Tap an underlined word for its ${heb ? "Hebrew" : "Greek"} source.</p>
         <div id="lorigin"></div>
+        ${discMini(discForVerse(DISCOVERIES, r.book, r.chapter, v, bIdx)) || (() => { const ch = discForChapter(DISCOVERIES, r.book, r.chapter, bIdx); return ch.length ? discMini(ch, `Discoveries linked to ${formatRef(r.book, r.chapter)}`) : ""; })()}
         <div class="lpar">${par.map(id => `<figure><figcaption>${esc(META[id].name)}</figcaption><p dir="${dirOf(id)}" lang="${langOf(id)}" data-par="${id}">…</p></figure>`).join("")}
           <label class="small">Add a translation <select id="lparsel"><option value="">Choose…</option>${allTranslations().filter(t => t.id !== "kjv" && !par.includes(t.id)).map(t => `<option value="${t.id}">${esc(t.name)}${t.languageEn !== "English" ? ` (${esc(t.languageEn)})` : ""}</option>`).join("")}</select></label>
           ${par.length ? `<button class="linkbtn small" type="button" id="lparclr">Reset translations</button>` : ""}</div>
@@ -1894,6 +2008,7 @@ async function route() {
     else if (head === "kids") await (rest[0] ? renderStory(rest[0]) : renderKids());
     else if (head === "soon") renderSoon(rest[0]);
     else if (head === "books") { await getIndex(); renderBooks(); }
+    else if (head === "discoveries") { await getIndex(); await renderDiscoveries(rest[0]); }
     else await renderHome();
   } catch (e) {
     console.error(e);
