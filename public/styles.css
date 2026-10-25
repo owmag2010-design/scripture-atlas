@@ -592,7 +592,8 @@ main:has(.hero2) { padding-top: 0; }
 .pagehead.art .small, .pagehead.art p { color: rgba(255,255,255,.8); }
 .pagehead.art a:not(.btn) { color: var(--gold); }
 .pagehead.art .btn:not(.pri):not(.gold) { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.25); color: #fff; }
-.pagehead.art .headcredit { position: absolute; right: 14px; bottom: 8px; font-size: .7rem; color: rgba(255,255,255,.55); margin: 0; }
+.pagehead.art .headcredit { position: absolute; right: 14px; bottom: 8px; font-size: .7rem; color: rgba(255,255,255,.85); margin: 0; background: rgba(21,18,14,.62); padding: 2px 8px; border-radius: 6px; max-width: calc(100% - 28px); }
+.pagehead.art .headcredit a { color: inherit; }
 @media (max-width: 720px) { .pagehead.art > img.headart { width: 100%; opacity: .3; -webkit-mask-image: none; mask-image: none; } }
 .mscard .msimg { display: block; margin: -20px -22px 14px; height: 180px; overflow: hidden; border-radius: var(--r) var(--r) 0 0; background: var(--soft); }
 .mscard .msimg img { width: 100%; height: 100%; object-fit: cover; }

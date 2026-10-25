@@ -1042,7 +1042,18 @@ export const DISCOVERIES = [
     "publisher": "Australian Catholic University Research Bank",
     "url": "https://acuresearchbank.acu.edu.au/item/86058/merneptah-s-israel-and-the-absence-of-origins-in-biblical-scholarship"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1051,
+   "h": 1400,
+   "alt": "The tall granite Merneptah Stele in the Egyptian Museum, Cairo, with a carved scene of Amun and the king at the top above rows of hieroglyphic text.",
+   "focus": "50% 35%",
+   "author": "Olaf Tausch",
+   "licence": "CC BY 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Kairo_Museum_Merenptah-Stele_01.jpg"
+  }
  },
  {
   "id": "shoshenq-karnak-relief",
@@ -1097,7 +1108,18 @@ export const DISCOVERIES = [
     "publisher": "Center for Online Judaic Studies",
     "url": "https://cojs.org/?p=7405"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1050,
+   "h": 1400,
+   "alt": "Part of Shoshenq I's campaign relief on the outer wall at Karnak: a large carved figure of Amun beside rows of captive figures whose name-rings list conquered towns.",
+   "focus": "50% 50%",
+   "author": "Olaf Tausch",
+   "licence": "CC BY 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Karnak_Tempel_19.jpg"
+  }
  },
  {
   "id": "mesha-stele",
@@ -1156,7 +1178,17 @@ export const DISCOVERIES = [
     "publisher": "World History Encyclopedia",
     "url": "https://www.worldhistory.org/Moabite_Stone_%5BMesha_Stele%5D/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1050,
+   "h": 1400,
+   "alt": "The black basalt Mesha Stele in the Louvre, a round-topped slab inscribed in Moabite script, with the original fragments set into a restored surface.",
+   "focus": "50% 40%",
+   "author": "Tangopaso",
+   "licence": "Public domain",
+   "source": "https://commons.wikimedia.org/wiki/File:Mesha_stele_(Louvre,_AO_5066).jpg"
+  }
  },
  {
   "id": "tel-dan-stele",
@@ -1219,7 +1251,18 @@ export const DISCOVERIES = [
     "publisher": "Center for Online Judaic Studies",
     "url": "https://cojs.org/?p=7804"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 933,
+   "alt": "The fragments of the Tel Dan Stele, a dark basalt slab inscribed in Aramaic, mounted together on display in the Israel Museum.",
+   "focus": "55% 45%",
+   "author": "Oren Rozen",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:JRSLM_300116_Tel_Dan_Stele_02.jpg"
+  }
  },
  {
   "id": "kurkh-monolith",
@@ -1275,7 +1318,18 @@ export const DISCOVERIES = [
     "publisher": "Center for Online Judaic Studies",
     "url": "https://cojs.org/?p=6525"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 858,
+   "h": 1400,
+   "alt": "The Kurkh Monolith in the British Museum: a round-topped stone stele carved with a standing figure of Shalmaneser III and divine symbols, covered in cuneiform text.",
+   "focus": "50% 30%",
+   "author": "Osama Shukir Muhammed Amin FRCP(Glasg)",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Kurkh_stele_of_Shalmaneser_III._From_Diyarbak%C4%B1r,_southern_Turkey._British_Museum.jpg"
+  }
  },
  {
   "id": "black-obelisk-shalmaneser-iii",
@@ -1570,7 +1624,18 @@ export const DISCOVERIES = [
     "publisher": "Tyndale House, Cambridge",
     "url": "https://tyndale.cam.ac.uk/explore/articles/the-lachish-reliefs/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 933,
+   "alt": "Detail of the Lachish reliefs in the British Museum: Sennacherib seated on his throne receiving officials, with a cuneiform caption above and captives approaching on the left.",
+   "focus": "55% 50%",
+   "author": "Zunkir",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Capture_of_Lachish_-_Sennacherib.jpg"
+  }
  },
  {
   "id": "siloam-inscription",
@@ -1677,7 +1742,18 @@ export const DISCOVERIES = [
     "publisher": "Center for Online Judaic Studies",
     "url": "https://cojs.org/?p=7864"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1246,
+   "h": 1400,
+   "alt": "The clay tablet of the Babylonian Chronicle for 605–594 BC, inscribed with cuneiform and mounted on a stand in the British Museum.",
+   "focus": "50% 45%",
+   "author": "Osama Shukir Muhammed Amin FRCP(Glasg)",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:The_cuneiform_inscription_highlights_the_conquest_of_Jerusalem_and_the_surrender_of_Jehoiakim,_king_of_Judah,_in_597_BCE._From_Babylon,_Iraq.jpg"
+  }
  },
  {
   "id": "jehoiachin-ration-tablets",
@@ -1731,7 +1807,18 @@ export const DISCOVERIES = [
     "publisher": "Center for Online Judaic Studies",
     "url": "https://cojs.org/?p=4828"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 1207,
+   "alt": "A broken clay tablet inscribed with cuneiform ration lists from Babylon that name Jehoiachin, displayed on a clear stand.",
+   "focus": "50% 45%",
+   "author": "Osama Shukir Muhammed Amin FRCP(Glasg)",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Clay_tablet._The_Akkadian_cuneiform_inscription_lists_certain_rations_and_mentions_the_name_of_Jeconiah_(Jehoiachin),_King_of_Judah_and_the_Babylonian_captivity._From_Babylon,_Iraq._C._580_BCE._Vorderasiatisches_Museum,_Berlin.jpg"
+  }
  },
  {
   "id": "nabonidus-cylinder-ur",
@@ -1836,7 +1923,18 @@ export const DISCOVERIES = [
     "publisher": "ANU – Museum of the Jewish People",
     "url": "https://index.anumuseum.org.il/exhibit/artifact-cyrus-cylinder/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 956,
+   "alt": "The barrel-shaped clay Cyrus Cylinder, covered in lines of cuneiform and broken across the middle, on a clear stand in the British Museum.",
+   "focus": "50% 45%",
+   "author": "Mike Peel (www.mikepeel.net)",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Cyrus_Cylinder.jpg"
+  }
  },
  {
   "id": "lachish-letters",
@@ -1942,7 +2040,18 @@ export const DISCOVERIES = [
     "publisher": "Hebrew University of Jerusalem research portal",
     "url": "https://cris.huji.ac.il/en/publications/algorithmic-handwriting-analysis-of-judahs-military-correspondenc-2/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 933,
+   "h": 1400,
+   "alt": "A pottery sherd from Arad written in ink in Hebrew script, displayed in the Israel Museum.",
+   "focus": "50% 45%",
+   "author": "Gary Todd from Xinzheng, China",
+   "licence": "CC0",
+   "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "source": "https://commons.wikimedia.org/wiki/File:Letter,_Arad,_6th_Century_BC,_Ink_on_Pottery,_Earliest_Reference_to_Solomon%27s_Temple_(42499943804).jpg"
+  }
  },
  {
   "id": "gezer-calendar",
@@ -1992,7 +2101,18 @@ export const DISCOVERIES = [
     "publisher": "University of Michigan (from J. B. Pritchard, Ancient Near Eastern Texts, Princeton University Press)",
     "url": "https://courses.lsa.umich.edu/israel-palestine/wp-content/uploads/sites/142/2013/12/028.-ANET-320-321.pdf"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1209,
+   "h": 1400,
+   "alt": "The small limestone Gezer Calendar tablet, incised with lines of early alphabetic script, on display in the Istanbul Archaeological Museums.",
+   "focus": "50% 45%",
+   "author": "Osama Shukir Muhammed Amin FRCP(Glasg)",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:The_Gezer_Calendar_tablet,_early_iron_age,_10th_century_BCE,_Museum_of_Archaeology,_Istanbul,_Turkey.jpg"
+  }
  },
  {
   "id": "ketef-hinnom-amulets",
@@ -2046,7 +2166,18 @@ export const DISCOVERIES = [
     "publisher": "Bar-Ilan University research portal",
     "url": "https://cris.biu.ac.il/en/publications/the-challenges-of-ketef-hinnom-using-advanced-technologies-to-rec/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 979,
+   "alt": "The two tiny Ketef Hinnom silver scrolls, partly unrolled and creased, mounted in display cases at the Israel Museum.",
+   "focus": "30% 50%",
+   "author": "Bachrach44",
+   "licence": "CC BY-SA 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Ketef_hinom_scrolls.JPG"
+  }
  },
  {
   "id": "ishtar-gate-babylon",
@@ -2350,7 +2481,18 @@ export const DISCOVERIES = [
     "publisher": "Journal of Mediterranean Archaeology (Equinox)",
     "url": "https://journal.equinoxpub.com/JMA/article/view/22950"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 934,
+   "alt": "Aerial view of Tel Hazor: the excavated upper city on a green mound, with a protective roof over part of the ruins and fields beyond.",
+   "focus": "50% 50%",
+   "author": "AVRAMGR",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:TEL_HATZOR_AERIAL.JPG"
+  }
  },
  {
   "id": "megiddo",
@@ -2409,7 +2551,18 @@ export const DISCOVERIES = [
     "publisher": "University of Haifa research portal",
     "url": "https://cris.haifa.ac.il/en/publications/the-megiddo-gates-outdated-views-versus-new-data/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 826,
+   "alt": "Aerial view of Tel Megiddo, a large mound with exposed excavated ruins on its summit, surrounded by fields of the Jezreel Valley.",
+   "focus": "50% 55%",
+   "author": "AVRAM GRAICER",
+   "licence": "CC BY-SA 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:%D7%AA%D7%9C_%D7%9E%D7%92%D7%99%D7%93%D7%95.JPG"
+  }
  },
  {
   "id": "gezer",
@@ -2524,7 +2677,18 @@ export const DISCOVERIES = [
     "publisher": "British Museum",
     "url": "https://www.britishmuseum.org/collection/object/W_1856-0909-14"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 1024,
+   "alt": "The restored main gate area of Tel Lachish: stone city walls and a stepped path climbing the slope of the mound.",
+   "focus": "45% 45%",
+   "author": "Wilson44691",
+   "licence": "CC BY-SA 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:LachishFrontGate.jpg"
+  }
  },
  {
   "id": "jericho-tell-es-sultan",
@@ -2639,7 +2803,18 @@ export const DISCOVERIES = [
     "publisher": "Biblical Archaeology Society",
     "url": "https://www.biblicalarchaeology.org/scholars-study/three-takes-on-the-oldest-hebrew-inscription/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 933,
+   "alt": "Excavated stone walls of Khirbet Qeiyafa on a hilltop overlooking the green Elah Valley.",
+   "focus": "50% 55%",
+   "author": "Davidbena",
+   "licence": "CC0",
+   "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "source": "https://commons.wikimedia.org/wiki/File:Excavations_at_Khirbet_Qeiyafa.jpg"
+  }
  },
  {
   "id": "arad-shrine",
@@ -2693,7 +2868,18 @@ export const DISCOVERIES = [
     "publisher": "Biblical Archaeology Society (Bible History Daily)",
     "url": "https://www.biblicalarchaeology.org/daily/marijuana-found-at-ancient-temple-in-israel/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 933,
+   "alt": "The inner room of the Judahite shrine at Tel Arad, with two small stone altars on the steps and a standing stone at the back (the originals are in the Israel Museum; those at the site are replicas).",
+   "focus": "50% 55%",
+   "author": "Oren Rozen",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Tel_Arad_280321_01_Temple_Dvir.jpg"
+  }
  },
  {
   "id": "samaria-ivories",
@@ -2859,7 +3045,18 @@ export const DISCOVERIES = [
     "publisher": "Biblical Archaeology Society Library",
     "url": "https://library.biblicalarchaeology.org/?p=108630"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1048,
+   "h": 1400,
+   "alt": "The limestone Pilate Stone in the Israel Museum, a worn rectangular block with three partial lines of Latin naming Tiberius and Pontius Pilate.",
+   "focus": "50% 35%",
+   "author": "Carole Raddato from Frankfurt, Germany",
+   "licence": "CC BY-SA 2.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Dedicatory_inscription_found_reused_in_the_staircase_of_the_theatre_of_Caesarea,_the_first_and_only_mention_of_Pontius_Pilates%27_name_ever_unearthed,_26-36_AD,_Israel_Museum,_Jerusalem_(15655925251).jpg"
+  }
  },
  {
   "id": "caiaphas-ossuary",
@@ -2920,7 +3117,18 @@ export const DISCOVERIES = [
     "publisher": "Religious Studies Department, Santa Clara University",
     "url": "https://webpages.scu.edu/ftp/cmurphy/courses/sctr027/artifacts/caiaphas-ossuary.htm"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 1050,
+   "alt": "The Caiaphas ossuary in the Israel Museum: a limestone bone box with a gabled lid, its front carved with rosettes inside circles framed by palm-branch patterns.",
+   "focus": "50% 55%",
+   "author": "deror_avi",
+   "licence": "CC BY-SA 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Ossuary_of_the_high_priest_Joseph_Caiaphas_P1180839.JPG"
+  }
  },
  {
   "id": "pool-of-siloam",
@@ -2983,7 +3191,18 @@ export const DISCOVERIES = [
     "publisher": "Orion Bibliography, Hebrew University",
     "url": "https://orion-bibliography.huji.ac.il/orion_editor/node/112612"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 1050,
+   "alt": "Excavated stone paving and steps at the edge of the Second Temple period Pool of Siloam in the City of David, under a shade canopy.",
+   "focus": "40% 60%",
+   "author": "Markbarnes",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:The_Second_Temple_Pool_of_Siloam.jpg"
+  }
  },
  {
   "id": "theodotus-inscription",
@@ -3091,7 +3310,18 @@ export const DISCOVERIES = [
     "publisher": "Loyola University Chicago (Jerusalem sources)",
     "url": "https://avande1.sites.luc.edu/jerusalem/sources/temple-warning.htm"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 942,
+   "alt": "The complete limestone Temple warning inscription in the Istanbul Archaeology Museums, a rectangular block carved with seven lines of Greek capitals.",
+   "focus": "50% 50%",
+   "author": "oncenawhile",
+   "licence": "CC BY-SA 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Jerusalem_Temple_Warning_Inscription.jpg"
+  }
  },
  {
   "id": "herodium-tomb",
@@ -3143,7 +3373,18 @@ export const DISCOVERIES = [
     "publisher": "The Bible and Interpretation",
     "url": "https://bibleinterp.arizona.edu/articles/was-herods-tomb-indeed-uncovered-herodium"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 910,
+   "alt": "The cone-shaped hill of Herodium seen from the north, with excavated structures on its slope above olive groves and houses.",
+   "focus": "50% 40%",
+   "author": "Bukvoed",
+   "licence": "CC BY 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Herodium-551.jpg"
+  }
  },
  {
   "id": "galilee-boat",
@@ -3195,7 +3436,18 @@ export const DISCOVERIES = [
     "publisher": "Archaeology magazine, Archaeological Institute of America",
     "url": "https://archive.archaeology.org/0005/newsbriefs/ship.html"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 1096,
+   "alt": "The blackened wooden hull of the ancient Sea of Galilee boat resting on a metal support frame in the Yigal Allon Centre at Ginosar.",
+   "focus": "50% 60%",
+   "author": "Travellers & Tinkers",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:JesusBoat.jpg"
+  }
  },
  {
   "id": "capernaum",

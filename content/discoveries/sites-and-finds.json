@@ -188,7 +188,18 @@
     "publisher": "Journal of Mediterranean Archaeology (Equinox)",
     "url": "https://journal.equinoxpub.com/JMA/article/view/22950"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 934,
+   "alt": "Aerial view of Tel Hazor: the excavated upper city on a green mound, with a protective roof over part of the ruins and fields beyond.",
+   "focus": "50% 50%",
+   "author": "AVRAMGR",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:TEL_HATZOR_AERIAL.JPG"
+  }
  },
  {
   "id": "megiddo",
@@ -247,7 +258,18 @@
     "publisher": "University of Haifa research portal",
     "url": "https://cris.haifa.ac.il/en/publications/the-megiddo-gates-outdated-views-versus-new-data/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 826,
+   "alt": "Aerial view of Tel Megiddo, a large mound with exposed excavated ruins on its summit, surrounded by fields of the Jezreel Valley.",
+   "focus": "50% 55%",
+   "author": "AVRAM GRAICER",
+   "licence": "CC BY-SA 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:%D7%AA%D7%9C_%D7%9E%D7%92%D7%99%D7%93%D7%95.JPG"
+  }
  },
  {
   "id": "gezer",
@@ -362,7 +384,18 @@
     "publisher": "British Museum",
     "url": "https://www.britishmuseum.org/collection/object/W_1856-0909-14"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 1024,
+   "alt": "The restored main gate area of Tel Lachish: stone city walls and a stepped path climbing the slope of the mound.",
+   "focus": "45% 45%",
+   "author": "Wilson44691",
+   "licence": "CC BY-SA 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:LachishFrontGate.jpg"
+  }
  },
  {
   "id": "jericho-tell-es-sultan",
@@ -477,7 +510,18 @@
     "publisher": "Biblical Archaeology Society",
     "url": "https://www.biblicalarchaeology.org/scholars-study/three-takes-on-the-oldest-hebrew-inscription/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 933,
+   "alt": "Excavated stone walls of Khirbet Qeiyafa on a hilltop overlooking the green Elah Valley.",
+   "focus": "50% 55%",
+   "author": "Davidbena",
+   "licence": "CC0",
+   "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "source": "https://commons.wikimedia.org/wiki/File:Excavations_at_Khirbet_Qeiyafa.jpg"
+  }
  },
  {
   "id": "arad-shrine",
@@ -531,7 +575,18 @@
     "publisher": "Biblical Archaeology Society (Bible History Daily)",
     "url": "https://www.biblicalarchaeology.org/daily/marijuana-found-at-ancient-temple-in-israel/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 933,
+   "alt": "The inner room of the Judahite shrine at Tel Arad, with two small stone altars on the steps and a standing stone at the back (the originals are in the Israel Museum; those at the site are replicas).",
+   "focus": "50% 55%",
+   "author": "Oren Rozen",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Tel_Arad_280321_01_Temple_Dvir.jpg"
+  }
  },
  {
   "id": "samaria-ivories",
@@ -697,7 +752,18 @@
     "publisher": "Biblical Archaeology Society Library",
     "url": "https://library.biblicalarchaeology.org/?p=108630"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1048,
+   "h": 1400,
+   "alt": "The limestone Pilate Stone in the Israel Museum, a worn rectangular block with three partial lines of Latin naming Tiberius and Pontius Pilate.",
+   "focus": "50% 35%",
+   "author": "Carole Raddato from Frankfurt, Germany",
+   "licence": "CC BY-SA 2.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Dedicatory_inscription_found_reused_in_the_staircase_of_the_theatre_of_Caesarea,_the_first_and_only_mention_of_Pontius_Pilates%27_name_ever_unearthed,_26-36_AD,_Israel_Museum,_Jerusalem_(15655925251).jpg"
+  }
  },
  {
   "id": "caiaphas-ossuary",
@@ -758,7 +824,18 @@
     "publisher": "Religious Studies Department, Santa Clara University",
     "url": "https://webpages.scu.edu/ftp/cmurphy/courses/sctr027/artifacts/caiaphas-ossuary.htm"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 1050,
+   "alt": "The Caiaphas ossuary in the Israel Museum: a limestone bone box with a gabled lid, its front carved with rosettes inside circles framed by palm-branch patterns.",
+   "focus": "50% 55%",
+   "author": "deror_avi",
+   "licence": "CC BY-SA 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Ossuary_of_the_high_priest_Joseph_Caiaphas_P1180839.JPG"
+  }
  },
  {
   "id": "pool-of-siloam",
@@ -821,7 +898,18 @@
     "publisher": "Orion Bibliography, Hebrew University",
     "url": "https://orion-bibliography.huji.ac.il/orion_editor/node/112612"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 1050,
+   "alt": "Excavated stone paving and steps at the edge of the Second Temple period Pool of Siloam in the City of David, under a shade canopy.",
+   "focus": "40% 60%",
+   "author": "Markbarnes",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:The_Second_Temple_Pool_of_Siloam.jpg"
+  }
  },
  {
   "id": "theodotus-inscription",
@@ -929,7 +1017,18 @@
     "publisher": "Loyola University Chicago (Jerusalem sources)",
     "url": "https://avande1.sites.luc.edu/jerusalem/sources/temple-warning.htm"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 942,
+   "alt": "The complete limestone Temple warning inscription in the Istanbul Archaeology Museums, a rectangular block carved with seven lines of Greek capitals.",
+   "focus": "50% 50%",
+   "author": "oncenawhile",
+   "licence": "CC BY-SA 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Jerusalem_Temple_Warning_Inscription.jpg"
+  }
  },
  {
   "id": "herodium-tomb",
@@ -981,7 +1080,18 @@
     "publisher": "The Bible and Interpretation",
     "url": "https://bibleinterp.arizona.edu/articles/was-herods-tomb-indeed-uncovered-herodium"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 910,
+   "alt": "The cone-shaped hill of Herodium seen from the north, with excavated structures on its slope above olive groves and houses.",
+   "focus": "50% 40%",
+   "author": "Bukvoed",
+   "licence": "CC BY 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Herodium-551.jpg"
+  }
  },
  {
   "id": "galilee-boat",
@@ -1033,7 +1143,18 @@
     "publisher": "Archaeology magazine, Archaeological Institute of America",
     "url": "https://archive.archaeology.org/0005/newsbriefs/ship.html"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 1096,
+   "alt": "The blackened wooden hull of the ancient Sea of Galilee boat resting on a metal support frame in the Yigal Allon Centre at Ginosar.",
+   "focus": "50% 60%",
+   "author": "Travellers & Tinkers",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:JesusBoat.jpg"
+  }
  },
  {
   "id": "capernaum",

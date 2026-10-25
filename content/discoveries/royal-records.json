@@ -57,7 +57,18 @@
     "publisher": "Australian Catholic University Research Bank",
     "url": "https://acuresearchbank.acu.edu.au/item/86058/merneptah-s-israel-and-the-absence-of-origins-in-biblical-scholarship"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1051,
+   "h": 1400,
+   "alt": "The tall granite Merneptah Stele in the Egyptian Museum, Cairo, with a carved scene of Amun and the king at the top above rows of hieroglyphic text.",
+   "focus": "50% 35%",
+   "author": "Olaf Tausch",
+   "licence": "CC BY 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Kairo_Museum_Merenptah-Stele_01.jpg"
+  }
  },
  {
   "id": "shoshenq-karnak-relief",
@@ -112,7 +123,18 @@
     "publisher": "Center for Online Judaic Studies",
     "url": "https://cojs.org/?p=7405"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1050,
+   "h": 1400,
+   "alt": "Part of Shoshenq I's campaign relief on the outer wall at Karnak: a large carved figure of Amun beside rows of captive figures whose name-rings list conquered towns.",
+   "focus": "50% 50%",
+   "author": "Olaf Tausch",
+   "licence": "CC BY 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Karnak_Tempel_19.jpg"
+  }
  },
  {
   "id": "mesha-stele",
@@ -171,7 +193,17 @@
     "publisher": "World History Encyclopedia",
     "url": "https://www.worldhistory.org/Moabite_Stone_%5BMesha_Stele%5D/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1050,
+   "h": 1400,
+   "alt": "The black basalt Mesha Stele in the Louvre, a round-topped slab inscribed in Moabite script, with the original fragments set into a restored surface.",
+   "focus": "50% 40%",
+   "author": "Tangopaso",
+   "licence": "Public domain",
+   "source": "https://commons.wikimedia.org/wiki/File:Mesha_stele_(Louvre,_AO_5066).jpg"
+  }
  },
  {
   "id": "tel-dan-stele",
@@ -234,7 +266,18 @@
     "publisher": "Center for Online Judaic Studies",
     "url": "https://cojs.org/?p=7804"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 933,
+   "alt": "The fragments of the Tel Dan Stele, a dark basalt slab inscribed in Aramaic, mounted together on display in the Israel Museum.",
+   "focus": "55% 45%",
+   "author": "Oren Rozen",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:JRSLM_300116_Tel_Dan_Stele_02.jpg"
+  }
  },
  {
   "id": "kurkh-monolith",
@@ -290,7 +333,18 @@
     "publisher": "Center for Online Judaic Studies",
     "url": "https://cojs.org/?p=6525"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 858,
+   "h": 1400,
+   "alt": "The Kurkh Monolith in the British Museum: a round-topped stone stele carved with a standing figure of Shalmaneser III and divine symbols, covered in cuneiform text.",
+   "focus": "50% 30%",
+   "author": "Osama Shukir Muhammed Amin FRCP(Glasg)",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Kurkh_stele_of_Shalmaneser_III._From_Diyarbak%C4%B1r,_southern_Turkey._British_Museum.jpg"
+  }
  },
  {
   "id": "black-obelisk-shalmaneser-iii",
@@ -585,7 +639,18 @@
     "publisher": "Tyndale House, Cambridge",
     "url": "https://tyndale.cam.ac.uk/explore/articles/the-lachish-reliefs/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 933,
+   "alt": "Detail of the Lachish reliefs in the British Museum: Sennacherib seated on his throne receiving officials, with a cuneiform caption above and captives approaching on the left.",
+   "focus": "55% 50%",
+   "author": "Zunkir",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Capture_of_Lachish_-_Sennacherib.jpg"
+  }
  },
  {
   "id": "siloam-inscription",
@@ -692,7 +757,18 @@
     "publisher": "Center for Online Judaic Studies",
     "url": "https://cojs.org/?p=7864"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1246,
+   "h": 1400,
+   "alt": "The clay tablet of the Babylonian Chronicle for 605–594 BC, inscribed with cuneiform and mounted on a stand in the British Museum.",
+   "focus": "50% 45%",
+   "author": "Osama Shukir Muhammed Amin FRCP(Glasg)",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:The_cuneiform_inscription_highlights_the_conquest_of_Jerusalem_and_the_surrender_of_Jehoiakim,_king_of_Judah,_in_597_BCE._From_Babylon,_Iraq.jpg"
+  }
  },
  {
   "id": "jehoiachin-ration-tablets",
@@ -746,7 +822,18 @@
     "publisher": "Center for Online Judaic Studies",
     "url": "https://cojs.org/?p=4828"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 1207,
+   "alt": "A broken clay tablet inscribed with cuneiform ration lists from Babylon that name Jehoiachin, displayed on a clear stand.",
+   "focus": "50% 45%",
+   "author": "Osama Shukir Muhammed Amin FRCP(Glasg)",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Clay_tablet._The_Akkadian_cuneiform_inscription_lists_certain_rations_and_mentions_the_name_of_Jeconiah_(Jehoiachin),_King_of_Judah_and_the_Babylonian_captivity._From_Babylon,_Iraq._C._580_BCE._Vorderasiatisches_Museum,_Berlin.jpg"
+  }
  },
  {
   "id": "nabonidus-cylinder-ur",
@@ -851,7 +938,18 @@
     "publisher": "ANU – Museum of the Jewish People",
     "url": "https://index.anumuseum.org.il/exhibit/artifact-cyrus-cylinder/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 956,
+   "alt": "The barrel-shaped clay Cyrus Cylinder, covered in lines of cuneiform and broken across the middle, on a clear stand in the British Museum.",
+   "focus": "50% 45%",
+   "author": "Mike Peel (www.mikepeel.net)",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Cyrus_Cylinder.jpg"
+  }
  },
  {
   "id": "lachish-letters",
@@ -957,7 +1055,18 @@
     "publisher": "Hebrew University of Jerusalem research portal",
     "url": "https://cris.huji.ac.il/en/publications/algorithmic-handwriting-analysis-of-judahs-military-correspondenc-2/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 933,
+   "h": 1400,
+   "alt": "A pottery sherd from Arad written in ink in Hebrew script, displayed in the Israel Museum.",
+   "focus": "50% 45%",
+   "author": "Gary Todd from Xinzheng, China",
+   "licence": "CC0",
+   "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "source": "https://commons.wikimedia.org/wiki/File:Letter,_Arad,_6th_Century_BC,_Ink_on_Pottery,_Earliest_Reference_to_Solomon%27s_Temple_(42499943804).jpg"
+  }
  },
  {
   "id": "gezer-calendar",
@@ -1007,7 +1116,18 @@
     "publisher": "University of Michigan (from J. B. Pritchard, Ancient Near Eastern Texts, Princeton University Press)",
     "url": "https://courses.lsa.umich.edu/israel-palestine/wp-content/uploads/sites/142/2013/12/028.-ANET-320-321.pdf"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1209,
+   "h": 1400,
+   "alt": "The small limestone Gezer Calendar tablet, incised with lines of early alphabetic script, on display in the Istanbul Archaeological Museums.",
+   "focus": "50% 45%",
+   "author": "Osama Shukir Muhammed Amin FRCP(Glasg)",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "source": "https://commons.wikimedia.org/wiki/File:The_Gezer_Calendar_tablet,_early_iron_age,_10th_century_BCE,_Museum_of_Archaeology,_Istanbul,_Turkey.jpg"
+  }
  },
  {
   "id": "ketef-hinnom-amulets",
@@ -1061,7 +1181,18 @@
     "publisher": "Bar-Ilan University research portal",
     "url": "https://cris.biu.ac.il/en/publications/the-challenges-of-ketef-hinnom-using-advanced-technologies-to-rec/"
    }
-  ]
+  ],
+  "image": {
+   "local": true,
+   "w": 1400,
+   "h": 979,
+   "alt": "The two tiny Ketef Hinnom silver scrolls, partly unrolled and creased, mounted in display cases at the Israel Museum.",
+   "focus": "30% 50%",
+   "author": "Bachrach44",
+   "licence": "CC BY-SA 3.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "source": "https://commons.wikimedia.org/wiki/File:Ketef_hinom_scrolls.JPG"
+  }
  },
  {
   "id": "ishtar-gate-babylon",
