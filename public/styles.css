@@ -868,3 +868,20 @@ body.kidsmode main { max-width: 1180px; }
 }
 @keyframes sheetup { from { transform: translateY(100%); } }
 @keyframes fadein { from { opacity: 0; } }
+
+/* ---------- pictures for eras, journeys and courses ---------- */
+.eraban { position: relative; margin: 26px 0 12px; border-radius: var(--r); overflow: hidden; aspect-ratio: 21 / 6; background: var(--lapis-deep); }
+.eraban img { width: 100%; height: 100%; object-fit: cover; display: block; filter: sepia(.2) contrast(1.05); }
+.eraban::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(11, 9, 7, .55), rgba(11, 9, 7, 0) 60%); pointer-events: none; }
+.eraban figcaption { position: absolute; right: 10px; bottom: 6px; z-index: 1; font-size: .68rem; color: rgba(255,255,255,.75); }
+.jchip { position: relative; overflow: hidden; }
+.jchip .jart { display: block; width: calc(100% + 28px); max-width: none; height: 84px; object-fit: cover; margin: -12px -14px 8px; filter: sepia(.15); }
+.course .cart { display: block; margin: -20px -22px 4px; height: 150px; overflow: hidden; border-radius: var(--r) var(--r) 0 0; background: var(--soft); }
+.course .cart img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (max-width: 720px) {
+  .eraban { aspect-ratio: 16 / 7; }
+  .jpick { display: grid; grid-auto-flow: column; grid-auto-columns: 62vw; grid-template-columns: none; overflow-x: auto; scroll-snap-type: x mandatory; margin-inline: -16px; padding: 0 16px 8px; scrollbar-width: none; }
+  .jpick .jchip { scroll-snap-align: start; }
+  .jchip .jart { height: 96px; }
+}
+.era b, .era a { overflow-wrap: anywhere; }

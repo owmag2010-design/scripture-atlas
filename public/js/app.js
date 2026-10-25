@@ -845,6 +845,9 @@ const ERAS = [
   ["Conquest and judges", -1450, -1100], ["The united kingdom", -1100, -975], ["The divided kingdom", -975, -586],
   ["Exile and return", -586, -300], ["The life of Jesus", -300, 30.44], ["The early church", 30.44, Infinity]
 ];
+const ERA_ART = ["creation-light", "era-patriarchs", "era-exodus", "map-holyland", "era-kingdom", "isaiah-scroll", "era-exile", "era-gospels", "map-paul"];
+const JOURNEY_ART = { abraham: "era-patriarchs", exodus: "era-exodus", paul1: "map-paul", paul2: "map-paul", paul3: "map-paul", rome: "map-paul" };
+const COURSE_ART = { foundations: "gutenberg", genesis: "creation-light", jesus: "era-gospels", hebrew: "leningrad" };
 async function renderHistory(tab = "map", sub = "") {
   setNav("history"); setTitle("History");
   view.innerHTML = `${artHead(tab === "timeline" ? "era-exodus" : tab === "people" ? "era-patriarchs" : "map-holyland")}<span class="eyebrow">History</span><h1>Where and when the story happened, and how sure we are.</h1>
@@ -879,7 +882,7 @@ async function renderJourneys(box, id) {
   const j = JOURNEYS.find(x => x.id === id) || JOURNEYS[0];
   const [base, places, lm] = await Promise.all([H.base(), H.places(), H.placeMap()]);
   const slugs = j.stops.map(s => s[0]);
-  box.innerHTML = `<div class="jpick">${JOURNEYS.map(x => `<a class="jchip ${x.id === j.id ? "on" : ""}" href="#/history/journeys/${x.id}" style="--c:${x.colour}"><b>${esc(x.title)}</b><span>${esc(x.range)}</span></a>`).join("")}</div>
+  box.innerHTML = `<div class="jpick">${JOURNEYS.map(x => `<a class="jchip ${x.id === j.id ? "on" : ""}" href="#/history/journeys/${x.id}" style="--c:${x.colour}">${pic(JOURNEY_ART[x.id], { cls: "jart", sizes: "240px" })}<b>${esc(x.title)}</b><span>${esc(x.range)}</span></a>`).join("")}</div>
     <div class="maplayout journey" style="--c:${j.colour}"><div class="card mapcard"><div id="jmap"></div></div>
       <aside class="card mapside"><h2 style="font-size:1.35rem">${esc(j.title)}</h2><p class="small">${esc(j.range)} · ${esc(j.when)}</p>
         ${j.note ? `<div class="textnote"><b>How sure is this?</b><br>${esc(j.note)}</div>` : ""}
@@ -907,7 +910,7 @@ async function renderTimeline(box) {
     <div class="legendrow"><span>${certChip(-1500)} ${dateCertainty(-1500).note}</span><span>${certChip(-700)} ${dateCertainty(-700).note}</span><span>${certChip(30)} ${dateCertainty(30).note}</span></div>
     <p class="small">Dates come from the Theographic dataset, which follows a traditional chronology close to Archbishop Ussher's (for example, the Exodus in 1490 BC). Many scholars place the Exodus around 1446 BC or in the 13th century BC, and treat earlier dates as unknowable.</p></div>
     <nav class="eranav" aria-label="Eras">${groups.map((g, i) => `<a class="btn" href="#/history/timeline#era${i}">${g.name}</a>`).join("")}</nav>
-    ${groups.map((g, i) => `<section class="era" id="era${i}"><h2>${g.name} <span class="small">${yearText(g.items[0].year)} – ${yearText(g.items.at(-1).year)}</span></h2>
+    ${groups.map((g, i) => `<section class="era" id="era${i}">${(() => { const slot = ERA_ART[ERAS.findIndex(e => e[0] === g.name)]; return IMAGES[slot] ? `<figure class="eraban">${pic(slot, { sizes: "(max-width: 760px) 100vw, 900px" })}<figcaption>${credit(slot)}</figcaption></figure>` : ""; })()}<h2>${g.name} <span class="small">${yearText(g.items[0].year)} – ${yearText(g.items.at(-1).year)}</span></h2>
       <ol class="tl">${g.items.map(e => { const f = e.first != null ? unpackRef(e.first) : null; return `<li id="e${e.id}"><span class="yr">${yearText(e.year)}</span><div><b>${esc(e.title)}</b> ${certChip(e.year)}
         <div class="tlmeta">${e.places.map(s => lm.get(s)).filter(Boolean).map(r => `<a class="chip ext" href="#/place/${r[0]}">${esc(r[1])}</a>`).join(" ")} ${e.people.map(s => pm.get(s)).filter(Boolean).filter(r => !["god_1324", "holy_spirit_7400", "jesus_905"].includes(r[0]) || e.year > -10).filter(r => r[0] !== "god_1324").slice(0, 4).map(r => `<a class="chip" href="#/person/${r[0]}">${esc(r[1])}</a>`).join(" ")}
         ${f ? `<a class="small" href="${readUrl("kjv", f.book, f.chapter, f.verse)}">${formatRef(f.book, f.chapter, f.verse)}</a>` : ""}</div></div></li>`; }).join("")}</ol></section>`).join("")}`;
@@ -1011,7 +1014,7 @@ function renderLearn() {
     <div class="minisearch"><label class="sr" for="gbq">Passage</label><input id="gbq" placeholder="e.g. Psalm 23, John 15:1-17"><button class="btn pri">Build guide</button></div></form>
   <div class="streak card"><div><span class="big">${streak}</span><span class="small">day study streak</span></div><div><span class="big">${days}</span><span class="small">day${days === 1 ? "" : "s"} studied</span></div><div><span class="big">${COURSES.reduce((n, c) => n + store.courseProgress(c.id, c.lessons.map(l => l.id)), 0)}</span><span class="small">lessons completed</span></div></div>
   <div class="coursegrid">${COURSES.map(c => { const done = store.courseProgress(c.id, c.lessons.map(l => l.id)), n = c.lessons.length; const next = c.lessons.find(l => !store.lessonResult(c.id, l.id)) || c.lessons[0];
-    return `<article class="card course"><div class="actions"><span class="chip ext">${c.level}</span>${statusChip(c)}</div><h2>${c.title}</h2><p class="small">${c.summary}</p>
+    return `<article class="card course">${IMAGES[COURSE_ART[c.id]] ? `<span class="cart">${pic(COURSE_ART[c.id], { sizes: "(max-width: 760px) 100vw, 420px" })}</span>` : ""}<div class="actions"><span class="chip ext">${c.level}</span>${statusChip(c)}</div><h2>${c.title}</h2><p class="small">${c.summary}</p>
       <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${done}" aria-label="${done} of ${n} lessons done"><i style="width:${done / n * 100}%"></i></div><span class="small">${done} of ${n} lessons</span>
       <div class="actions"><a class="btn pri" href="#/learn/${c.id}/${next.id}">${done ? (done === n ? "Review" : "Continue") : "Start"}</a><a class="btn" href="#/learn/${c.id}">All lessons</a></div></article>`; }).join("")}</div>
   <section class="card" style="margin-top:18px"><h2 style="font-size:1.4rem">Planned courses</h2><ul class="planned">${PLANNED.map(([t, d]) => `<li><b>${t}</b> <span class="small">${d}</span></li>`).join("")}</ul></section>`;
