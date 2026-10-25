@@ -194,14 +194,14 @@ async function renderHome() {
   </section>
 
   <section class="mosaic" aria-label="Explore">
-    ${tile("#/read/kjv/John.1", "sinaiticus", "The reading room", "The KJV with every word traced to its source, side by side with any of 54 Bibles", "t-big")}
-    ${tile("#/history/map", "map-holyland", "Maps, timeline and people", "1,267 places, 450 events and 3,067 people, each date and site labelled for certainty", "t-tall")}
+    ${tile("#/lens/John.1.1", "sinaiticus", "Scripture Lens", "One verse, every layer: plain meaning, context, the Hebrew or Greek, manuscripts and 11 English translations compared", "t-big")}
+    ${tile("#/history/journeys/paul2", "map-paul", "Journeys and maps", "Follow Abraham, the Exodus and Paul stop by stop, with 1,267 places and 450 dated events", "t-tall")}
     ${tile("#/languages", "leningrad", "Hebrew and Greek", "Interlinear for every verse, grammar and lexicon")}
     ${tile("#/bibles", "gutenberg", "54 Bibles, 38 languages", "Each with the story of its translation")}
+    <a class="tile t-kids" href="#/kids">${kidImg("hero", "tart")}<span class="tcap"><b>Kids</b><span>Eight Bible stories to read, hear and play</span></span></a>
+    ${tile("#/sermon", "tissot", "Sermon studio", "Record a sermon, catch every verse, make study notes")}
     ${tile("#/research", "two-old-men", "Research", "Follow a verse into its words, people, places and links")}
     ${tile("#/library", "isaiah-scroll", "The manuscripts", "From the Dead Sea Scrolls to the printed page")}
-    ${tile("#/learn", "rembrandt-paul", "Courses", "Guided study, quizzes and a family mode")}
-    ${tile("#/ai", "map-paul", "AI Studio", "Ask a question; every claim is checked against its source")}
   </section>
 
   ${ms.length ? `<section class="ribbon"><div class="ribbon-head"><h2>From scroll to screen</h2><p class="small">No original manuscript of any biblical book survives. These copies, oldest first, are how the text reached us.</p></div>
