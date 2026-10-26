@@ -1059,29 +1059,87 @@ function enterFocus() {
 }
 
 /* ---------- search ---------- */
+// Unified search: exact matches first, grouped by kind; partial matches are labelled as suggestions.
+const fold = t => String(t || "").normalize("NFD").replace(/[̀-֑ͯ-ׇ]/g, "").replace(/[ʼʽ’'·.,;]/g, "").toLowerCase().trim();
+let WORDS = null;
 async function renderSearch(q) {
+  q = (q || "").trim();
   const sk = normaliseStrong(q);
-  if (sk) { location.replace(`#/word/${sk}`); return; }
-  setNav(""); setTitle(`Search: ${q}`);
+  if (sk) { go(`#/word/${sk}`, { replace: true }); return; }
+  setNav("search"); setTitle(q ? `Search: ${q}` : "Search");
   await getIndex();
   $("#gq").value = q;
+  if (!q) {
+    view.innerHTML = `<div class="pagehead"><span class="eyebrow">Search</span><h1>Search the Scriptures</h1><p class="small">One search covers passages, original words, people, places, discoveries, manuscripts and your own notes.</p>
+      <form class="bigsearch" id="sform" role="search" style="max-width:640px"><label class="sr" for="sq">Search</label><input id="sq" type="search" placeholder="John 1:1, logos, shepherd, Abraham, Lachish" autocomplete="off"><button>Search</button></form></div>`;
+    $("#sform").addEventListener("submit", e => { e.preventDefault(); goSearch($("#sq").value); }); return;
+  }
   const t = TR[store.setting("searchT", "kjv")] ? store.setting("searchT", "kjv") : "kjv";
-  const parsed = parseQuery(q);
-  const bookHits = NAMES.map((n, i) => i).filter(i => q.trim().length > 2 && NAMES[i].toLowerCase().includes(q.trim().toLowerCase()));
+  const fq = fold(q), ql = q.toLowerCase();
+  const ref = parseReference(q, chapterCount);
   view.innerHTML = `<div class="pagehead"><span class="eyebrow">Search</span><h1>${esc(q)}</h1>
-    <div class="actions"><label class="sr" for="stsel">Search in</label><select id="stsel" class="trsel">${translationOptions(t)}</select>
-    <span class="small">Words match whole words and word beginnings; put a phrase in "quotes" for an exact match.</span></div></div>
-    ${bookHits.length ? `<div class="card" style="margin-bottom:16px"><span class="chip">Book</span><ul class="linklist">${bookHits.map(i => `<li><a href="${readUrl(t, i, 1)}"><span><span class="t">${NAMES[i]}</span><span class="d">${esc(CONTEXT[i][1])}</span></span><span class="arr">›</span></a></li>`).join("")}</ul></div>` : ""}
-    <div id="res"><p class="loading">Searching the ${esc(META[t]?.name || "Bible")}…</p></div>`;
+    <div class="sfilters" role="toolbar" aria-label="Show results for">${[["all", "All"], ["passages", "Passages"], ["words", "Original words"], ["people", "People"], ["places", "Places"], ["disc", "Discoveries"], ["ms", "Manuscripts"], ["mine", "My notes"]].map(([k, l], i) => `<button type="button" data-sf="${k}" aria-pressed="${i === 0}">${l}<span class="n" data-n="${k}"></span></button>`).join("")}</div>
+    <p class="small">Exact matches come first. <b>Suggestions</b> are partial matches only: check they are what you mean. Nothing here is ranked by guesswork about meaning.</p></div>
+    <div id="sres" class="sres"><p class="loading">Searching…</p></div>`;
+  const sec = (k, title, kindLabel, items) => items.length ? `<section class="sgroup" data-k="${k}"><h2>${title} <span class="small">${items.length}</span></h2><span class="mtype ${kindLabel === "Suggestion" ? "sugg" : ""}">${kindLabel}</span><div class="sitems">${items.join("")}</div></section>` : "";
+  const [pp, pl] = await Promise.all([H.people().catch(() => []), H.places().catch(() => [])]);
+  WORDS ??= await loadJson("data/research/words.json").catch(() => []);
+  const stems = [...new Set(glossStems(q).length ? glossStems(q) : [stem(q)])].filter(Boolean);
+  const shards = await Promise.all([...new Set(stems.map(x => x[0]))].map(l => loadJson(`data/research/en/${l}.json`).catch(() => ({}))));
+  const idx = Object.assign({}, ...shards);
+  const enRows = new Map(); for (const st of stems) for (const row of idx[st] || []) if (!enRows.has(row[0])) enRows.set(row[0], row);
+  const wExact = WORDS.filter(w => fold(w[2]) === fq || fold(w[1]) === fq).sort((a, b) => b[4] - a[4]).slice(0, 12);
+  const wEn = [...enRows.values()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const nameExact = n => fold(n) === fq, nameWord = n => fold(n).split(/\s+/).includes(fq), namePart = n => fq.length > 2 && fold(n).includes(fq);
+  const P1 = pp.filter(r => nameExact(r[1]) || nameWord(r[1])).sort((a, b) => b[5] - a[5]).slice(0, 12), P2 = pp.filter(r => !P1.includes(r) && namePart(r[1])).sort((a, b) => b[5] - a[5]).slice(0, 8);
+  const L1 = pl.filter(r => nameExact(r[1]) || nameWord(r[1])).slice(0, 12), L2 = pl.filter(r => !L1.includes(r) && namePart(r[1])).slice(0, 8);
+  const D1 = DISCOVERIES.filter(d => fold(d.name).includes(fq)), D2 = DISCOVERIES.filter(d => !D1.includes(d) && fq.length > 3 && fold(`${d.summary} ${d.description}`).includes(fq)).slice(0, 8);
+  const M1 = MANUSCRIPTS.filter(m => fold(`${m.name} ${m.about}`).includes(fq));
+  const mine = store.notes().filter(n => fold(n.text).includes(fq) || fold(labelOf(n.osis)).includes(fq));
+  const bookHits = NAMES.map((n, i) => i).filter(i => q.length > 2 && fold(NAMES[i]).includes(fq));
+  const person = r => `<a class="sitem" href="#/person/${r[0]}"><b>${esc(r[1])}</b><span class="small">${esc(r[3] || "Person")}${r[5] ? ` · ${r[5]} verses` : ""}</span></a>`;
+  const place = r => `<a class="sitem" href="#/place/${r[0]}"><b>${esc(r[1])}</b><span class="small">${esc(r[4] || "Place")} · ${PRECISION[r[5]]?.label || ""}</span></a>`;
+  const word = w => `<a class="sitem" href="#/word/${w[0]}"><b lang="${w[0][0] === "H" ? "hbo" : "grc"}">${esc(w[1])}</b><span class="small">${esc(w[2])} · “${esc(w[3])}” · ${displayStrong(w[0])} · ${Number(w[4]).toLocaleString()} uses</span></a>`;
+  const enw = r => `<a class="sitem" href="#/word/${r[0]}"><b lang="${r[0][0] === "H" ? "hbo" : "grc"}">${esc(r[2])}</b><span class="small">${esc(r[3])} · “${esc(r[4])}” · rendered “${esc(q)}” ${r[1]} times in the KJV</span></a>`;
+  const disc = d => `<a class="sitem" href="#/discoveries/${d.id}"><b>${esc(d.name)}</b><span class="small">${esc(KINDS[d.kind] || "")} · ${esc(DSTATUS[d.status]?.label || "")} · ${esc(d.objectDate?.text || "")}</span></a>`;
+  const msx = m => `<a class="sitem" href="#/library"><b>${esc(m.name)}</b><span class="small">${esc(m.date)}</span></a>`;
+  const note = n => `<a class="sitem" href="${readUrl("kjv", fromOsis(n.osis).book, fromOsis(n.osis).chapter, fromOsis(n.osis).verse)}"><b>${labelOf(n.osis)}</b><span class="small">Your note: ${esc(n.text.slice(0, 120))}</span></a>`;
+  let html = "";
+  if (ref) html += sec("passages", "Passage", "Exact match", [`<a class="sitem big" href="${readUrl(store.setting("translation", "kjv"), ref.book, ref.chapter, ref.verse)}"><b>${formatRef(ref.book, ref.chapter, ref.verse, ref.verseEnd)}</b><span class="small">Open in the Research Desk</span></a>`]);
+  if (bookHits.length) html += sec("passages", "Books", "Exact match", bookHits.map(i => `<a class="sitem" href="${readUrl(t, i, 1)}"><b>${NAMES[i]}</b><span class="small">${chapterCount(i)} chapters · ${esc(groupOf(i))}</span></a>`));
+  html += sec("words", "Original words", "Exact match", wExact.map(word));
+  html += sec("words", `Hebrew and Greek words translated “${esc(q)}”`, "Index match", wEn.map(enw));
+  html += sec("people", "People", "Exact match", P1.map(person));
+  html += sec("places", "Places", "Exact match", L1.map(place));
+  html += sec("disc", "Discoveries", "Name match", D1.map(disc));
+  html += sec("ms", "Manuscripts", "Text match", M1.map(msx));
+  html += sec("mine", "My notes", "On this device", mine.map(note));
+  html += `<section class="sgroup" data-k="passages"><h2>Verses containing “${esc(q)}” <span class="small" id="pcount"></span></h2><span class="mtype">Literal text match</span>
+    <div class="actions"><label class="sr" for="stsel">Search in</label><select id="stsel" class="trsel">${translationOptions(t)}</select><span class="small">Whole words and word beginnings; put a phrase in "quotes" for an exact phrase.</span></div><div id="res"><p class="loading">Searching the ${esc(META[t]?.name || "Bible")}…</p></div></section>`;
+  html += sec("people", "People: suggestions", "Suggestion", P2.map(person));
+  html += sec("places", "Places: suggestions", "Suggestion", L2.map(place));
+  html += sec("disc", "Discoveries that mention it", "Suggestion", D2.map(disc));
+  html += `<p class="small" style="margin-top:18px"><a href="#/research/topic/${encodeURIComponent(q)}">Research “${esc(q)}” as a topic</a>: the Hebrew and Greek words behind it, the people and places it names, and where it is concentrated.</p>`;
+  $("#sres").innerHTML = html;
+  const counts = { all: 0 }; view.querySelectorAll(".sgroup").forEach(g => { const n = g.querySelectorAll(".sitem").length; counts[g.dataset.k] = (counts[g.dataset.k] || 0) + n; counts.all += n; });
+  const setCounts = () => view.querySelectorAll("[data-n]").forEach(el => { const n = counts[el.dataset.n] || 0; el.textContent = n ? ` ${n.toLocaleString()}` : ""; });
+  setCounts();
+  view.querySelectorAll("[data-sf]").forEach(b => b.addEventListener("click", () => {
+    view.querySelectorAll("[data-sf]").forEach(x => x.setAttribute("aria-pressed", x === b));
+    view.querySelectorAll(".sgroup").forEach(g => (g.hidden = b.dataset.sf !== "all" && g.dataset.k !== b.dataset.sf));
+  }));
   $("#stsel").addEventListener("change", e => { store.setSetting("searchT", e.target.value); renderSearch(q); });
   try {
     const corpus = await loadAll(t);
-    const hits = searchCorpus(corpus, q, { limit: 500 });
+    const parsed = parseQuery(q);
+    const hits = searchCorpus(corpus, q, { limit: 300 });
+    counts.passages = (counts.passages || 0) + hits.total; counts.all += hits.total; setCounts();
+    $("#pcount").textContent = hits.total ? hits.total.toLocaleString() : "";
     $("#res").innerHTML = hits.length
-      ? `<p class="small">${hits.total.toLocaleString()} verse${hits.total === 1 ? "" : "s"}${hits.total > hits.length ? `, showing the first ${hits.length}` : ""}. Refine with more words or a "phrase in quotes".</p>
-        <div class="results">${hits.map(h => `<a class="hit" href="${readUrl(t, h.book, h.chapter, h.verse)}"><span class="meta"><span class="ref">${formatRef(h.book, h.chapter, h.verse)}</span><span class="chip scripture">Scripture · ${TR[t]}</span></span><span class="tx" dir="${dirOf(t)}" lang="${langOf(t)}">${highlightTerms(h.text, parsed)}</span></a>`).join("")}</div>`
-      : `<p class="empty">No verses in the ${TR[t]} contain ${parsed.phrases.length ? "that phrase" : "all of those words"}. Try fewer words, the other translation, or a reference such as John 3:16.</p>`;
-  } catch { $("#res").innerHTML = `<p class="empty">The text could not load for searching. Check your connection and try again.</p>`; }
+      ? `<p class="small">${hits.total.toLocaleString()} verse${hits.total === 1 ? "" : "s"} in the ${esc(META[t]?.name || "")}${hits.total > hits.length ? `, showing the first ${hits.length}` : ""}.</p>
+        <div class="results">${hits.map(h => `<a class="hit" href="${readUrl(t, h.book, h.chapter, h.verse)}"><span class="meta"><span class="ref">${formatRef(h.book, h.chapter, h.verse)}</span></span><span class="tx">${highlightTerms(h.text, parsed)}</span></a>`).join("")}</div>`
+      : `<p class="empty">No verses in the ${esc(META[t]?.name || "")} contain ${parsed.phrases.length ? "that phrase" : "all of those words"}.</p>`;
+  } catch { $("#res").innerHTML = `<p class="empty">The text could not load for searching. Check your connection and try again; the other results above still work.</p>`; }
 }
 
 /* ---------- my study ---------- */
