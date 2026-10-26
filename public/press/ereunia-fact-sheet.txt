@@ -37,6 +37,7 @@ Typefaces
 Files in this kit
 - graphics/: launch and feature graphics (square 1080x1080, story 1080x1920, wide 1200x630) and sample verse and discovery cards
 - logos/: logo, symbol and app icon in SVG and PNG, for dark and light backgrounds
+- social/: profile pictures, covers for Facebook, X, LinkedIn and YouTube, and Instagram highlight covers
 
 Website: https://ereunia.com
 Press kit: https://ereunia.com/press/ereunia-press-kit.zip
