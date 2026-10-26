@@ -336,22 +336,25 @@ $("#gsearch").addEventListener("submit", e => { e.preventDefault(); goSearch($("
 const THREADS = [["Gen.1.1", "Genesis 1:1"], ["John.1.1", "John 1:1"], ["Ps.23.1", "Psalm 23:1"], ["John.3.16", "John 3:16"]];
 async function renderHome() {
   setNav("home"); setTitle("");
+  document.body.classList.add("home");
   await getIndex();
   const day = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 864e5);
   const votd = DAILY[day % DAILY.length], vr = fromOsis(votd);
   const pos = store.position(), posRef = pos && fromOsis(pos.osis);
-  const tile = (href, slot, title, desc, cls = "") => `<a class="tile ${cls}" href="${href}">${pic(slot, { cls: "tart", sizes: "(max-width: 760px) 100vw, 40vw" }) || `<span class="tart fallback"></span>`}<span class="tcap"><b>${title}</b><span>${desc}</span></span></a>`;
-  const ms = MANUSCRIPTS.filter(m => IMAGES[m.img]);
+  const nT = allTranslations().length, nL = new Set(allTranslations().map(t => t.languageEn)).size;
+  const MS = ["Dead Sea Scrolls", "Rylands Papyrus P52", "Leningrad Codex"].map(n => MANUSCRIPTS.find(m => m.name === n)).filter(m => m && IMAGES[m.img]);
+  const FINDS = ["tel-dan-stele", "cyrus-cylinder", "pilate-stone"].map(id => DISC.get(id)).filter(d => d?.image?.local);
   view.innerHTML = `
-  <section class="hero2">
+  <section class="hero2 obs-hero">
     ${pic("creation-light", { cls: "heroart", eager: true, sizes: "100vw" })}
-    <div class="hero-in">
-      <div class="hero-copy">
-        <h1>Every word of the Bible, traced to its source.</h1>
-        <p>Read ${allTranslations().length} Bibles in ${new Set(allTranslations().map(t => t.languageEn)).size} languages. Tap an English word to reach the Hebrew or Greek behind it, then follow it through history, manuscripts and every verse it touches.</p>
-        <form class="bigsearch" id="bigsearch" role="search"><label class="sr" for="bq">Search</label>
-          <input id="bq" type="search" placeholder="A verse, a word or a topic: Romans 8:28, shepherd, covenant" autocomplete="off"><button>Search</button></form>
-        <div class="tryline"><span>Try</span>${["Psalm 23", "John 1", "covenant", "Abraham", "\"bread of life\""].map(q => `<button type="button" data-q="${esc(q)}">${esc(q)}</button>`).join("")}</div>
+    <div class="hero-in obs-in">
+      <div class="hero-copy obs-copy">
+        <span class="eyebrow">Ereunia · Search the Scriptures</span>
+        <h1>Ancient Scripture. <em>A new depth of discovery.</em></h1>
+        <p class="obs-promise">Every word of the Bible, traced to its source.</p>
+        <form class="bigsearch" id="bigsearch" role="search"><label class="sr" for="bq">Search passages, words, topics, people and places</label>
+          <input id="bq" type="search" placeholder="John 1:1, logos, covenant, Abraham, Jerusalem" autocomplete="off"><button>Search</button></form>
+        <div class="tryline"><span>Try</span>${["John 1:1", "Psalm 23", "shepherd", "Abraham", "Lachish"].map(q => `<button type="button" data-q="${esc(q)}">${esc(q)}</button>`).join("")}</div>
       </div>
       <figure class="threads" id="threads" aria-label="How English words come from the original language">
         <div class="th-tabs" role="tablist">${THREADS.map(([o, l], i) => `<button type="button" role="tab" data-th="${o}" aria-selected="${i === 0}">${l}</button>`).join("")}</div>
@@ -362,46 +365,75 @@ async function renderHome() {
     ${IMAGES["creation-light"] ? `<p class="herocredit">${credit("creation-light")}</p>` : ""}
   </section>
 
-  <section class="home-row">
+  <section class="paths" aria-label="Where to start">
+    <a class="path" href="${posRef ? readUrl(pos.translation || "kjv", posRef.book, posRef.chapter) : "#/read/kjv/John.1"}"><span class="pn">Read Scripture</span><b>${posRef ? `Continue ${formatRef(posRef.book, posRef.chapter)}` : "Open the reader"}</b><span>${nT} complete Bibles in ${nL} languages, with parallel reading.</span></a>
+    <a class="path" href="#/read/kjv/John.1.1?panel=words"><span class="pn">Research a passage</span><b>Trace a verse to its sources</b><span>Original words, translations, connections, history and manuscripts beside the text.</span></a>
+    <a class="path" href="#/atlas"><span class="pn">Explore the biblical world</span><b>Places, journeys and finds</b><span>1,267 places, Paul's journeys and ${DISCOVERIES.length} documented discoveries.</span></a>
+  </section>
+
+  <section class="desk-demo" id="deskdemo" aria-labelledby="ddh">
+    <div class="dd-copy"><span class="eyebrow">The Research Desk</span><h2 id="ddh">One passage. Every layer, side by side.</h2>
+      <p>Select a verse and the panel beside the text follows it: the original words, other translations, connected passages, people and places, history and manuscript witnesses. Every layer names its source.</p>
+      <a class="btn gold" href="#/read/kjv/John.1.1">Open John 1:1 in the Research Desk</a></div>
+    <div class="dd-frame" aria-label="A live preview using John 1:1">
+      <div class="dd-text"><span class="chip scripture">Scripture · King James Version</span><p id="ddv" class="dd-verse">In the beginning was the Word…</p><span class="dd-ref">John 1:1</span></div>
+      <div class="dd-panel"><div class="dd-tabs" role="tablist" aria-label="Research layers">${[["words", "Greek"], ["compare", "Translations"], ["xref", "Connections"], ["people", "People"]].map(([k, l], i) => `<button type="button" role="tab" data-dd="${k}" aria-selected="${i === 0}">${l}</button>`).join("")}</div><div class="dd-body" id="ddbody" role="tabpanel"><p class="small">Loading…</p></div></div>
+    </div>
+  </section>
+
+  <section class="today">
     <div class="votd2"><span class="eyebrow">Verse for today</span><blockquote id="votd">…</blockquote>
-      <div class="actions"><a class="btn pri" href="${readUrl("kjv", vr.book, vr.chapter, vr.verse)}">Read in context</a><a class="btn" href="#/research/${votd}">See its connections</a><a class="btn" href="#/compare/${votd}">In every Bible</a><a class="btn" href="#/share/v/${votd}/kjv">Share as a card</a></div></div>
-    <div class="resume2">${posRef
-      ? `<span class="eyebrow">Continue reading</span><h2>${formatRef(posRef.book, posRef.chapter)}</h2><p class="small">${TR[pos.translation] || "KJV"}, last opened ${new Date(pos.at).toLocaleDateString()}</p><a class="btn gold" href="${readUrl(pos.translation || "kjv", posRef.book, posRef.chapter, pos.verse ? fromOsis(pos.verse)?.verse : null)}">Resume reading</a>`
-      : `<span class="eyebrow">Start reading</span><h2>Genesis 1</h2><p class="small">Or choose any book in the reader.</p><a class="btn gold" href="#/read/kjv/Gen.1">Open the reader</a>`}
-      ${store.streak() ? `<p class="small streak">Study streak: ${store.streak()} day${store.streak() === 1 ? "" : "s"}</p>` : ""}</div>
+      <div class="actions"><a class="btn pri" href="${readUrl("kjv", vr.book, vr.chapter, vr.verse)}">Read in context</a><a class="btn" href="#/compare/${votd}">In every Bible</a><a class="btn" href="#/share/v/${votd}/kjv">Share as a card</a></div></div>
   </section>
 
-  <section class="mosaic" aria-label="Explore">
-    ${tile("#/lens/John.1.1", "sinaiticus", "Scripture Lens", "One verse, every layer: plain meaning, context, the Hebrew or Greek, manuscripts and 11 English translations compared", "t-big")}
-    ${tile("#/history/journeys/paul2", "map-paul", "Journeys and maps", "Follow Abraham, the Exodus and Paul stop by stop, with 1,267 places and 450 dated events", "t-tall")}
-    ${tile("#/languages", "leningrad", "Hebrew and Greek", "Interlinear for every verse, grammar and lexicon")}
-    ${tile("#/bibles", "gutenberg", "54 Bibles, 38 languages", "Each with the story of its translation")}
-    <a class="tile t-kids" href="#/kids">${kidImg("hero", "tart")}<span class="tcap"><b>Kids</b><span>Eight Bible stories to read, hear and play</span></span></a>
-    ${tile("#/sermon", "era-gospels", "Sermon studio", "Record a sermon, catch every verse, make study notes")}
-    ${tile("#/research", "vaticanus", "Research", "Follow a verse into its words, people, places and links")}
-    ${tile("#/library", "isaiah-scroll", "The manuscripts", "From the Dead Sea Scrolls to the printed page")}
-    ${DISCOVERIES.length ? tile("#/discoveries", "aleppo", "Discoveries", `${DISCOVERIES.length} finds from archaeology, inscriptions and science, each linked to its passages and sources`, "t-wide") : ""}
-    ${tile("#/atlas", "map-holyland", "Interactive atlas", "Places, journeys and periods on one map, with the finds made at each site")}
-    ${tile("#/learn", "era-exodus", "Courses", "Lessons with readings, questions and a short quiz")}
+  <section class="archive" aria-labelledby="arh">
+    <div class="ribbon-head"><h2 id="arh">From the living archive</h2><p class="small">Real manuscripts and documented finds, each with what it shows, what it doesn't, and who holds it today.</p></div>
+    <div class="arc-grid">
+      ${MS.map(m => `<a class="arc" href="#/library"><span class="arc-img">${pic(m.img, { sizes: "(max-width: 720px) 50vw, 280px" })}</span><span class="arc-k">Manuscript</span><b>${esc(m.name)}</b><span class="arc-d">${esc(m.date.replace(/^about /, "c. "))}</span><span class="arc-c">${credit(m.img)}</span></a>`).join("")}
+      ${FINDS.map(d => `<a class="arc" href="#/discoveries/${d.id}"><span class="arc-img">${discImg(d, { sizes: "(max-width: 720px) 50vw, 280px" })}</span><span class="arc-k">Discovery · ${esc(DSTATUS[d.status]?.label || "")}</span><b>${esc(d.name)}</b><span class="arc-d">${esc(d.objectDate?.text || "")}</span><span class="arc-c">Photo: ${esc(d.image.author)}, ${esc(d.image.licence)}</span></a>`).join("")}
+    </div>
+    <div class="actions"><a class="btn" href="#/library">All manuscripts</a><a class="btn" href="#/discoveries">All ${DISCOVERIES.length} discoveries</a></div>
   </section>
 
-  ${Object.keys(BOOK_ART).length ? `<section class="shelf"><div class="ribbon-head"><h2>The library of 66 books</h2><a class="seeall" href="#/books">See all 66 ›</a></div>
-    ${carousel("Books of the Bible", BOOKS.map((b, i) => ({ i, b })).filter(({ b }) => BOOK_ART[b.osis] && !BOOK_ART[b.osis].related).map(({ b, i }) => ({ href: `#/read/kjv/${b.osis}.1`, img: bookArt(i, { sizes: "260px" }), title: esc(NAMES[i]), sub: esc(groupOf(i)) })))}</section>` : ""}
+  <section class="standards" aria-labelledby="sth">
+    <h2 id="sth" class="sr">How Ereunia handles sources</h2>
+    <div><span class="eyebrow">Sources</span><h3>Every layer names where it comes from</h3><p>Bible texts are public domain or openly licensed. Hebrew and Greek come from STEPBible (Tyndale House), cross references from OpenBible.info, people and places from Theographic. Each panel shows its source.</p><a href="#/credits">Credits and licences ›</a></div>
+    <div><span class="eyebrow">Editorial standards</span><h3>Scripture first, interpretation labelled</h3><p>The text comes first. Background notes give traditional and academic views side by side. Each discovery says what it establishes, what it doesn't, and where experts disagree.</p><a href="#/discoveries">How evidence is graded ›</a></div>
+    <div><span class="eyebrow">AI, with limits</span><h3>Answers only from cited sources</h3><p>The research assistant answers from the passages and notes it shows you. Statements without a supporting source are removed, and every answer is labelled as AI. It can still be wrong: check it against the text.</p><a href="#/ai">Try the assistant ›</a></div>
+  </section>
 
-  ${Object.keys(PEOPLE_ART).length ? `<section class="shelf"><div class="ribbon-head"><h2>People of the Bible</h2><a class="seeall" href="#/history/people">All 3,000+ people ›</a></div>
-    ${carousel("People of the Bible", Object.keys(PEOPLE_ART).map(s => ({ href: `#/person/${s}`, img: personArt(s, { sizes: "200px" }), title: esc(PEOPLE_ART[s].name || s.replace(/_\d+$/, "").replace(/^./, c => c.toUpperCase())), sub: esc(PEOPLE_ART[s].title) })), "portrait")}</section>` : ""}
-
-  ${ms.length ? `<section class="ribbon"><div class="ribbon-head"><h2>From scroll to screen</h2><p class="small">No original manuscript of any biblical book survives. These copies, oldest first, are how the text reached us.</p></div>
-    <ol class="ribbon-track">${ms.map(m => `<li><a href="#/library"><span class="rimg">${pic(m.img, { sizes: "220px" })}</span><span class="rdate">${esc(m.date.replace(/^about /, "c. "))}</span><b>${esc(m.name)}</b></a></li>`).join("")}</ol></section>` : ""}`;
+  <nav class="more-row" aria-label="More from Ereunia"><a href="#/books">Books of the Bible</a><a href="#/history/people">People</a><a href="#/learn">Courses</a><a href="#/sermon">Sermon studio</a><a href="#/kids">Kids</a><a href="#/share">Share cards</a></nav>`;
 
   $("#bigsearch").addEventListener("submit", e => { e.preventDefault(); goSearch($("#bq").value); });
   view.querySelectorAll(".tryline button").forEach(b => b.addEventListener("click", () => goSearch(b.dataset.q)));
   view.querySelectorAll("[data-th]").forEach(b => b.addEventListener("click", () => { view.querySelectorAll("[data-th]").forEach(x => x.setAttribute("aria-selected", x === b)); drawThreads(b.dataset.th); }));
   drawThreads(THREADS[0][0]);
+  deskDemo();
+  addEventListener("routechange", () => document.body.classList.remove("home"), { once: true });
   try {
     const t = await verseText("kjv", votd);
     $("#votd").innerHTML = `${esc(t)}<cite>${labelOf(votd)}, King James Version</cite>`;
   } catch { $("#votd").textContent = labelOf(votd); }
+}
+
+// The homepage preview of the Research Desk, using real data for John 1:1.
+async function deskDemo() {
+  const B = 42, C = 1, V = 1, osis = "John.1.1", body = $("#ddbody"); if (!body) return;
+  const [kjv, web, orig, xr, vx, pm, lm] = await Promise.all([verseText("kjv", osis), verseText("web", osis), loadOrig(B, C), loadXref(B), H.vx(B), H.peopleMap(), H.placeMap()].map(p => p.catch(() => null)));
+  if ($("#ddv") && kjv) $("#ddv").textContent = kjv;
+  const words = orig?.verses?.[V - 1] || [];
+  const xrefs = (xr?.[B * 1e6 + C * 1e3 + V] || []).slice(0, 4);
+  const xt = await Promise.all(xrefs.map(async ([to]) => { const r = unpackRef(to); return [r, await verseText("kjv", toOsis(r.book, r.chapter, r.verse)).catch(() => "")]; }));
+  const tag = vx?.[B * 1e6 + C * 1e3 + V] || [[], [], []];
+  const panes = {
+    words: () => `<div class="dd-words" lang="grc">${words.map(w => `<a href="#/word/${w[3]}" class="ddw"><span class="ow">${esc(w[0])}</span><span class="gl">${esc(w[2])}</span></a>`).join("")}</div><p class="small">Greek New Testament, word by word, from STEPBible (CC BY 4.0). Tap a word for its lexicon entry and every other use.</p>`,
+    compare: () => `<dl class="dd-cmp"><dt>King James Version</dt><dd>${esc(kjv || "")}</dd><dt>World English Bible</dt><dd>${esc(web || "")}</dd></dl><p class="small">Compare any verse in all ${allTranslations().length} Bibles.</p>`,
+    xref: () => `<ul class="dd-x">${xt.map(([r, t]) => `<li><a href="${readUrl("kjv", r.book, r.chapter, r.verse)}">${formatRef(r.book, r.chapter, r.verse)}</a> <span>${esc(t.slice(0, 90))}${t.length > 90 ? "…" : ""}</span></li>`).join("")}</ul><p class="small">Ranked by reader votes, OpenBible.info (CC BY). A link means readers saw a connection, not a claim about the author's intent.</p>`,
+    people: () => `<div class="plist">${tag[0].map(s => pm?.get(s)).filter(Boolean).map(r => `<a href="#/person/${r[0]}"><b>${esc(r[1])}</b><span class="small">${esc(r[3] || "")}</span></a>`).join("") || `<p class="small">No people tagged.</p>`}</div><p class="small">Tagging: Theographic Bible Metadata (CC BY-SA 4.0).</p>`
+  };
+  const show = k => { body.innerHTML = panes[k](); view.querySelectorAll("[data-dd]").forEach(b => b.setAttribute("aria-selected", b.dataset.dd === k)); };
+  view.querySelectorAll("[data-dd]").forEach(b => b.addEventListener("click", () => show(b.dataset.dd)));
+  show("words");
 }
 
 // The hero diagram: English words (KJV, Strong's-tagged) joined by gold threads to the Hebrew or Greek words they translate.
