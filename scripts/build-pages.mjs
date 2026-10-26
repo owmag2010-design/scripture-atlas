@@ -19,6 +19,7 @@ const urls = [];
 let count = 0;
 
 function page(path, { title, description, body, image }) {
+  path = path.toLowerCase();   // Netlify serves files at lower-cased paths
   const url = SITE + path, full = title ? `${title} · Ereunia` : "Ereunia · Search the Scriptures", desc = description.slice(0, 300);
   let html = tpl
     .replace(/<title>[^<]*<\/title>/, `<title>${esc(full)}</title>`)

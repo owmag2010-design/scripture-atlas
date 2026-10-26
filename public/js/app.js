@@ -2467,7 +2467,10 @@ async function route() {
   await Promise.all([imagesReady, artReady]);
   closeMore();
   document.dispatchEvent(new Event("routechange")); dispatchEvent(new Event("routechange"));
-  const h = currentRoute();
+  let h = currentRoute();
+  // Netlify serves pre-rendered pages at lower-cased paths; restore the canonical case of translation ids.
+  if (/^(read|translation|share)\//i.test(h)) await getIndex().catch(() => {});
+  h = h.replace(/^(read|translation|share\/v\/[^/]+)\/([^/]+)/i, (m0, a, id) => { const k = Object.keys(TR).find(x => x.toLowerCase() === id.toLowerCase()); return `${a}/${k || id}`; });
   const [head, ...rest] = h.split("/");
   document.body.classList.remove("focus", "kidsmode"); window.speechSynthesis?.cancel(); document.querySelector(".exitfocus")?.remove();
   try {
