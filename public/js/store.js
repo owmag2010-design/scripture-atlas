@@ -1,9 +1,9 @@
-// Personal study data kept on this device (Phase 1). One versioned JSON record,
-// so it can be migrated to user accounts in Phase 3 without changing its shape.
+// Personal study data kept in this browser on this device. One versioned JSON record, so it can be
+// backed up, restored, and later synchronised to an account without changing its shape.
 // Keys are OSIS references, e.g. "John.3.16".
 
 const KEY = "scripture-atlas:v1";
-const blank = () => ({ version: 1, notes: {}, bookmarks: {}, highlights: {}, history: [], position: null, settings: {}, progress: {}, days: [], ai: [], guides: {} });
+const blank = () => ({ version: 1, notes: {}, bookmarks: {}, highlights: {}, history: [], position: null, settings: {}, progress: {}, days: [], ai: [], guides: {}, trail: { started: null, steps: [] }, trails: [] });
 
 export const today = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
@@ -95,6 +95,44 @@ export function createStore(storage) {
     history: () => data.history.slice(),
     position: () => data.position,
     setPositionVerse(osis) { if (data.position) { data.position.verse = osis; save(); } },
+
+    /** Research trail: the path taken through passages, words and sources in this session of study. */
+    trailAdd(step) {
+      if (!step?.href || !step?.label) return;
+      const steps = data.trail.steps, last = steps[steps.length - 1];
+      if (last && last.href === step.href) return;
+      if (!data.trail.started) data.trail.started = now();
+      steps.push({ kind: step.kind || "page", label: String(step.label).slice(0, 140), href: step.href, detail: step.detail ? String(step.detail).slice(0, 400) : "", at: now() });
+      if (steps.length > 80) steps.splice(0, steps.length - 80);
+      save();
+    },
+    trailSteps: () => data.trail.steps.slice(),
+    trailClear() { data.trail = { started: null, steps: [] }; save(); },
+    saveTrail(title) {
+      if (!data.trail.steps.length) return null;
+      const t = { id: "t" + Date.now().toString(36), title: (title || "Research trail").slice(0, 120), steps: data.trail.steps.slice(), started: data.trail.started, saved: now() };
+      data.trails = [t, ...data.trails].slice(0, 50); save(); return t;
+    },
+    trails: () => data.trails.slice(),
+    trail: id => data.trails.find(t => t.id === id) || null,
+    removeTrail(id) { data.trails = data.trails.filter(t => t.id !== id); save(); },
+
+    /** Full backup of everything kept on this device, and restore from such a backup. */
+    backup: () => ({ app: "ereunia", kind: "backup", exported: now(), data: structuredClone(data) }),
+    restore(obj, { merge = true } = {}) {
+      const src = obj?.app === "ereunia" && obj?.data ? obj.data : null;
+      if (!src || typeof src !== "object" || src.version !== 1) throw new Error("This file is not an Ereunia backup.");
+      const clean = v => JSON.parse(JSON.stringify(v ?? null));            // drops functions and prototypes
+      const plain = o => (o && typeof o === "object" && !Array.isArray(o) ? Object.fromEntries(Object.entries(o).filter(([k]) => !["__proto__", "constructor", "prototype"].includes(k))) : {});
+      const next = merge ? data : blank();
+      for (const k of ["notes", "bookmarks", "highlights", "settings", "progress", "guides"]) next[k] = { ...(merge ? next[k] : {}), ...plain(clean(src[k])) };
+      for (const k of ["history", "days", "ai", "trails"]) if (Array.isArray(src[k])) next[k] = merge ? [...clean(src[k]), ...next[k]].filter((x, i, a) => a.findIndex(y => JSON.stringify(y) === JSON.stringify(x)) === i) : clean(src[k]);
+      if (!merge && src.position) next.position = clean(src.position);
+      if (src.trail?.steps && Array.isArray(src.trail.steps) && !next.trail.steps.length) next.trail = clean(src.trail);
+      data = { ...blank(), ...next }; save();
+      return { notes: Object.keys(data.notes).length, bookmarks: Object.keys(data.bookmarks).length, highlights: Object.keys(data.highlights).length, trails: data.trails.length };
+    },
+    savedOk: () => save(),
 
     clearAll() { data = blank(); save(); }
   };

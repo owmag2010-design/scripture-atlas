@@ -740,19 +740,113 @@ async function renderChapterText() {
   }
 }
 
+/* ---------- Research Desk: shared passage context, depth modes, manuscripts and inline research assistant ---------- */
+const DESK_TABS = [["verse", "Passage"], ["words", null], ["xref", "Connections"], ["people", "People & places"], ["bg", "History"], ["ms", "Manuscripts"], ["ask", "Ask"]];
+const DEPTHS = [["discover", "Discover", "Plain meaning and the essentials"], ["study", "Study", "Words, connections and background"], ["scholar", "Scholar", "Grammar, lexicons and textual evidence"], ["teach", "Teach", "Questions and outlines for a group"]];
+const depth = () => { const d = store.setting("depth", "study"); return DEPTHS.some(x => x[0] === d) ? d : "study"; };
+const deskUrl = () => `${readUrl(R.t, R.book, R.chapter, R.verse)}${R.tab && R.tab !== "verse" ? `?panel=${R.tab}${R.word != null ? `&w=${R.word}` : ""}${R.origin != null ? `&o=${R.origin}` : ""}` : ""}`;
+function rememberDesk() { try { sessionStorage.setItem("ereunia:desk", JSON.stringify({ href: deskUrl().replace(/^#/, ""), label: formatRef(R.book, R.chapter, R.verse) })); } catch {} }
+
+// Which surviving witnesses contain a passage. Book indexes: 0 Genesis … 38 Malachi, 39 Matthew … 65 Revelation.
+const MS_COVER = {
+  "Dead Sea Scrolls": (b) => b < 39 ? (b === 16 ? ["no", "Esther is the one book of the Hebrew Bible not found at Qumran."] : ["part", "Fragments of this book survive; most books are incomplete."]) : null,
+  "Septuagint": (b) => b < 39 ? ["yes", "Greek translation of this book, known from later copies such as Vaticanus and Sinaiticus."] : null,
+  "Rylands Papyrus P52": (b, c) => b === 42 ? (c === 18 ? ["yes", "Contains John 18:31–33 and 37–38 only."] : ["no", "Preserves only a few verses of John 18."]) : null,
+  "Papyrus P46": (b) => (b >= 44 && b <= 51) || b === 57 ? ["part", "Contains most of Paul's letters and Hebrews; some leaves are lost."] : null,
+  "Codex Vaticanus": (b, c, v) => (b === 0 && (c < 46 || (c === 46 && (v || 1) < 28))) || [53, 54, 55, 56, 65].includes(b) || (b === 57 && (c > 9 || (c === 9 && (v || 1) > 14))) ? ["no", "Lost or absent here: Vaticanus lacks Genesis 1:1–46:28, Hebrews after 9:14, 1–2 Timothy, Titus, Philemon and Revelation."] : ["yes", "Contains this passage (Greek)."],
+  "Codex Sinaiticus": (b) => b >= 39 ? ["yes", "The complete New Testament survives in Sinaiticus."] : ["part", "Only parts of the Old Testament survive in Sinaiticus."],
+  "Latin Vulgate": () => ["yes", "Jerome's Latin translation of the whole Bible."],
+  "Aleppo Codex": (b, c) => b < 39 ? (b < 4 || (b === 4 && c < 28) ? ["no", "Lost: most of the Torah, up to Deuteronomy 28:16, has been missing since 1947."] : ["part", "Survives in part; about 40 percent of the codex was lost after 1947."]) : null,
+  "Leningrad Codex": (b) => b < 39 ? ["yes", "The complete Hebrew Bible; the Hebrew text shown in Ereunia."] : null,
+  "Textus Receptus": (b) => b >= 39 ? ["yes", "The printed Greek text behind the KJV New Testament."] : null,
+  "Critical editions (Nestle–Aland)": (b) => b >= 39 ? ["yes", "The Greek text most modern translations follow."] : null
+};
+async function msPane() {
+  const scope = R.verse ? formatRef(R.book, R.chapter, R.verse) : formatRef(R.book, R.chapter);
+  const rows = MANUSCRIPTS.map(m => [m, MS_COVER[m.name]?.(R.book, R.chapter, R.verse)]).filter(([, c]) => c);
+  const label = { yes: "Contains this", part: "Partly preserved", no: "Not here" };
+  const osis = R.verse ? toOsis(R.book, R.chapter, R.verse) : null;
+  const note = osis ? TEXT_NOTES[osis] : null;
+  const kjvNotes = R.verse ? ((await loadKjvs(R.book, R.chapter).catch(() => null))?.notes?.[R.verse] || []) : [];
+  let variants = [];
+  if (R.verse) { const o = await loadOrig(R.book, R.chapter).catch(() => null); variants = (o?.verses?.[R.verse - 1] || []).filter(w => w[6]).map(w => [w[0], editionNote(w[6])]).filter(x => x[1]); }
+  return `<div class="pane"><div><span class="chip">Manuscript witnesses</span><div class="vref" style="margin-top:6px">${scope}</div></div>
+    ${note ? `<div class="textnote"><b>Textual note</b><br>${note === "absent" ? "Present in the Textus Receptus behind the KJV; absent from the oldest Greek manuscripts and from the text behind most modern translations." : "Manuscripts place this doxology in different positions."}</div>` : ""}
+    ${variants.length ? `<div class="textnote d-scholar-open"><b>Edition differences in this verse</b><ul>${variants.map(([w, n]) => `<li><span lang="${R.book < 39 ? "hbo" : "grc"}">${esc(w)}</span>: ${n}</li>`).join("")}</ul></div>` : ""}
+    ${kjvNotes.length ? `<div class="textnote margnote"><b>KJV translators' margin (1611)</b><br>${kjvNotes.map(esc).join("<br>")}</div>` : ""}
+    <ul class="mslist">${rows.map(([m, [k, txt]]) => `<li class="ms-${k}"><span class="mschip">${label[k]}</span><div><b>${esc(m.name)}</b> <span class="small">${esc(m.date)}</span><p class="small">${esc(txt)}</p></div></li>`).join("")}</ul>
+    <p class="small">Coverage is summarised at book level from published descriptions of each manuscript; "partly preserved" does not mean this verse survives. <a href="#/library">About each manuscript</a></p></div>`;
+}
+function askPane() {
+  const ref = R.verse ? formatRef(R.book, R.chapter, R.verse) : formatRef(R.book, R.chapter);
+  const lvl = { discover: "beginner", study: "intermediate", scholar: "academic", teach: "intermediate" }[depth()];
+  return `<div class="pane"><div><span class="chip draftchip">AI research assistant</span><div class="vref" style="margin-top:6px">${ref}</div></div>
+    <form id="deskask" class="deskask"><label for="dq" class="small">Ask about ${ref}</label><textarea id="dq" rows="3">What does ${ref} mean in its context?</textarea>
+      <div class="actions"><button class="btn pri" type="submit">Ask</button><span class="small">Answers only from cited sources, each labelled as AI.</span></div></form>
+    <div id="deskout"></div></div>`;
+}
+function wireAskPane() {
+  const f = $("#deskask"); if (!f) return;
+  const ref = R.verse ? formatRef(R.book, R.chapter, R.verse) : formatRef(R.book, R.chapter);
+  const lvl = { discover: "beginner", study: "intermediate", scholar: "academic", teach: "intermediate" }[depth()];
+  f.addEventListener("submit", async e => {
+    e.preventDefault(); const q = $("#dq").value.trim(); if (q.length < 5) return;
+    const out = $("#deskout"); out.innerHTML = `<p class="loading">Searching the sources…</p>`;
+    try {
+      const r = await fetch("api/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q, ref, level: lvl }) });
+      const res = await r.json().catch(() => ({ error: "The assistant sent an unreadable reply." }));
+      if (!r.ok || res.error) { out.innerHTML = `<p class="empty">${esc(res.error || (r.status === 429 ? "Too many questions just now. Wait a moment and try again." : "The assistant is unavailable. Reading and every other panel still work."))}</p>`; return; }
+      out.innerHTML = renderAnswer(res); wireAnswer(out); store.saveAnswer({ question: q, ref, result: res });
+      store.trailAdd({ kind: "ai", label: `Asked: ${q}`, href: deskUrl().replace(/^#/, "") });
+    } catch { out.innerHTML = `<p class="empty">Could not reach the assistant. Reading and every other panel still work offline.</p>`; }
+  });
+}
+async function historyPane() {
+  const [vx, em] = await Promise.all([H.vx(R.book), H.eventMap()]).catch(() => [{}, new Map()]);
+  const evs = new Set();
+  for (const [k, r] of Object.entries(vx || {})) if (Math.floor(k / 1e3) % 1e3 === R.chapter) r[2].forEach(x => evs.add(x));
+  const E = [...evs].map(i => em.get(i)).filter(Boolean).sort((a, b) => a.year - b.year).slice(0, 8);
+  return backgroundPane().replace(/<\/div>\s*$/, "") + (E.length ? `<div><h3>Events in ${formatRef(R.book, R.chapter)}</h3><ul class="evlist">${E.map(e => `<li><span class="yr">${yearText(e.year)}</span> ${certChip(e.year)}<br><a href="#/history/timeline#e${e.id}">${esc(e.title)}</a></li>`).join("")}</ul></div>` : "") + `</div>`;
+}
+function railHtml() {
+  const osis = R.verse ? toOsis(R.book, R.chapter, R.verse) : toOsis(R.book, R.chapter, 1);
+  const steps = store.trailSteps().slice(-6).reverse();
+  return `<nav class="rail" aria-label="Research tools">
+    <button type="button" class="railtoggle" id="railtoggle" aria-expanded="true" aria-controls="railbody"><span class="sr">Hide research tools</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <div id="railbody" class="railbody">
+      <span class="eyebrow">Passage</span><b class="railref">${formatRef(R.book, R.chapter, R.verse)}</b>
+      <ul class="raillinks">
+        <li><a href="#/lens/${osis}">Scripture Lens</a></li>
+        <li><a href="#/compare/${osis}">Compare all ${allTranslations().length} Bibles</a></li>
+        <li><a href="#/research/${osis}">Connections graph</a></li>
+        <li><a href="#/guide/${BOOKS[R.book].osis}.${R.chapter}">Study guide</a></li>
+        <li><a href="#/atlas/book/${BOOKS[R.book].osis}">${NAMES[R.book]} on the atlas</a></li>
+        <li><a href="#/history/timeline">Timeline</a></li>
+      </ul>
+      <span class="eyebrow">Research trail</span>
+      ${steps.length ? `<ol class="railtrail">${steps.map(t => `<li><a href="${esc(t.href)}"><span class="tk tk-${esc(t.kind)}">${esc(TRAIL_KIND[t.kind] || "Page")}</span>${esc(t.label)}</a></li>`).join("")}</ol>` : `<p class="small">The passages, words and sources you open are listed here, so you can retrace your steps.</p>`}
+      <a class="btn" href="#/study/trails">Save or export trail</a>
+    </div></nav>`;
+}
+const TRAIL_KIND = { verse: "Verse", passage: "Passage", word: "Word", source: "Source", note: "Note", ai: "AI", page: "Page", place: "Place", person: "Person", discovery: "Find" };
+
 async function renderMargin() {
   const m = $("#margin");
   m.querySelectorAll(".tabs [data-tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === R.tab));
   const pane = $("#pane");
   pane.innerHTML = '<p class="small" style="padding:16px 18px">Loading…</p>';
   try {
-    pane.innerHTML = R.tab === "bg" ? backgroundPane() : R.tab === "words" ? await wordsPane() : R.tab === "xref" ? await xrefPane() : R.tab === "people" ? await peoplePane() : await versePane();
+    pane.innerHTML = R.tab === "bg" ? await historyPane() : R.tab === "words" ? await wordsPane() : R.tab === "xref" ? await xrefPane() : R.tab === "people" ? await peoplePane() : R.tab === "ms" ? await msPane() : R.tab === "ask" ? askPane() : await versePane();
     // Discoveries linked to the selected verse (Verse tab) or to this chapter (Book tab).
     const dl = R.tab === "verse" && R.verse ? discForVerse(DISCOVERIES, R.book, R.chapter, R.verse, bIdx) : R.tab === "bg" ? discForChapter(DISCOVERIES, R.book, R.chapter, bIdx) : [];
     if (dl.length) pane.querySelector(".pane")?.insertAdjacentHTML("beforeend", discMini(dl, R.tab === "bg" ? `Discoveries linked to ${formatRef(R.book, R.chapter)}` : "Archaeology and discoveries"));
   } catch { pane.innerHTML = `<div class="pane"><p class="small">This could not load. Check your connection and try again.</p></div>`; }
   pane.querySelectorAll("[data-gotab]").forEach(a => a.addEventListener("click", e => { e.preventDefault(); R.tab = a.dataset.gotab; renderMargin(); }));
   if (R.tab === "verse" && R.verse) wireVersePane();
+  if (R.tab === "ask") wireAskPane();
+  m.dataset.depth = depth();
+  if (store.setting("depth", "study") === "scholar") pane.querySelectorAll("details").forEach(d => (d.open = true));
+  if (location.pathname.startsWith("/read/")) { setPath(deskUrl()); rememberDesk(); }
 }
 
 function wireVersePane() {
