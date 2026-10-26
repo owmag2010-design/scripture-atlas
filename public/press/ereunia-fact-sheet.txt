@@ -1,0 +1,42 @@
+Ereunia: fact sheet
+====================
+
+Ereunia (eh-ROO-nee-ah) takes its name from the Greek verb ereunaō, "to search diligently", used in John 5:39: "Search the scriptures." The site brings 54 complete, openly licensed Bibles in 38 languages together with Hebrew and Greek word study, an interactive atlas of 1,267 places, 66 documented archaeological and manuscript finds, courses, a sermon studio, Bible stories for children and an AI research assistant that answers only from cited sources. It is free, needs no account, and keeps your notes on your own device. Its three rules: Scripture first. Sources visible. Interpretation distinguished from fact.
+
+Key facts
+- Name: Ereunia, from the Greek ereunaō, "to search diligently" (John 5:39). Said eh-ROO-nee-ah.
+- Tagline: Search the Scriptures
+- Promise: Every word of the Bible, traced to its source.
+- Website: ereunia.com (ereunia.org forwards to it)
+- Bibles: 54 complete Bibles in 38 languages, each public domain or openly licensed
+- Original languages: Hebrew and Greek interlinear, lexicon and grammar for every verse (STEPBible data)
+- Atlas: 1,267 places, 11 journeys, 10 historical periods, 59 archaeological sites
+- Discoveries: 66 documented finds, each labelled corroborates, consistent, debated or method
+- People: 3,000+ people of the Bible with family trees
+- AI: Answers only from cited sources; uncited statements are removed and AI content is labelled
+- Kids: 8 illustrated Bible stories to read and hear
+- Cost and privacy: Free. No account. Notes stay on the user's device.
+- Founder: Owen Magocha
+
+Short description
+Ereunia is a free Bible research website that traces every word of Scripture to its source.
+
+Brand colours
+- Ink #15120E: Main background, text on light
+- Parchment #F5EFE6: Light background, text on dark
+- Amber #F2C14E: Accent, the search mark, highlights
+- Gilt #8A6408: Accent on light backgrounds
+- Rubric #B5321C: Verse references in text
+
+Typefaces
+- Schibsted Grotesk: Headlines and interface (800 / 700 / 500)
+- EB Garamond: Scripture and quotations (400 / 500 / italic)
+- Noto Serif Hebrew: Hebrew text (400 / 500)
+- Fredoka: Kids section only (500 / 600 / 700)
+
+Files in this kit
+- graphics/: launch and feature graphics (square 1080x1080, story 1080x1920, wide 1200x630) and sample verse and discovery cards
+- logos/: logo, symbol and app icon in SVG and PNG, for dark and light backgrounds
+
+Website: https://ereunia.com
+Press kit: https://ereunia.com/press/ereunia-press-kit.zip
