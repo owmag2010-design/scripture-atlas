@@ -1414,3 +1414,11 @@ header.site .bar, nav.main, main, footer.site, body.kidsmode main { max-width: 1
 @media (max-width: 520px) { .skinds { grid-template-columns: minmax(0, 1fr); } }
 .skinds { border-top: 0; margin-top: -6px; }
 .trailgrid { align-items: stretch; } .trailgrid > .card { display: flex; flex-direction: column; } .trailgrid > .card > ol.trail { flex: 1; }
+
+/* static first view of the home page, shown before the app has loaded */
+.prehome { display: none; }
+html.is-home .prehome { display: block; }
+html.is-home main > .notprehome { display: none; }
+html.is-home:not(.app) header.site .gsearch { display: none; }
+.prehome .threads { min-height: 280px; }
+@media (max-width: 720px) { .prehome .threads { min-height: 300px; } }

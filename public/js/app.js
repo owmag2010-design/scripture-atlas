@@ -444,7 +444,10 @@ async function renderHome() {
   view.querySelectorAll(".tryline button").forEach(b => b.addEventListener("click", () => goSearch(b.dataset.q)));
   view.querySelectorAll("[data-th]").forEach(b => b.addEventListener("click", () => { view.querySelectorAll("[data-th]").forEach(x => x.setAttribute("aria-selected", x === b)); drawThreads(b.dataset.th); }));
   drawThreads(THREADS[0][0]);
-  deskDemo();
+  // The Research Desk preview loads several data files, so it waits until it is about to scroll into view.
+  const dd = $("#deskdemo");
+  if (dd && "IntersectionObserver" in window) { const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); deskDemo(); } }, { rootMargin: "300px" }); io.observe(dd); addEventListener("routechange", () => io.disconnect(), { once: true }); }
+  else deskDemo();
   addEventListener("routechange", () => document.body.classList.remove("home"), { once: true });
   try {
     const t = await verseText("kjv", votd);
@@ -1067,6 +1070,7 @@ async function renderSearch(q) {
   q = (q || "").trim();
   const sk = normaliseStrong(q);
   if (sk) { go(`#/word/${sk}`, { replace: true }); return; }
+  if (!q) { const pq = new URLSearchParams(location.search).get("q"); if (pq) { go(`/search/${encodeURIComponent(pq)}`, { replace: true }); return; } }
   setNav("search"); setTitle(q ? `Search: ${q}` : "Search");
   await getIndex();
   $("#gq").value = q;
@@ -2542,6 +2546,7 @@ async function route() {
     if (head === "atlas") document.body.insertAdjacentHTML("beforeend", back); else view.insertAdjacentHTML("afterbegin", back);
   }
 }
+document.documentElement.classList.add("app");
 setRouter(route);
 startNavigation();
 getIndex().catch(() => {});

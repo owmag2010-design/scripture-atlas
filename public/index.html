@@ -28,6 +28,31 @@
 <link rel="stylesheet" href="/fonts.css">
 <link rel="stylesheet" href="/styles.css">
 <script src="/js/theme.js"></script>
+<link rel="modulepreload" href="/js/app.js">
+<link rel="modulepreload" href="/js/books.js">
+<link rel="modulepreload" href="/js/ref.js">
+<link rel="modulepreload" href="/js/search.js">
+<link rel="modulepreload" href="/js/store.js">
+<link rel="modulepreload" href="/js/context.js">
+<link rel="modulepreload" href="/js/content.js">
+<link rel="modulepreload" href="/js/history.js">
+<link rel="modulepreload" href="/js/atlas-map.js">
+<link rel="modulepreload" href="/js/ai-core.js">
+<link rel="modulepreload" href="/js/nav.js">
+<link rel="modulepreload" href="/js/translations-info.js">
+<link rel="modulepreload" href="/js/kids.js">
+<link rel="modulepreload" href="/js/journeys.js">
+<link rel="modulepreload" href="/js/sermon.js">
+<link rel="modulepreload" href="/js/lens.js">
+<link rel="modulepreload" href="/js/research.js">
+<link rel="modulepreload" href="/js/guide.js">
+<link rel="modulepreload" href="/js/discoveries.js">
+<link rel="modulepreload" href="/js/discoveries-data.js">
+<link rel="modulepreload" href="/js/lang.js">
+<link rel="modulepreload" href="/js/images.js">
+<link rel="modulepreload" href="/js/art.js">
+<link rel="preload" href="/data/index.json" as="fetch" crossorigin>
+<link rel="preload" href="/data/bible/catalogue.json" as="fetch" crossorigin>
 </head>
 <body>
 <a class="skip" href="#view">Skip to content</a>
@@ -55,7 +80,18 @@
     <div class="navsecondary" aria-label="Learn and teach"><a href="/learn" data-nav="learn">Learn</a><a href="/sermon" data-nav="sermon">Sermons</a><a href="/kids" data-nav="kids" class="kidsnav">Kids</a></div>
   </nav>
 </header>
-<main id="view" tabindex="-1"><p class="loading">Opening Ereunia…</p></main>
+<main id="view" tabindex="-1"><section class="hero2 obs-hero prehome" aria-label="Ereunia">
+    <img class="heroart" src="/img/creation-light-sm.webp" srcset="/img/creation-light-sm.webp 640w, /img/creation-light.webp 1600w" sizes="100vw" alt="An engraving of rays of light bursting through dark, billowing clouds above a dim, barren landscape." width="1269" height="1600" style="object-position:35% 25%" fetchpriority="high">
+    <div class="hero-in obs-in">
+      <div class="hero-copy obs-copy">
+        <h1>Ancient Scripture. <em>A new depth of discovery.</em></h1>
+        <p class="obs-promise">Every word of the Bible, traced to its source.</p>
+        <form class="bigsearch" id="pq" action="/search" method="get" role="search"><label class="sr" for="bq0">Search passages, words, topics, people and places</label><input id="bq0" name="q" type="search" placeholder="John 1:1, logos, covenant, Abraham, Jerusalem" autocomplete="off"><button>Search</button></form>
+        <div class="tryline"><span>Try</span><button form="pq" name="q" value="John 1:1">John 1:1</button><button form="pq" name="q" value="Psalm 23">Psalm 23</button><button form="pq" name="q" value="shepherd">shepherd</button><button form="pq" name="q" value="Abraham">Abraham</button><button form="pq" name="q" value="Lachish">Lachish</button></div>
+      </div>
+      <figure class="threads" aria-hidden="true"><div class="th-stage"></div></figure>
+    </div>
+  </section><p class="loading notprehome">Opening Ereunia…</p></main>
 <footer class="site">
   <img class="footlogo" src="/brand/ereunia-logo-tagline-for-light-bg.svg" alt="Ereunia, search the Scriptures" width="170" height="60">
   <p class="motto">Scripture first. Sources visible. Interpretation distinguished from fact.</p>
