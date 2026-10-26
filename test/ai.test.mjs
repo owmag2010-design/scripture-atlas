@@ -29,7 +29,7 @@ test("keeps cited statements and exact quotations", () => {
   const { sections, dropped } = verifyAnswer({
     scripture: [{ text: "John says “God so loved the world” and gave his Son.", cites: ["S1"] }],
     translation: [{ text: "The WEB renders monogenēs as “one and only Son”.", cites: ["S2"] }],
-    interpretation: [{ text: "Christian tradition reads this as the heart of the gospel.", cites: ["S1"] }],
+    interpretation: [{ text: "One reading of the text is that God's love is the reason for the gift of the Son.", cites: ["S1"], kind: "inference" }],
     uncertainty: [{ text: "These sources do not settle the exact date of writing.", cites: [] }]
   }, sources);
   assert.equal(dropped.length, 0);
