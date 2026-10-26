@@ -19,6 +19,7 @@ import { renderAtlas } from "./atlas-app.js";
 import { COURSES, PLANNED, STATUS } from "./courses.js";
 import { SECTIONS } from "./ai-core.js";
 import { drawCard, canvasBlob, SIZES, STYLES } from "./share.js";
+import { go, setPath, currentRoute, setRouter, startNavigation } from "./nav.js";
 import { HISTORY, NOT_HOSTED } from "./translations-info.js";
 import { KID_STORIES } from "./kids.js";
 import { JOURNEYS } from "./journeys.js";
@@ -108,7 +109,7 @@ async function renderDiscoveries(id) {
   if ($("#dmap")) {
     const base = await H.base();
     const rows = DISCOVERIES.filter(d => d.location).map(d => [d.id, d.name, d.location.lat, d.location.lon, "Discovery", "located", 40]);
-    mountMap($("#dmap"), { base, places: rows, onPick: s => (location.hash = `#/discoveries/${s}`) }).fit(new Set(rows.map(r => r[0])));
+    mountMap($("#dmap"), { base, places: rows, onPick: s => go(`#/discoveries/${s}`) }).fit(new Set(rows.map(r => r[0])));
   }
 }
 
@@ -154,7 +155,7 @@ async function renderDiscovery(id) {
   });
   if (d.location && $("#dpmap")) {
     const base = await H.base();
-    mountMap($("#dpmap"), { base, places: [[d.id, d.name, d.location.lat, d.location.lon, "Discovery", "located", 40], ...DISCOVERIES.filter(x => x.location && x.id !== d.id).map(x => [x.id, x.name, x.location.lat, x.location.lon, "Discovery", "located", 10])], focus: d.id, onPick: s => (location.hash = `#/discoveries/${s}`) }).focusOn(d.id, 10);
+    mountMap($("#dpmap"), { base, places: [[d.id, d.name, d.location.lat, d.location.lon, "Discovery", "located", 40], ...DISCOVERIES.filter(x => x.location && x.id !== d.id).map(x => [x.id, x.name, x.location.lat, x.location.lon, "Discovery", "located", 10])], focus: d.id, onPick: s => go(`#/discoveries/${s}`) }).focusOn(d.id, 10);
   }
 }
 
@@ -255,17 +256,53 @@ function toast(msg) {
   const t = $("#toast"); t.textContent = msg; t.hidden = false;
   clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 2200);
 }
+// Main navigation: five groups (Read, Research, Explore, Library, My study) plus Learn, Sermons and Kids.
+const NAV_GROUP = { home: "", read: "read", books: "read", bibles: "read", compare: "read", translation: "read", guide: "read",
+  lens: "research", languages: "research", word: "research", research: "research", ai: "research", search: "research",
+  atlas: "explore", history: "explore", timeline: "explore", journeys: "explore", people: "explore", person: "explore", place: "explore", discoveries: "explore",
+  library: "library", credits: "library", study: "study", learn: "learn", sermon: "sermon", kids: "kids", share: "" };
 function setNav(key) {
-  document.querySelectorAll("nav.main a, nav.tabbar a").forEach(a => a.classList.toggle("on", a.dataset.nav === key));
-  const inBar = [...document.querySelectorAll("nav.tabbar a")].some(a => a.dataset.nav === key);
-  document.querySelector("#morebtn")?.classList.toggle("on", !inBar && key !== "home");
+  const g = NAV_GROUP[key] ?? "";
+  document.querySelectorAll("nav.main .navgroup").forEach(el => el.querySelector(".navtop").classList.toggle("on", el.dataset.group === g));
+  document.querySelectorAll("nav.main .navlink").forEach(a => a.classList.toggle("on", a.dataset.group === g));
+  document.querySelectorAll("nav.main .navmenu a, nav.main .navsecondary a").forEach(a => { const on = a.dataset.nav === key; a.classList.toggle("on", on); if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  document.querySelectorAll("nav.tabbar a").forEach(a => a.classList.toggle("on", a.dataset.group === g));
+  const inBar = [...document.querySelectorAll("nav.tabbar a")].some(a => a.dataset.group === g);
+  document.querySelector("#morebtn")?.classList.toggle("on", !!g && !inBar);
+  document.querySelectorAll("#moresheet a").forEach(a => a.classList.toggle("on", a.dataset.nav === key));
 }
-// Phone "More" sheet: the full section list, as large picture-free tiles.
+function closeMenus(except) {
+  document.querySelectorAll("nav.main .navgroup").forEach(el => { if (el === except) return; el.querySelector(".navtop").setAttribute("aria-expanded", "false"); el.querySelector(".navmenu").hidden = true; });
+}
+(function wireMenus() {
+  const groups = [...document.querySelectorAll("nav.main .navgroup")];
+  groups.forEach(el => {
+    const btn = el.querySelector(".navtop"), menu = el.querySelector(".navmenu"), links = () => [...menu.querySelectorAll("a")];
+    const open = (focus) => { closeMenus(el); menu.hidden = false; btn.setAttribute("aria-expanded", "true"); if (focus) links()[focus === "last" ? links().length - 1 : 0]?.focus(); };
+    const shut = (refocus) => { menu.hidden = true; btn.setAttribute("aria-expanded", "false"); if (refocus) btn.focus(); };
+    btn.addEventListener("click", () => (menu.hidden ? open() : shut()));
+    btn.addEventListener("keydown", e => { if (e.key === "ArrowDown") { e.preventDefault(); open("first"); } else if (e.key === "ArrowUp") { e.preventDefault(); open("last"); } });
+    menu.addEventListener("keydown", e => {
+      const l = links(), i = l.indexOf(document.activeElement);
+      if (e.key === "Escape") { e.preventDefault(); shut(true); }
+      else if (e.key === "ArrowDown") { e.preventDefault(); l[(i + 1) % l.length].focus(); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); l[(i - 1 + l.length) % l.length].focus(); }
+      else if (e.key === "Home") { e.preventDefault(); l[0].focus(); } else if (e.key === "End") { e.preventDefault(); l[l.length - 1].focus(); }
+    });
+    el.addEventListener("focusout", e => { if (!el.contains(e.relatedTarget)) shut(); });
+    menu.addEventListener("click", e => { if (e.target.closest("a")) shut(); });
+  });
+  document.addEventListener("click", e => { if (!e.target.closest("nav.main .navgroup")) closeMenus(); });
+  addEventListener("keydown", e => { if (e.key === "Escape") { const open = groups.find(g => !g.querySelector(".navmenu").hidden); if (open) { closeMenus(); open.querySelector(".navtop").focus(); } } });
+  addEventListener("routechange", () => closeMenus());
+})();
+// Phone "More" sheet: every section, grouped as in the desktop menus.
 function closeMore() { const s = document.querySelector("#moresheet"); if (s && !s.hidden) { s.hidden = true; document.querySelector("#morebtn")?.setAttribute("aria-expanded", "false"); } }
 (function wireTabbar() {
   const btn = document.querySelector("#morebtn"), sheet = document.querySelector("#moresheet"); if (!btn || !sheet) return;
-  sheet.querySelector(".sheetlinks").innerHTML = [...document.querySelectorAll("nav.main a")].map(a => `<a href="${a.getAttribute("href")}" data-nav="${a.dataset.nav}">${a.textContent}</a>`).join("") + `<a href="#/books" data-nav="read">All 66 books</a>`;
-  btn.addEventListener("click", () => { const open = sheet.hidden; sheet.hidden = !open; btn.setAttribute("aria-expanded", String(open)); });
+  const groups = [...document.querySelectorAll("nav.main .navgroup")].map(g => `<div class="sheetgroup"><h3>${g.querySelector(".navtop").textContent}</h3>${[...g.querySelectorAll(".navmenu a")].map(a => `<a href="${a.getAttribute("href")}" data-nav="${a.dataset.nav}">${a.querySelector("b").textContent}</a>`).join("")}</div>`).join("");
+  sheet.querySelector(".sheetlinks").innerHTML = `<a class="sheethome" href="/" data-nav="home">Home</a>` + groups + `<div class="sheetgroup"><h3>Learn and teach</h3><a href="/learn" data-nav="learn">Courses</a><a href="/sermon" data-nav="sermon">Sermon studio</a><a href="/kids" data-nav="kids">Kids</a><a href="/share" data-nav="share">Share cards</a></div><div class="sheetgroup"><h3>My study</h3><a href="/study" data-nav="study">Notes, highlights and trails</a></div>`;
+  btn.addEventListener("click", () => { const open = sheet.hidden; sheet.hidden = !open; btn.setAttribute("aria-expanded", String(open)); if (open) sheet.querySelector("a")?.focus(); });
   sheet.addEventListener("click", e => { if (e.target === sheet || e.target.closest("a, .sheetclose")) closeMore(); });
   addEventListener("keydown", e => { if (e.key === "Escape") closeMore(); });
 })();
@@ -279,10 +316,10 @@ async function copyText(s) {
 function goSearch(q) {
   q = q.trim(); if (!q) return;
   const sk = normaliseStrong(q);
-  if (sk) { location.hash = `#/word/${sk}`; return; }
+  if (sk) { go(`#/word/${sk}`); return; }
   const r = parseReference(q, chapterCount);
-  if (r) location.hash = readUrl(store.setting("translation", "kjv"), r.book, r.chapter, r.verse);
-  else location.hash = `#/search/${encodeURIComponent(q)}`;
+  if (r) go(readUrl(store.setting("translation", "kjv"), r.book, r.chapter, r.verse));
+  else go(`#/search/${encodeURIComponent(q)}`);
 }
 
 /* ---------- theme ---------- */
@@ -667,7 +704,7 @@ async function renderChapterText() {
       }
     }
   } catch {
-    box.innerHTML = `<p class="loading">This chapter could not load. Check your connection and <a href="${location.hash}">try again</a>.</p>`;
+    box.innerHTML = `<p class="loading">This chapter could not load. Check your connection and <a href="${esc(location.pathname)}">try again</a>.</p>`;
   }
 }
 
@@ -724,7 +761,7 @@ function selectVerse(v, { scroll = false, open = true, word = null, tab = null, 
   document.querySelectorAll("#text .wb.on").forEach(el => el.classList.remove("on"));
   if (word != null) document.querySelector(`#text .wb[data-v="${v}"][data-w="${word}"]`)?.classList.add("on");
   const osis = toOsis(R.book, R.chapter, v);
-  history.replaceState(null, "", readUrl(R.t, R.book, R.chapter, v));
+  setPath(readUrl(R.t, R.book, R.chapter, v));
   store.setPositionVerse(osis);
   if (open) $("#margin").classList.add("open");
   if (open && matchMedia("(max-width: 960px)").matches) document.getElementById(`${R.t}-v${v}`)?.scrollIntoView({ block: "start", behavior: "smooth" });
@@ -781,12 +818,12 @@ async function renderRead(t, osis) {
       <div id="pane"></div>
     </aside>
   </div>`;
-  const go = (b, c, v = null) => (location.hash = readUrl(R.t, b, c, v));
-  $("#bk").addEventListener("change", e => go(+e.target.value, 1));
-  $("#cp").addEventListener("change", e => go(R.book, +e.target.value));
-  $("#prev").addEventListener("click", () => { if (R.chapter > 1) go(R.book, R.chapter - 1); else if (R.book > 0) go(R.book - 1, chapterCount(R.book - 1)); });
-  $("#next").addEventListener("click", () => { if (R.chapter < chapterCount(R.book)) go(R.book, R.chapter + 1); else if (R.book < 65) go(R.book + 1, 1); });
-  $("#trsel").addEventListener("change", e => { location.hash = readUrl(e.target.value, R.book, R.chapter, R.verse); });
+  const goCh = (b, c, v = null) => go(readUrl(R.t, b, c, v));
+  $("#bk").addEventListener("change", e => goCh(+e.target.value, 1));
+  $("#cp").addEventListener("change", e => goCh(R.book, +e.target.value));
+  $("#prev").addEventListener("click", () => { if (R.chapter > 1) goCh(R.book, R.chapter - 1); else if (R.book > 0) goCh(R.book - 1, chapterCount(R.book - 1)); });
+  $("#next").addEventListener("click", () => { if (R.chapter < chapterCount(R.book)) goCh(R.book, R.chapter + 1); else if (R.book < 65) goCh(R.book + 1, 1); });
+  $("#trsel").addEventListener("change", e => { go(readUrl(e.target.value, R.book, R.chapter, R.verse)); });
   $("#cmpsel").addEventListener("change", e => { store.setSetting("compare", e.target.value); store.setSetting("parallel", false); renderRead(R.t, toOsis(R.book, R.chapter, R.verse)); });
   view.querySelectorAll("[data-size]").forEach(b => b.addEventListener("click", () => {
     store.setSetting("size", b.dataset.size); document.documentElement.dataset.size = b.dataset.size;
@@ -952,7 +989,7 @@ function renderLanguages() {
       <p class="small">Hebrew: Leningrad Codex (c. AD 1008). Greek: STEPBible's amalgamated New Testament, covering NA28 and the Textus Receptus. All tagging and lexicons from STEPBible.org (Tyndale House, Cambridge), CC BY 4.0.</p>
       <a class="btn pri" href="#/read/kjv/Gen.1.1">Try Genesis 1 interlinear</a></section>
   </div>`;
-  $("#lk").addEventListener("submit", ev => { ev.preventDefault(); const k = normaliseStrong($("#lkq").value); if (k) location.hash = `#/word/${k}`; else toast("Enter a number such as H7225 or G26"); });
+  $("#lk").addEventListener("submit", ev => { ev.preventDefault(); const k = normaliseStrong($("#lkq").value); if (k) go(`#/word/${k}`); else toast("Enter a number such as H7225 or G26"); });
 }
 
 /* ---------- history: map, timeline, people ---------- */
@@ -1016,7 +1053,7 @@ async function renderJourneys(box, id) {
     let i = 0; show(0); $("#jplay").textContent = "Pause";
     journeyTimer = setInterval(() => { i++; if (i >= slugs.length || !document.contains($("#jmap"))) return stop(); show(i); }, 2200);
   });
-  addEventListener("hashchange", stop, { once: true });
+  addEventListener("routechange", stop, { once: true });
 }
 
 async function renderTimeline(box) {
@@ -1030,7 +1067,7 @@ async function renderTimeline(box) {
       <ol class="tl">${g.items.map(e => { const f = e.first != null ? unpackRef(e.first) : null; return `<li id="e${e.id}"><span class="yr">${yearText(e.year)}</span><div><b>${esc(e.title)}</b> ${certChip(e.year)}
         <div class="tlmeta">${e.places.map(s => lm.get(s)).filter(Boolean).map(r => `<a class="chip ext" href="#/place/${r[0]}">${esc(r[1])}</a>`).join(" ")} ${e.people.map(s => pm.get(s)).filter(Boolean).filter(r => !["god_1324", "holy_spirit_7400", "jesus_905"].includes(r[0]) || e.year > -10).filter(r => r[0] !== "god_1324").slice(0, 4).map(r => `<a class="chip" href="#/person/${r[0]}">${esc(r[1])}</a>`).join(" ")}
         ${f ? `<a class="small" href="${readUrl("kjv", f.book, f.chapter, f.verse)}">${formatRef(f.book, f.chapter, f.verse)}</a>` : ""}</div></div></li>`; }).join("")}</ol></section>`).join("")}`;
-  const h = location.hash.split("#")[2];
+  const h = location.hash.slice(1);
   if (h) document.getElementById(h)?.scrollIntoView({ block: "center" });
 }
 
@@ -1108,7 +1145,7 @@ async function renderPlace(slug) {
       ${p.born.length || p.died.length ? `<p>${p.born.length ? `Born here: ${p.born.map(s => `<a href="#/person/${s}">${esc(pm.get(s)?.[1] || s)}</a>`).join(", ")}. ` : ""}${p.died.length ? `Died here: ${p.died.map(s => `<a href="#/person/${s}">${esc(pm.get(s)?.[1] || s)}</a>`).join(", ")}.` : ""}</p>` : ""}
       ${p.dict ? `<h3>Dictionary entry</h3><p class="dict">${esc(p.dict)}</p><p class="small">Easton's Bible Dictionary (1897), public domain. Some identifications have changed since it was written.</p>` : ""}</section>
     <section class="card"><h2 style="font-size:1.4rem">Verses</h2><div id="lv"></div></section></div>`;
-  if (plotted) mountMap($("#pmap"), { base, places, focus: slug, onPick: s => (location.hash = `#/place/${s}`) }).focusOn(slug, 16);
+  if (plotted) mountMap($("#pmap"), { base, places, focus: slug, onPick: s => go(`#/place/${s}`) }).focusOn(slug, 16);
   const page = async n => { const r = await versesList(p.verses, n, page); $("#lv").innerHTML = r.html; r.wire($("#lv")); };
   page(0);
 }
@@ -1137,7 +1174,7 @@ function renderLearn() {
       <div class="actions"><a class="btn pri" href="#/learn/${c.id}/${next.id}">${done ? (done === n ? "Review" : "Continue") : "Start"}</a><a class="btn" href="#/learn/${c.id}">All lessons</a></div></article>`; }).join("")}</div>
   <section class="card" style="margin-top:18px"><h2 style="font-size:1.4rem">Planned courses</h2><ul class="planned">${PLANNED.map(([t, d]) => `<li><b>${t}</b> <span class="small">${d}</span></li>`).join("")}</ul></section>`;
   wireFamily(renderLearn);
-  $("#gb").addEventListener("submit", e => { e.preventDefault(); const r = parseReference($("#gbq").value, chapterCount); if (r) location.hash = `#/guide/${guideSpec(r.book, r.chapter, r.verse, r.verseEnd)}`; else toast("Enter a passage such as Psalm 23 or John 15:1-17"); });
+  $("#gb").addEventListener("submit", e => { e.preventDefault(); const r = parseReference($("#gbq").value, chapterCount); if (r) go(`#/guide/${guideSpec(r.book, r.chapter, r.verse, r.verseEnd)}`); else toast("Enter a passage such as Psalm 23 or John 15:1-17"); });
 }
 
 function renderCourse(id) {
@@ -1262,7 +1299,7 @@ async function renderGuide(spec) {
   let tmr;
   view.querySelectorAll("[data-ans]").forEach(el => el.addEventListener("input", () => { clearTimeout(tmr); tmr = setTimeout(() => { store.setGuideAnswer(key, el.dataset.ans, el.value); $("#gsv").textContent = "Saved"; }, 400); }));
   $("#gtr").addEventListener("change", e => { store.setSetting("guideT", e.target.value); renderGuide(key); });
-  $("#gp").addEventListener("submit", e => { e.preventDefault(); const r = parseReference($("#gpq").value, chapterCount); if (r) location.hash = `#/guide/${guideSpec(r.book, r.chapter, r.verse, r.verseEnd)}`; else toast("Enter a passage such as Psalm 23 or Romans 8:28-39"); });
+  $("#gp").addEventListener("submit", e => { e.preventDefault(); const r = parseReference($("#gpq").value, chapterCount); if (r) go(`#/guide/${guideSpec(r.book, r.chapter, r.verse, r.verseEnd)}`); else toast("Enter a passage such as Psalm 23 or Romans 8:28-39"); });
   $("#gpr").addEventListener("click", () => window.print());
   $("#gdl").addEventListener("click", () => {
     view.querySelectorAll("[data-ans]").forEach(el => store.setGuideAnswer(key, el.dataset.ans, el.value));
@@ -1400,9 +1437,9 @@ function wireResearchForm() {
     e.preventDefault();
     const q = $("#rq").value.trim(); if (!q) return;
     const sk = normaliseStrong(q);
-    if (sk) { location.hash = `#/word/${sk}`; return; }
+    if (sk) { go(`#/word/${sk}`); return; }
     const r = parseReference(q, chapterCount);
-    location.hash = r ? `#/research/${toOsis(r.book, r.chapter, r.verse || 1)}` : `#/research/topic/${encodeURIComponent(q)}`;
+    go(r ? `#/research/${toOsis(r.book, r.chapter, r.verse || 1)}` : `#/research/topic/${encodeURIComponent(q)}`);
   });
 }
 
@@ -1584,7 +1621,7 @@ function renderLibrary() {
 /* ---------- one verse in every translation ---------- */
 async function renderCompare(osis) {
   await getIndex();
-  const r = fromOsis(osis || ""); if (!r) { location.replace("#/bibles"); return; }
+  const r = fromOsis(osis || ""); if (!r) { go("/bibles", { replace: true }); return; }
   const v = r.verse || 1, label = formatRef(r.book, r.chapter, v), o = toOsis(r.book, r.chapter, v);
   setNav("bibles"); setTitle(`${label} in every translation`);
   const list = allTranslations();
@@ -1896,7 +1933,7 @@ async function renderSermon(openId) {
     if ($("#interim")) $("#interim").textContent = "";
   }
   $("#rec").addEventListener("click", () => ($("#rec").getAttribute("aria-pressed") === "true" ? stop() : start()));
-  addEventListener("hashchange", () => sermonRec?.stop(), { once: true });
+  addEventListener("routechange", () => sermonRec?.stop(), { once: true });
 }
 
 /* ---------- kids: animated Bible stories ---------- */
@@ -1983,7 +2020,7 @@ function renderStory(id) {
   addEventListener("keydown", keys);
   let sx = null; $("#stage").addEventListener("touchstart", e => (sx = e.touches[0].clientX), { passive: true });
   $("#stage").addEventListener("touchend", e => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) go(i + (dx < 0 ? 1 : -1)); sx = null; });
-  addEventListener("hashchange", stop, { once: true });
+  addEventListener("routechange", stop, { once: true });
   go(0);
 }
 
@@ -2035,7 +2072,7 @@ async function renderShare(kind, a, b) {
     const res = await drawCard(cv, current, { size: state.size, style: state.style });
     $("#smsg").textContent = res.ok ? (state.style === "picture" && !current.image ? "No picture for this one yet, so it uses the Night look." : "") : res.reason;
     cv.style.aspectRatio = `${SIZES[state.size].w} / ${SIZES[state.size].h}`;
-    history.replaceState(null, "", state.kind === "v" ? `#/share/v/${state.osis}/${state.t}` : `#/share/d/${state.id}`);
+    setPath(state.kind === "v" ? `#/share/v/${state.osis}/${state.t}` : `#/share/d/${state.id}`);
   }
   view.querySelectorAll("[data-kind]").forEach(x => x.addEventListener("click", () => { state.kind = x.dataset.kind; if (state.kind === "d" && !state.id) state.id = $("#sdsel").value; draw(); }));
   view.querySelectorAll("[data-style]").forEach(x => x.addEventListener("click", () => { state.style = x.dataset.style; store.setSetting?.("sharestyle", state.style); draw(); }));
@@ -2058,7 +2095,8 @@ async function renderShare(kind, a, b) {
 async function route() {
   await Promise.all([imagesReady, artReady]);
   closeMore();
-  let h = location.hash.replace(/^#\/?/, "").split("#")[0]; try { h = decodeURIComponent(h); } catch {}
+  document.dispatchEvent(new Event("routechange")); dispatchEvent(new Event("routechange"));
+  const h = currentRoute();
   const [head, ...rest] = h.split("/");
   document.body.classList.remove("focus", "kidsmode"); window.speechSynthesis?.cancel(); document.querySelector(".exitfocus")?.remove();
   try {
@@ -2085,15 +2123,16 @@ async function route() {
     else if (head === "soon") renderSoon(rest[0]);
     else if (head === "books") { await getIndex(); renderBooks(); }
     else if (head === "share") await renderShare(rest[0], rest[1], rest[2]);
-    else if (head === "atlas") { await getIndex(); setNav("atlas"); setTitle("Atlas"); await renderAtlas({ view, H, esc, DISCOVERIES, JOURNEYS, NAMES, BOOKS, ERAS, unpackRef, readUrl, formatRef, PRECISION, toOsis, fromOsis, labelOf, discImg, discCredit, discMini, yearText, verseText, rangeHref, rangeLabel, project, MAP_SIZE, SECTIONS, parseRef: q => parseReference(q, chapterCount) }, rest); }
+    else if (head === "atlas") { await getIndex(); setNav("atlas"); setTitle("Atlas"); await renderAtlas({ view, H, esc, go, DISCOVERIES, JOURNEYS, NAMES, BOOKS, ERAS, unpackRef, readUrl, formatRef, PRECISION, toOsis, fromOsis, labelOf, discImg, discCredit, discMini, yearText, verseText, rangeHref, rangeLabel, project, MAP_SIZE, SECTIONS, parseRef: q => parseReference(q, chapterCount) }, rest); }
     else if (head === "discoveries") { await getIndex(); await renderDiscoveries(rest[0]); }
     else await renderHome();
   } catch (e) {
     console.error(e);
-    view.innerHTML = `<p class="empty">Something did not load. Check your connection, then <a href="${esc(location.hash || "#/")}">try again</a>.</p>`;
+    view.innerHTML = `<p class="empty">Something did not load. Check your connection, then <a href="${esc(location.pathname)}">try again</a>.</p>`;
   }
-  if (head !== "read") window.scrollTo(0, 0);
+  if (head !== "read" && !location.hash) window.scrollTo(0, 0);
 }
-addEventListener("hashchange", route);
+setRouter(route);
+startNavigation();
 getIndex().catch(() => {});
 route();

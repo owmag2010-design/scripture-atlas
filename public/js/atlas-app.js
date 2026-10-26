@@ -43,7 +43,7 @@ async function mount(ctx) {
   const map = mountMap($("#amap"), {
     base, places, relief: true, regionLabels: true, fill: true,
     credit: periodsData?.credit ? "Period layers: historical-basemaps (GPL-3.0), Pleiades, Natural Earth; details in the panel." : "",
-    onPick: s => { location.hash = s.startsWith("d:") ? `#/discoveries/${s.slice(2)}` : `#/atlas/place/${s}`; }
+    onPick: s => { ctx.go(s.startsWith("d:") ? `#/discoveries/${s.slice(2)}` : `#/atlas/place/${s}`); }
   });
   map.setDiscoveries(drows);
 
@@ -188,7 +188,7 @@ async function mount(ctx) {
     if (r.type === "person") return showPerson(r.slug);
     if (r.type === "book") return showBook(r.osis);
     if (r.type === "period") return showPeriod(r.id);
-    if (r.type === "discovery") { location.hash = `#/discoveries/${r.id}`; return; }
+    if (r.type === "discovery") { ctx.go(`#/discoveries/${r.id}`); return; }
     if (r.type === "passage") {
       const nums = []; for (let v = r.ref.verse || 1; v <= (r.ref.verseEnd || r.ref.verse || 200); v++) nums.push(r.ref.book * 1e6 + r.ref.chapter * 1e3 + v);
       const slugs = (await placesForVerses(nums)).filter(mapped);
@@ -229,14 +229,14 @@ async function mount(ctx) {
   function setTime(id) { time.querySelectorAll("a").forEach(a => a.classList.toggle("on", a.dataset.p === id)); time.querySelector(".on")?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" }); }
 
   // ---------- controls ----------
-  $("#asf").addEventListener("submit", e => { e.preventDefault(); const q = $("#aq").value.trim(); if (q) location.hash = `#/atlas/q/${encodeURIComponent(q)}`; });
-  $("#abook").addEventListener("change", e => { location.hash = e.target.value ? `#/atlas/book/${e.target.value}` : "#/atlas"; });
+  $("#asf").addEventListener("submit", e => { e.preventDefault(); const q = $("#aq").value.trim(); if (q) ctx.go(`#/atlas/q/${encodeURIComponent(q)}`); });
+  $("#abook").addEventListener("change", e => { ctx.go(e.target.value ? `#/atlas/book/${e.target.value}` : "#/atlas"); });
   $("#adisc").addEventListener("click", e => { showDisc = !showDisc; e.currentTarget.setAttribute("aria-pressed", showDisc); map.setDiscoveries(showDisc ? drows : []); });
   $("#aapprox").addEventListener("click", e => { showApprox = !showApprox; e.currentTarget.setAttribute("aria-pressed", showApprox); map.setPlaces(showApprox ? places : places.filter(p => p[5] === "located" || p[4] === "Region" || p[4] === "Water")); });
-  $("#areset").addEventListener("click", () => { location.hash = "#/atlas"; map.flyBox({ x: 0, y: 0, w: ctx.MAP_SIZE[0], h: ctx.MAP_SIZE[1] }, 800); });
+  $("#areset").addEventListener("click", () => { ctx.go("#/atlas"); map.flyBox({ x: 0, y: 0, w: ctx.MAP_SIZE[0], h: ctx.MAP_SIZE[1] }, 800); });
   root.querySelector('[data-open="journeys"]').addEventListener("click", () => open(`<span class="eyebrow">Journeys</span><h1>Follow a journey</h1><div class="ajourneys big">${JOURNEYS.map(j => `<a href="#/atlas/journey/${j.id}" style="--c:${j.colour}"><b>${esc(j.title)}</b><span>${esc(j.range)}</span></a>`).join("")}</div>`, { expand: true }));
   root.querySelector('[data-open="periods"]').addEventListener("click", () => open(`<span class="eyebrow">Periods</span><h1>Travel through time</h1><div class="ajourneys big">${PERIODS.map(p => `<a href="#/atlas/period/${p.id}"><b>${esc(p.name)}</b><span>${esc(p.range || ctx.yearText(p.from))}</span></a>`).join("")}</div>`, { expand: true }));
-  addEventListener("hashchange", function leave() { if (!location.hash.startsWith("#/atlas")) { document.body.classList.remove("atlasmode"); clearInterval(jt); removeEventListener("hashchange", leave); } });
+  addEventListener("routechange", function leave() { if (!location.pathname.startsWith("/atlas")) { document.body.classList.remove("atlasmode"); clearInterval(jt); removeEventListener("routechange", leave); } });
 
   return {
     root,

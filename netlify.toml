@@ -60,3 +60,9 @@
   to = "https://ereunia.com/:splat"
   status = 301
   force = true
+
+# Pages live at real paths (/read/kjv/John.1). Static files are served first; every other path loads the app.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
