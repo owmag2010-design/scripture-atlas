@@ -16,7 +16,6 @@ Key facts
 - AI: Answers only from cited sources; uncited statements are removed and AI content is labelled
 - Kids: 8 illustrated Bible stories to read and hear
 - Cost and privacy: Free. No account. Notes stay on the user's device.
-- Founder: Owen Magocha
 
 Short description
 Ereunia is a free Bible research website that traces every word of Scripture to its source.

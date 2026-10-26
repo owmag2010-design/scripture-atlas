@@ -33,7 +33,7 @@ Preview: https://deploy-preview-1--scripture-atlas-om.netlify.app (Netlify team 
 - **Speed on slow networks:** largest paint improved locally on every page measured (home 880 → 568 ms, reader 444 → 356 ms, atlas 960 → 860 ms). Real-device field data is not available.
 
 ## External dependencies
-- **Corrections address:** a public email for corrections is needed. The Credits page currently points readers to owenmagocha.org.
+- **Corrections address:** a public email for corrections is needed. The About page says a contact address is being set up.
 - **Accounts and sync:** optional accounts, cross-device sync, entitlements and usage metering need an auth and database provider and a decision on one. Storage is versioned and has backup and restore, ready for migration, but no account system has been simulated.
 - **IIIF deep zoom:** this needs partner institutions' IIIF endpoints and permission, plus changes to the security policy to allow them. A local zoom viewer is used for Ereunia's own images.
 

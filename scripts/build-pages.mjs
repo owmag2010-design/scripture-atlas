@@ -56,6 +56,7 @@ const SECTIONS = [
   ["/ai", "Research assistant", "Ask a question and see exactly which sources the answer rests on."],
   ["/search", "Search", "Search passages, original words, people, places, discoveries and manuscripts."],
   ["/share", "Share cards", "Make a branded card of any Bible verse or documented discovery to share."],
+  ["/about", "About Ereunia", "What Ereunia is, how its pages are written and sourced, and how to send a correction."],
   ["/privacy", "Privacy and your data", "What Ereunia stores on your device and what is sent when you use a feature."]
 ];
 page("/", { title: "", description: "Ancient Scripture. A new depth of discovery. Every word of the Bible, traced to its source.", body: "<h1>Ereunia: every word of the Bible, traced to its source</h1>" });

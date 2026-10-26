@@ -1,6 +1,6 @@
-# Scripture Atlas — Phase 1
+# Ereunia
 
-Bible study and research app for owenmagocha.org/scripture.
+Source code for [ereunia.com](https://ereunia.com), a free Bible research website.
 Scripture first. Sources visible. Interpretation distinguished from fact.
 
 ## What is here
