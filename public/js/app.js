@@ -763,7 +763,8 @@ const MS_COVER = {
 };
 async function msPane() {
   const scope = R.verse ? formatRef(R.book, R.chapter, R.verse) : formatRef(R.book, R.chapter);
-  const rows = MANUSCRIPTS.map(m => [m, MS_COVER[m.name]?.(R.book, R.chapter, R.verse)]).filter(([, c]) => c);
+  const rank = { yes: 0, part: 1, no: 2 };
+  const rows = MANUSCRIPTS.map(m => [m, MS_COVER[m.name]?.(R.book, R.chapter, R.verse)]).filter(([, c]) => c).sort((a, b) => rank[a[1][0]] - rank[b[1][0]]);
   const label = { yes: "Contains this", part: "Partly preserved", no: "Not here" };
   const osis = R.verse ? toOsis(R.book, R.chapter, R.verse) : null;
   const note = osis ? TEXT_NOTES[osis] : null;
@@ -874,7 +875,7 @@ function wireVersePane() {
   let timer;
   $("#note").addEventListener("input", e => {
     clearTimeout(timer);
-    timer = setTimeout(() => { store.setNote(osis, e.target.value); $("#saved").textContent = "Saved"; refresh(); }, 300);
+    timer = setTimeout(() => { store.setNote(osis, e.target.value); $("#saved").textContent = "Saved on this device"; refresh(); store.trailAdd({ kind: "note", label: `Note on ${labelOf(osis)}`, href: readUrl(R.t, R.book, R.chapter, R.verse).replace(/^#/, "") + "#note", detail: e.target.value }); }, 600);
   });
 }
 
@@ -889,6 +890,7 @@ function selectVerse(v, { scroll = false, open = true, word = null, tab = null, 
   const osis = toOsis(R.book, R.chapter, v);
   setPath(readUrl(R.t, R.book, R.chapter, v));
   store.setPositionVerse(osis);
+  store.trailAdd({ kind: "verse", label: formatRef(R.book, R.chapter, v), href: readUrl(R.t, R.book, R.chapter, v).replace(/^#/, ""), detail: TR[R.t] });
   if (open) $("#margin").classList.add("open");
   if (open && matchMedia("(max-width: 960px)").matches) document.getElementById(`${R.t}-v${v}`)?.scrollIntoView({ block: "start", behavior: "smooth" });
   else if (scroll) document.getElementById(`${R.t}-v${v}`)?.scrollIntoView({ block: "center" });
@@ -903,7 +905,11 @@ async function renderRead(t, osis) {
   R.t = TR[t] ? t : store.setting("translation", "kjv");
   R.book = r.book; R.chapter = Math.min(Math.max(r.chapter, 1), chapterCount(r.book));
   R.word = null; R.origin = null;
-  R.verse = r.verse; if (!["verse", "words", "xref", "people", "bg"].includes(R.tab)) R.tab = "verse";
+  R.verse = r.verse; if (!DESK_TABS.some(([k]) => k === R.tab)) R.tab = "verse";
+  const qp = new URLSearchParams(location.search);
+  if (qp.get("panel") && DESK_TABS.some(([k]) => k === qp.get("panel"))) R.tab = qp.get("panel");
+  if (qp.get("w") != null && R.verse) R.word = +qp.get("w");
+  if (qp.get("o") != null && R.verse) R.origin = +qp.get("o");
   store.setSetting("translation", R.t);
   store.visit(toOsis(R.book, R.chapter), R.t);
   setTitle(formatRef(R.book, R.chapter));
@@ -925,7 +931,8 @@ async function renderRead(t, osis) {
     <button class="btn ${lines ? "on" : ""}" type="button" id="linesbtn" aria-pressed="${lines}" title="One verse per line">Verse lines</button>
     <button class="btn" type="button" id="focusbtn" title="Hide everything except the text">Focus</button>
   </div>
-  <div class="reader">
+  <div class="reader desk ${store.setting("rail", true) ? "" : "norail"}">
+    ${railHtml()}
     <article class="page" aria-labelledby="chh">
       ${BOOK_ART[BOOKS[R.book].osis] ? `<figure class="bookban ${R.chapter === 1 ? "" : "slim"}"><a href="#/books" aria-label="All books of the Bible">${bookArt(R.book, { sizes: "(max-width: 960px) 100vw, 760px", eager: true })}</a><figcaption>${artCredit("books", BOOKS[R.book].osis)}</figcaption></figure>` : ""}
       <div class="runhead"><div><span class="eyebrow">${testamentOf(R.book)} · ${groupOf(R.book)}</span><h1 id="chh">${R.book === 18 ? "Psalm" : NAMES[R.book]} <span class="cn">${R.chapter}</span></h1></div>
@@ -939,9 +946,10 @@ async function renderRead(t, osis) {
         <button class="btn" type="button" id="next" ${lastBook ? "disabled" : ""}>Next ›</button>
       </nav>
     </article>
-    <aside class="margin" id="margin" aria-label="Study margin">
-      <div class="tabs" role="tablist"><button role="tab" type="button" data-tab="verse">Verse</button><button role="tab" type="button" data-tab="words">${R.book < 39 ? "Hebrew" : "Greek"}</button><button role="tab" type="button" data-tab="xref">Refs</button><button role="tab" type="button" data-tab="people">People</button><button role="tab" type="button" data-tab="bg">Book</button><button class="close" type="button" aria-label="Close study panel">×</button></div>
-      <div id="pane"></div>
+    <aside class="margin" id="margin" aria-label="Research panel" data-depth="${depth()}">
+      <div class="deskhead"><div class="depth" role="radiogroup" aria-label="Depth">${DEPTHS.map(([k, l, d]) => `<button type="button" role="radio" data-depth="${k}" aria-checked="${depth() === k}" title="${d}">${l}</button>`).join("")}</div><button class="close" type="button" aria-label="Close research panel">×</button></div>
+      <div class="tabs" role="tablist" aria-label="Research layers">${DESK_TABS.map(([k, l]) => `<button role="tab" type="button" data-tab="${k}">${l || (R.book < 39 ? "Hebrew" : "Greek")}</button>`).join("")}</div>
+      <div id="pane" role="tabpanel"></div>
     </aside>
   </div>`;
   const goCh = (b, c, v = null) => go(readUrl(R.t, b, c, v));
@@ -966,11 +974,24 @@ async function renderRead(t, osis) {
     document.querySelectorAll("#pane .wb.on").forEach(x => x.classList.remove("on")); wb.classList.add("on");
     document.querySelectorAll("#text .wb.on").forEach(x => x.classList.remove("on"));
     document.querySelector(`#text .wb[data-v="${R.verse}"][data-w="${R.word}"]`)?.classList.add("on");
-    loadOrig(R.book, R.chapter).then(c => wordCard(c.verses[R.verse - 1][R.word], R.book)).then(h => { $("#wordcard").innerHTML = h; });
+    loadOrig(R.book, R.chapter).then(c => { const w = c.verses[R.verse - 1][R.word]; store.trailAdd({ kind: "word", label: `${w[0]} (${w[1]}) in ${formatRef(R.book, R.chapter, R.verse)}`, href: deskUrl().replace(/^#/, "").replace(/\?.*/, "") + `?panel=words&w=${R.word}` }); return wordCard(w, R.book); }).then(h => { $("#wordcard").innerHTML = h; });
+    setPath(deskUrl()); rememberDesk();
   });
-  $("#margin .tabs").addEventListener("click", e => {
-    if (e.target.closest(".close")) { $("#margin").classList.remove("open"); return; }
-    const b = e.target.closest("[data-tab]"); if (b) { R.tab = b.dataset.tab; renderMargin(); }
+  $("#margin .close").addEventListener("click", () => $("#margin").classList.remove("open"));
+  $("#margin .tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) { R.tab = b.dataset.tab; if (R.tab !== "words") { R.word = null; R.origin = null; } renderMargin(); } });
+  $("#margin .tabs").addEventListener("keydown", e => {
+    const tabs = [...$("#margin .tabs").querySelectorAll("[data-tab]")], i = tabs.indexOf(document.activeElement); if (i < 0) return;
+    const n = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? tabs.length - 1 : null;
+    if (n == null) return; e.preventDefault(); const t = tabs[(n + tabs.length) % tabs.length]; t.focus(); t.click();
+  });
+  $("#margin .depth").addEventListener("click", e => { const b = e.target.closest("[data-depth]"); if (!b) return; store.setSetting("depth", b.dataset.depth); $("#margin .depth").querySelectorAll("[data-depth]").forEach(x => x.setAttribute("aria-checked", x === b)); renderMargin(); });
+  $("#railtoggle").addEventListener("click", () => { const on = !store.setting("rail", true); store.setSetting("rail", on); view.querySelector(".desk").classList.toggle("norail", !on); $("#railtoggle").setAttribute("aria-expanded", on); });
+  $("#railtoggle").setAttribute("aria-expanded", store.setting("rail", true));
+  $("#pane").addEventListener("click", e => {
+    const a = e.target.closest("a[href]"); if (!a) return;
+    const href = a.getAttribute("href").replace(/^#/, ""), text = (a.querySelector(".ref, b")?.textContent || a.textContent).trim().slice(0, 100);
+    const kind = href.startsWith("/read/") ? "passage" : href.startsWith("/word/") ? "word" : href.startsWith("/person/") ? "person" : href.startsWith("/place/") ? "place" : href.startsWith("/discoveries/") ? "discovery" : "source";
+    store.trailAdd({ kind, label: text, href });
   });
   const pick = el => {
     const ew = el.closest(".ew");
@@ -983,6 +1004,7 @@ async function renderRead(t, osis) {
   $("#text").addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(e.target); } });
   await renderChapterText();
   await renderMargin();
+  if (R.verse) store.trailAdd({ kind: "verse", label: formatRef(R.book, R.chapter, R.verse), href: readUrl(R.t, R.book, R.chapter, R.verse).replace(/^#/, ""), detail: TR[R.t] });
   if (R.verse) {
     try { await document.fonts?.ready; } catch {}
     const phone = matchMedia("(max-width: 960px)").matches;
@@ -1072,10 +1094,11 @@ async function renderStudy(tab = "notes") {
 async function renderWord(key, page = 0) {
   await getIndex();
   const k = normaliseStrong(key) || key;
-  setNav("languages"); setTitle(displayStrong(k));
+  setNav("word"); setTitle(displayStrong(k));
   let e = await loadLex(k).catch(() => null);
-  if (!e && !/[A-Z]$/.test(k)) for (const s of ["G", "A", "B", "H"]) { e = await loadLex(k + s).catch(() => null); if (e) { location.replace(`#/word/${k + s}`); return; } }
+  if (!e && !/[A-Z]$/.test(k)) for (const s of ["G", "A", "B", "H"]) { e = await loadLex(k + s).catch(() => null); if (e) { go(`#/word/${k + s}`, { replace: true }); return; } }
   if (!e) { view.innerHTML = `<div class="pagehead"><span class="eyebrow">Languages</span><h1>${esc(displayStrong(k) || key)}</h1><p class="empty">No word with this Strong's number appears in the Hebrew or Greek text here. Try another number, such as H7225 or G26.</p></div>`; return; }
+  setTitle(`${e.lemma} (${e.translit.replace(/\./g, "")}), ${displayStrong(k)}`);
   const greek = k[0] === "G", PAGE = 50;
   const refs = e.refs.slice(page * PAGE, page * PAGE + PAGE);
   const rows = await Promise.all(refs.map(async n => { const r = unpackRef(n); const t = await verseText("kjv", toOsis(r.book, r.chapter, r.verse)).catch(() => ""); return `<a class="hit" href="${readUrl("kjv", r.book, r.chapter, r.verse)}"><span class="meta"><span class="ref">${formatRef(r.book, r.chapter, r.verse)}</span></span><span class="tx">${esc(t)}</span></a>`; }));
@@ -2257,6 +2280,15 @@ async function route() {
     view.innerHTML = `<p class="empty">Something did not load. Check your connection, then <a href="${esc(location.pathname)}">try again</a>.</p>`;
   }
   if (head !== "read" && !location.hash) window.scrollTo(0, 0);
+  // Research trail: record the sources and studies opened anywhere on the site.
+  const TRAIL_HEADS = { word: "word", discoveries: "discovery", person: "person", place: "place", lens: "passage", compare: "passage", translation: "source", research: "source" };
+  if (TRAIL_HEADS[head] && rest[0]) store.trailAdd({ kind: TRAIL_HEADS[head], label: document.title.replace(/ · Ereunia$/, ""), href: location.pathname });
+  // A way back to the passage being studied, from any page opened out of the Research Desk.
+  document.querySelector(".deskreturn")?.remove();
+  let desk = null; try { desk = JSON.parse(sessionStorage.getItem("ereunia:desk") || "null"); } catch {}
+  if (desk?.href && head !== "read" && head !== "" && head !== "kids") {
+    document.body.insertAdjacentHTML("beforeend", `<a class="deskreturn" href="${esc(desk.href)}"><span aria-hidden="true">↩</span> Back to ${esc(desk.label)}</a>`);
+  }
 }
 setRouter(route);
 startNavigation();

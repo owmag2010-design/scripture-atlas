@@ -1144,3 +1144,43 @@ body.home header.site .gsearch { display: none; }
 .more-row a:hover { border-color: var(--gilt); }
 @media (max-width: 1000px) { .desk-demo { grid-template-columns: minmax(0, 1fr); } .arc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 760px) { .paths, .standards { grid-template-columns: minmax(0, 1fr); } .dd-frame { grid-template-columns: minmax(0, 1fr); } .dd-text { border-right: 0; border-bottom: 1px solid var(--line); } }
+
+/* ---------- Research Desk ---------- */
+.reader.desk { grid-template-columns: 220px minmax(0, 1fr) 420px; }
+.reader.desk.norail { grid-template-columns: 44px minmax(0, 1fr) 420px; }
+.rail { position: sticky; top: 120px; align-self: start; max-height: calc(100vh - 140px); overflow: auto; display: grid; gap: 8px; padding-right: 4px; }
+.railtoggle { justify-self: end; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--page); display: grid; place-items: center; cursor: pointer; color: var(--ink); }
+.railtoggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; transition: transform .2s; }
+.norail .railtoggle svg { transform: rotate(180deg); }
+.norail .railbody { display: none; }
+.railbody { display: grid; gap: 8px; }
+.railbody .eyebrow { margin-top: 8px; }
+.railref { font: 700 1.1rem var(--sans); }
+.raillinks, .railtrail { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.raillinks a, .railtrail a { display: block; padding: 6px 8px; border-radius: 8px; text-decoration: none; color: var(--ink); font-size: .9rem; line-height: 1.3; }
+.raillinks a:hover, .railtrail a:hover { background: var(--soft); }
+.railtrail .tk { display: block; font: 700 .64rem var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--gilt); }
+.deskhead { display: flex; align-items: center; gap: 8px; padding: 8px 8px 0; position: sticky; top: 0; background: var(--page); z-index: 2; }
+.depth { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 3px; background: var(--soft); border-radius: 10px; }
+.depth button { border: 0; background: transparent; padding: 6px 4px; border-radius: 8px; font: 600 .8rem var(--sans); color: var(--muted); cursor: pointer; }
+.depth button[aria-checked="true"] { background: var(--page); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.margin .deskhead .close { display: none; }
+.margin .tabs { top: 46px; overflow-x: auto; scrollbar-width: thin; }
+.margin .tabs button { flex: none; padding-inline: 10px; white-space: nowrap; }
+.margin[data-depth="discover"] .mono, .margin[data-depth="discover"] .margnote, .margin[data-depth="discover"] .lexdef, .margin[data-depth="discover"] .rend { display: none; }
+.mslist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.mslist li { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 10px; align-items: start; padding: 10px; border: 1px solid var(--line); border-radius: 10px; }
+.mslist p { margin: 2px 0 0; }
+.mschip { font: 700 .72rem var(--sans); padding: 4px 8px; border-radius: 99px; text-align: center; }
+.ms-yes .mschip { background: #DCEFD8; color: #22502A; } .ms-part .mschip { background: #F6E7C3; color: #6B4A06; } .ms-no .mschip { background: var(--soft); color: var(--muted); }
+.ms-no { opacity: .75; }
+.deskask { display: grid; gap: 8px; } .deskask textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font: 1rem var(--sans); background: var(--page); color: var(--ink); }
+.deskreturn { position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 26; background: var(--lapis-deep); color: #F5EFE6; padding: 10px 16px; border-radius: 99px; text-decoration: none; font: 600 .9rem var(--sans); box-shadow: 0 10px 30px -10px rgba(0,0,0,.5); border: 1px solid rgba(242,193,78,.4); }
+.deskreturn:hover, .deskreturn:focus-visible { background: #000; outline: none; }
+@media (max-width: 1200px) { .reader.desk, .reader.desk.norail { grid-template-columns: minmax(0, 1fr) 400px; } .rail { display: none; } }
+@media (max-width: 960px) {
+  .reader.desk, .reader.desk.norail { grid-template-columns: minmax(0, 1fr); }
+  .margin .deskhead .close { display: block; border: 0; background: none; font-size: 1.5rem; padding: 0 8px; color: var(--muted); }
+  .margin .tabs { top: 44px; }
+  .deskreturn { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+}
