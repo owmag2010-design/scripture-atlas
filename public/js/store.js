@@ -3,7 +3,7 @@
 // Keys are OSIS references, e.g. "John.3.16".
 
 const KEY = "scripture-atlas:v1";
-const blank = () => ({ version: 1, notes: {}, bookmarks: {}, highlights: {}, history: [], position: null, settings: {}, progress: {}, days: [], ai: [], guides: {}, trail: { started: null, steps: [] }, trails: [] });
+const blank = () => ({ version: 1, notes: {}, bookmarks: {}, highlights: {}, history: [], position: null, settings: {}, progress: {}, days: [], ai: [], guides: {}, trail: { started: null, steps: [] }, trails: [], preps: {} });
 
 export const today = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
@@ -117,6 +117,17 @@ export function createStore(storage) {
     trail: id => data.trails.find(t => t.id === id) || null,
     removeTrail(id) { data.trails = data.trails.filter(t => t.id !== id); save(); },
 
+    /** Sermon and lesson preparations, keyed by passage (e.g. "John.1.1-18"). */
+    prep: key => (data.preps[key] ? structuredClone(data.preps[key]) : null),
+    savePrep(p) {
+      if (!p?.key) return;
+      const keep = Object.values(data.preps).filter(x => x.key !== p.key).sort((a, b) => (b.updated || "").localeCompare(a.updated || "")).slice(0, 59);
+      data.preps = Object.fromEntries([...keep, { ...structuredClone(p), updated: now(), created: p.created || now() }].map(x => [x.key, x]));
+      markDay(today()); save();
+    },
+    preps: () => Object.values(data.preps).map(x => structuredClone(x)).sort((a, b) => (b.updated || "").localeCompare(a.updated || "")),
+    removePrep(key) { delete data.preps[key]; save(); },
+
     /** Full backup of everything kept on this device, and restore from such a backup. */
     backup: () => ({ app: "ereunia", kind: "backup", exported: now(), data: structuredClone(data) }),
     restore(obj, { merge = true } = {}) {
@@ -125,7 +136,7 @@ export function createStore(storage) {
       const clean = v => JSON.parse(JSON.stringify(v ?? null));            // drops functions and prototypes
       const plain = o => (o && typeof o === "object" && !Array.isArray(o) ? Object.fromEntries(Object.entries(o).filter(([k]) => !["__proto__", "constructor", "prototype"].includes(k))) : {});
       const next = merge ? data : blank();
-      for (const k of ["notes", "bookmarks", "highlights", "settings", "progress", "guides"]) next[k] = { ...(merge ? next[k] : {}), ...plain(clean(src[k])) };
+      for (const k of ["notes", "bookmarks", "highlights", "settings", "progress", "guides", "preps"]) next[k] = { ...(merge ? next[k] : {}), ...plain(clean(src[k])) };
       for (const k of ["history", "days", "ai", "trails"]) if (Array.isArray(src[k])) next[k] = merge ? [...clean(src[k]), ...next[k]].filter((x, i, a) => a.findIndex(y => JSON.stringify(y) === JSON.stringify(x)) === i) : clean(src[k]);
       if (!merge && src.position) next.position = clean(src.position);
       if (src.trail?.steps && Array.isArray(src.trail.steps) && !next.trail.steps.length) next.trail = clean(src.trail);

@@ -24,6 +24,7 @@ export const TEXT_NOTES = {
 };
 
 export const SOURCES = [
+  { name: "Classic commentaries: Matthew Henry (complete and concise), Jamieson–Fausset–Brown, Albert Barnes, Adam Clarke, Keil and Delitzsch, C. H. Spurgeon's Treasury of David", type: "Commentary · interpretation", owner: "CrossWire Bible Society (SWORD modules)", licence: "Public domain", use: "The Commentaries tab in the Research Desk and the Commentaries step in Prepare; each is labelled with its author, date and tradition", url: "https://crosswire.org/sword/modules/ModDisp.jsp?modType=Commentaries" },
   { name: "King James Version, with Strong's numbers", type: "Scripture · translation", owner: "CrossWire Bible Society and eBible.org", licence: "Public domain (Crown patent in the United Kingdom)", use: "Full text, word origins, translators' additions, marginal notes", url: "https://ebible.org/kjv/" },
   { name: "World English Bible", type: "Scripture · translation", owner: "eBible.org", licence: "Public domain", use: "Full text with paragraphs and poetry lines", url: "https://ebible.org/web/" },
   { name: "Book background notes", type: "Ereunia editorial", owner: "Ereunia", licence: "Original work", use: "Authorship, dating, setting and themes for 66 books, with traditional and critical views", url: null },

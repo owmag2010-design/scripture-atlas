@@ -67,3 +67,14 @@ Preview: https://deploy-preview-1--scripture-atlas-om.netlify.app (Netlify team 
   - axe reports 0 violations on 15 page and theme combinations.
   - A crawl of 152 routes on phone and desktop, light and dark, found no overflow, broken images or script errors.
   - 147 tests pass.
+
+## Pastor tools (27 October 2026, branch `pastors`)
+- **Commentaries tab** in the Research Desk, from public-domain SWORD modules (CrossWire Bible Society): Matthew Henry (concise and complete), Jamieson–Fausset–Brown, Barnes (NT), Clarke, Keil and Delitzsch (OT) and Spurgeon's Treasury of David (Psalms). Each is labelled with its author, date and tradition, and marked as interpretation. Built at deploy time by `scripts/build-commentaries.mjs` (about 6,150 chapter files, 131 MB). Its output is limited to p, h4, i, b, br and links to Bible references; the build fails on anything else.
+- **Prepare** (`/prepare/<passage>`): eight steps (Read, Observe, Words, Context, Commentaries, Connections, Outline, Apply), with notes, done ticks and collected material that keeps its citation. The outline exports to Word (.docx, written in the browser), prints as a handout or small-group guide, and opens in a Present view with slides and preaching notes, a timer and keeping the screen awake. Everything stays on the device and is included in backups.
+- **For pastors** page (`/pastors`), an "Add to preparation" action on verses and commentary in the desk, and a "Prepare a sermon on it" link in study guides.
+- **AI kept in the background:** the homepage block about AI is replaced by one about preparing to teach. "AI Studio" is renamed "Ask a question" and moved to the end of the Research menu. No AI is used in the pastor tools.
+- **Checked:**
+  - The full journey (desk commentary, Prepare steps, outline, Word, Present, handout, group guide) passes with no script errors.
+  - The Word file opens in python-docx with the expected styles.
+  - axe reports no new violations on the new pages.
+  - 152 tests pass.
