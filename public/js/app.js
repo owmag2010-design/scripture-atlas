@@ -18,6 +18,7 @@ import { mountMap } from "./atlas-map.js";
 import { renderAtlas } from "./atlas-app.js";
 import { COURSES, PLANNED, STATUS } from "./courses.js";
 import { SECTIONS } from "./ai-core.js";
+import { drawCard, canvasBlob, SIZES, STYLES } from "./share.js";
 import { HISTORY, NOT_HOSTED } from "./translations-info.js";
 import { KID_STORIES } from "./kids.js";
 import { JOURNEYS } from "./journeys.js";
@@ -120,7 +121,7 @@ async function renderDiscovery(id) {
   const fact = (k, v) => v ? `<div><dt>${k}</dt><dd>${v}</dd></div>` : "";
   const rel = discRelated(DISCOVERIES, d, bIdx);
   view.innerHTML = `<div class="pagehead ${photo ? "art" : ""}">${photo}<span class="eyebrow"><a href="#/discoveries">Discoveries</a> · ${esc(KINDS[d.kind] || "")}</span><h1>${esc(d.name)}</h1>
-    <p>${esc(d.summary)}</p><div class="actions">${dChip(d)}<span class="small">${esc(DSTATUS[d.status]?.note || "")}</span></div>${photo ? `<p class="headcredit">${discCredit(d)}</p>` : ""}</div>
+    <p>${esc(d.summary)}</p><div class="actions">${dChip(d)}<span class="small">${esc(DSTATUS[d.status]?.note || "")}</span><a class="btn sharebtn" href="#/share/d/${d.id}">Share as a card</a></div>${photo ? `<p class="headcredit">${discCredit(d)}</p>` : ""}</div>
   <div class="dlayout">
     <div class="dmain">
       <section class="card"><h2>What it is</h2><p>${esc(d.description)}</p></section>
@@ -326,7 +327,7 @@ async function renderHome() {
 
   <section class="home-row">
     <div class="votd2"><span class="eyebrow">Verse for today</span><blockquote id="votd">…</blockquote>
-      <div class="actions"><a class="btn pri" href="${readUrl("kjv", vr.book, vr.chapter, vr.verse)}">Read in context</a><a class="btn" href="#/research/${votd}">See its connections</a><a class="btn" href="#/compare/${votd}">In every Bible</a></div></div>
+      <div class="actions"><a class="btn pri" href="${readUrl("kjv", vr.book, vr.chapter, vr.verse)}">Read in context</a><a class="btn" href="#/research/${votd}">See its connections</a><a class="btn" href="#/compare/${votd}">In every Bible</a><a class="btn" href="#/share/v/${votd}/kjv">Share as a card</a></div></div>
     <div class="resume2">${posRef
       ? `<span class="eyebrow">Continue reading</span><h2>${formatRef(posRef.book, posRef.chapter)}</h2><p class="small">${TR[pos.translation] || "KJV"}, last opened ${new Date(pos.at).toLocaleDateString()}</p><a class="btn gold" href="${readUrl(pos.translation || "kjv", posRef.book, posRef.chapter, pos.verse ? fromOsis(pos.verse)?.verse : null)}">Resume reading</a>`
       : `<span class="eyebrow">Start reading</span><h2>Genesis 1</h2><p class="small">Or choose any book in the reader.</p><a class="btn gold" href="#/read/kjv/Gen.1">Open the reader</a>`}
@@ -463,6 +464,7 @@ async function versePane() {
     <div class="actions" aria-label="Verse actions">
       <button class="btn ${bm ? "on" : ""}" id="bmk" type="button" aria-pressed="${bm}">${bm ? "Bookmarked" : "Bookmark"}</button>
       <button class="btn" id="cpy" type="button">Copy</button>
+      <a class="btn" href="#/share/v/${osis}/${R.t}">Share card</a>
       <span class="small" style="margin-left:4px">Highlight</span>
       ${HL.map(h => `<button type="button" class="swatch sw-${h}" data-hl="${h}" aria-label="Highlight ${h}" aria-pressed="${hl === h}"></button>`).join("")}
       <button type="button" class="swatch sw-none" data-hl="" aria-label="Remove highlight"></button>
@@ -1985,6 +1987,73 @@ function renderStory(id) {
   go(0);
 }
 
+
+/* ---------- share cards: branded images of a verse or a discovery ---------- */
+async function renderShare(kind, a, b) {
+  setNav(""); setTitle("Share a card");
+  await getIndex();
+  const day = Math.floor(Date.now() / 864e5);
+  let state = { kind: kind === "d" && DISC.has(a) ? "d" : "v", osis: kind === "v" && fromOsis(a) ? a : DAILY[day % DAILY.length], t: b && TR[b] ? b : "kjv", id: kind === "d" ? a : null, size: store.setting("sharesize", "square"), style: store.setting("sharestyle", "picture") };
+  const trs = allTranslations();
+  view.innerHTML = `<div class="pagehead"><span class="eyebrow">Share</span><h1>Make a card to share</h1>
+    <p class="small" style="max-width:68ch">Choose a verse or a discovery, pick a look and a size, then download it or share it straight to your apps. The words always come from the Bible text or the documented find, and every card names its source.</p></div>
+  <div class="sharegrid">
+    <div class="card sharepreview"><canvas id="scv" aria-label="Card preview"></canvas><p class="small" id="smsg" role="status"></p></div>
+    <aside class="card sharectl">
+      <div class="sseg" role="tablist" aria-label="Card type"><button type="button" data-kind="v">Verse</button><button type="button" data-kind="d">Discovery</button></div>
+      <form id="sverse" class="sfield"><label for="sref">Verse</label><div class="minisearch"><input id="sref" placeholder="e.g. John 3:16" autocomplete="off"><button class="btn" type="submit">Show</button></div>
+        <label for="str">Translation</label><select id="str">${trs.map(t => `<option value="${esc(t.id)}">${esc(t.name)}</option>`).join("")}</select></form>
+      <div id="sdisc" class="sfield"><label for="sdsel">Discovery</label><select id="sdsel">${DISCOVERIES.slice().sort((x, y) => x.name.localeCompare(y.name)).map(d => `<option value="${esc(d.id)}">${esc(d.name)}</option>`).join("")}</select></div>
+      <div class="sfield"><span class="lbl">Look</span><div class="sseg" id="sstyle">${Object.entries(STYLES).map(([k, v]) => `<button type="button" data-style="${k}">${v.label}</button>`).join("")}</div></div>
+      <div class="sfield"><span class="lbl">Size</span><div class="sseg" id="ssize">${Object.entries(SIZES).map(([k, v]) => `<button type="button" data-size="${k}" title="${esc(v.hint)}">${v.label}<small>${v.w}×${v.h}</small></button>`).join("")}</div></div>
+      <div class="actions"><button class="btn pri" type="button" id="sdl">Download image</button><button class="btn" type="button" id="sshare" hidden>Share…</button><button class="btn" type="button" id="slink">Copy link</button></div>
+      <p class="small">Bible text from public-domain or openly licensed translations; artwork public domain; photos credited on the card under their licence.</p>
+    </aside>
+  </div>`;
+  const cv = $("#scv"); let current = null;
+  async function build() {
+    if (state.kind === "v") {
+      const r = fromOsis(state.osis); const text = (await verseText(state.t, state.osis).catch(() => "")).replace(/\s+/g, " ").trim();
+      if (!text) return null;
+      const osisB = BOOKS[r.book].osis, art = BOOK_ART[osisB];
+      return { kind: "verse", text, ref: formatRef(r.book, r.chapter, r.verse), source: META[state.t]?.name || TR[state.t], eyebrow: "", dir: dirOf(state.t),
+        image: art ? `img/books/${osisB}.webp` : null, focus: art?.focus, credit: art && state.style === "picture" ? `Art: Gustave Doré, ${art.title} (1866), public domain` : "" };
+    }
+    const d = DISC.get(state.id) || DISCOVERIES[0]; state.id = d.id;
+    const m = d.image?.local ? d.image : null;
+    return { kind: "discovery", title: d.name, text: d.summary, ref: d.objectDate?.text || "", source: d.heldAt?.institution ? `Held at ${d.heldAt.institution}` : (d.found?.where ? `Found at ${d.found.where}` : ""), eyebrow: `Discovery · ${DSTATUS[d.status]?.label || ""}`,
+      image: m ? `img/disc/${d.id}.webp` : null, focus: m?.focus, credit: m && state.style === "picture" ? `Photo: ${m.author}, ${m.licence}, via Wikimedia Commons` : "" };
+  }
+  async function draw() {
+    view.querySelectorAll("[data-kind]").forEach(x => x.setAttribute("aria-pressed", x.dataset.kind === state.kind));
+    view.querySelectorAll("[data-style]").forEach(x => x.setAttribute("aria-pressed", x.dataset.style === state.style));
+    view.querySelectorAll("[data-size]").forEach(x => x.setAttribute("aria-pressed", x.dataset.size === state.size));
+    $("#sverse").hidden = state.kind !== "v"; $("#sdisc").hidden = state.kind !== "d";
+    if (state.kind === "v") { const r = fromOsis(state.osis); $("#sref").value = formatRef(r.book, r.chapter, r.verse); $("#str").value = state.t; } else $("#sdsel").value = state.id || $("#sdsel").value;
+    current = await build();
+    if (!current) { $("#smsg").textContent = "That verse isn't in this translation. Try another translation."; return; }
+    const res = await drawCard(cv, current, { size: state.size, style: state.style });
+    $("#smsg").textContent = res.ok ? (state.style === "picture" && !current.image ? "No picture for this one yet, so it uses the Night look." : "") : res.reason;
+    cv.style.aspectRatio = `${SIZES[state.size].w} / ${SIZES[state.size].h}`;
+    history.replaceState(null, "", state.kind === "v" ? `#/share/v/${state.osis}/${state.t}` : `#/share/d/${state.id}`);
+  }
+  view.querySelectorAll("[data-kind]").forEach(x => x.addEventListener("click", () => { state.kind = x.dataset.kind; if (state.kind === "d" && !state.id) state.id = $("#sdsel").value; draw(); }));
+  view.querySelectorAll("[data-style]").forEach(x => x.addEventListener("click", () => { state.style = x.dataset.style; store.setSetting?.("sharestyle", state.style); draw(); }));
+  view.querySelectorAll("[data-size]").forEach(x => x.addEventListener("click", () => { state.size = x.dataset.size; store.setSetting?.("sharesize", state.size); draw(); }));
+  $("#sverse").addEventListener("submit", e => { e.preventDefault(); const r = parseReference($("#sref").value, chapterCount); if (!r) { $("#smsg").textContent = "Type a reference such as John 3:16."; return; } state.osis = toOsis(r.book, r.chapter, r.verse || 1); draw(); });
+  $("#str").addEventListener("change", e => { state.t = e.target.value; draw(); });
+  $("#sdsel").addEventListener("change", e => { state.id = e.target.value; draw(); });
+  const fileName = () => `ereunia-${state.kind === "v" ? state.osis.replace(/\./g, "-") : state.id}-${state.size}.png`;
+  $("#sdl").addEventListener("click", async () => { const b = await canvasBlob(cv); const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = fileName(); a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); });
+  const link = () => { if (state.kind !== "v") return `${location.origin}/#/discoveries/${state.id}`; const r = fromOsis(state.osis); return `${location.origin}/${readUrl(state.t, r.book, r.chapter, r.verse)}`; };
+  if (navigator.canShare && navigator.canShare({ files: [new File([""], "x.png", { type: "image/png" })] })) {
+    $("#sshare").hidden = false;
+    $("#sshare").addEventListener("click", async () => { const b = await canvasBlob(cv); try { await navigator.share({ files: [new File([b], fileName(), { type: "image/png" })], text: `${current.ref || current.title} · ereunia.com`, url: link() }); } catch {} });
+  }
+  $("#slink").addEventListener("click", async () => { try { await navigator.clipboard.writeText(link()); toast("Link copied"); } catch { toast(link()); } });
+  draw();
+}
+
 /* ---------- router ---------- */
 async function route() {
   await Promise.all([imagesReady, artReady]);
@@ -2015,6 +2084,7 @@ async function route() {
     else if (head === "kids") await (rest[0] ? renderStory(rest[0]) : renderKids());
     else if (head === "soon") renderSoon(rest[0]);
     else if (head === "books") { await getIndex(); renderBooks(); }
+    else if (head === "share") await renderShare(rest[0], rest[1], rest[2]);
     else if (head === "atlas") { await getIndex(); setNav("atlas"); setTitle("Atlas"); await renderAtlas({ view, H, esc, DISCOVERIES, JOURNEYS, NAMES, BOOKS, ERAS, unpackRef, readUrl, formatRef, PRECISION, toOsis, fromOsis, labelOf, discImg, discCredit, discMini, yearText, verseText, rangeHref, rangeLabel, project, MAP_SIZE, SECTIONS, parseRef: q => parseReference(q, chapterCount) }, rest); }
     else if (head === "discoveries") { await getIndex(); await renderDiscoveries(rest[0]); }
     else await renderHome();

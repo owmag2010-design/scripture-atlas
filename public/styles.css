@@ -1057,3 +1057,20 @@ body.atlasmode main#view { max-width: none; padding: 0; margin: 0; }
   footer.site .namenote { grid-column: 2; grid-row: 1; justify-self: end; text-align: right; }
   footer.site .fproj { grid-column: 2; grid-row: 2; justify-self: end; text-align: right; }
 }
+/* ---------- share cards ---------- */
+.sharegrid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 18px; align-items: start; margin-top: 18px; }
+.sharepreview { display: grid; place-items: center; background: var(--lapis-soft); min-height: 420px; }
+.sharepreview canvas { width: 100%; max-width: 620px; max-height: 76vh; height: auto; object-fit: contain; border-radius: 10px; box-shadow: 0 18px 50px -20px rgba(0,0,0,.45); }
+.sharepreview .small:empty { display: none; }
+.sharectl { display: grid; gap: 16px; position: sticky; top: 120px; }
+.sharectl .sfield { display: grid; gap: 6px; }
+.sharectl .sfield[hidden] { display: none; }
+.sharectl label, .sharectl .lbl { font: 600 .82rem var(--sans); color: var(--muted); }
+.sharectl select { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--page); color: var(--ink); font: 1rem var(--sans); }
+.sseg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; background: var(--lapis-soft); border-radius: 12px; }
+.sseg button { border: 0; background: transparent; color: var(--ink); padding: 9px 8px; border-radius: 9px; font: 600 .92rem var(--sans); cursor: pointer; display: grid; gap: 1px; justify-items: center; }
+.sseg button small { font-weight: 500; font-size: .7rem; color: var(--muted); }
+.sseg button[aria-pressed="true"] { background: var(--page); box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+.sseg button:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+.pagehead .sharebtn { margin-left: auto; }
+@media (max-width: 900px) { .sharegrid { grid-template-columns: minmax(0, 1fr); } .sharectl { position: static; } .sharepreview { min-height: 0; } }
