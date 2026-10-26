@@ -1052,7 +1052,8 @@ export const DISCOVERIES = [
    "author": "Olaf Tausch",
    "licence": "CC BY 3.0",
    "licenceUrl": "https://creativecommons.org/licenses/by/3.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Kairo_Museum_Merenptah-Stele_01.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Kairo_Museum_Merenptah-Stele_01.jpg",
+   "depicts": "object"
   }
  },
  {
@@ -1118,7 +1119,8 @@ export const DISCOVERIES = [
    "author": "Olaf Tausch",
    "licence": "CC BY 3.0",
    "licenceUrl": "https://creativecommons.org/licenses/by/3.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Karnak_Tempel_19.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Karnak_Tempel_19.jpg",
+   "depicts": "object"
   }
  },
  {
@@ -1187,7 +1189,8 @@ export const DISCOVERIES = [
    "focus": "50% 40%",
    "author": "Tangopaso",
    "licence": "Public domain",
-   "source": "https://commons.wikimedia.org/wiki/File:Mesha_stele_(Louvre,_AO_5066).jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Mesha_stele_(Louvre,_AO_5066).jpg",
+   "depicts": "object"
   }
  },
  {
@@ -1261,7 +1264,8 @@ export const DISCOVERIES = [
    "author": "Oren Rozen",
    "licence": "CC BY-SA 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:JRSLM_300116_Tel_Dan_Stele_02.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:JRSLM_300116_Tel_Dan_Stele_02.jpg",
+   "depicts": "object"
   }
  },
  {
@@ -1328,7 +1332,8 @@ export const DISCOVERIES = [
    "author": "Osama Shukir Muhammed Amin FRCP(Glasg)",
    "licence": "CC BY-SA 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Kurkh_stele_of_Shalmaneser_III._From_Diyarbak%C4%B1r,_southern_Turkey._British_Museum.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Kurkh_stele_of_Shalmaneser_III._From_Diyarbak%C4%B1r,_southern_Turkey._British_Museum.jpg",
+   "depicts": "object"
   }
  },
  {
@@ -1634,7 +1639,8 @@ export const DISCOVERIES = [
    "author": "Zunkir",
    "licence": "CC BY-SA 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Capture_of_Lachish_-_Sennacherib.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Capture_of_Lachish_-_Sennacherib.jpg",
+   "depicts": "object"
   }
  },
  {
@@ -1752,7 +1758,8 @@ export const DISCOVERIES = [
    "author": "Osama Shukir Muhammed Amin FRCP(Glasg)",
    "licence": "CC BY-SA 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:The_cuneiform_inscription_highlights_the_conquest_of_Jerusalem_and_the_surrender_of_Jehoiakim,_king_of_Judah,_in_597_BCE._From_Babylon,_Iraq.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:The_cuneiform_inscription_highlights_the_conquest_of_Jerusalem_and_the_surrender_of_Jehoiakim,_king_of_Judah,_in_597_BCE._From_Babylon,_Iraq.jpg",
+   "depicts": "object"
   }
  },
  {
@@ -1817,7 +1824,8 @@ export const DISCOVERIES = [
    "author": "Osama Shukir Muhammed Amin FRCP(Glasg)",
    "licence": "CC BY-SA 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Clay_tablet._The_Akkadian_cuneiform_inscription_lists_certain_rations_and_mentions_the_name_of_Jeconiah_(Jehoiachin),_King_of_Judah_and_the_Babylonian_captivity._From_Babylon,_Iraq._C._580_BCE._Vorderasiatisches_Museum,_Berlin.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Clay_tablet._The_Akkadian_cuneiform_inscription_lists_certain_rations_and_mentions_the_name_of_Jeconiah_(Jehoiachin),_King_of_Judah_and_the_Babylonian_captivity._From_Babylon,_Iraq._C._580_BCE._Vorderasiatisches_Museum,_Berlin.jpg",
+   "depicts": "object"
   }
  },
  {
@@ -1933,7 +1941,8 @@ export const DISCOVERIES = [
    "author": "Mike Peel (www.mikepeel.net)",
    "licence": "CC BY-SA 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Cyrus_Cylinder.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Cyrus_Cylinder.jpg",
+   "depicts": "object"
   }
  },
  {
@@ -2050,7 +2059,8 @@ export const DISCOVERIES = [
    "author": "Gary Todd from Xinzheng, China",
    "licence": "CC0",
    "licenceUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
-   "source": "https://commons.wikimedia.org/wiki/File:Letter,_Arad,_6th_Century_BC,_Ink_on_Pottery,_Earliest_Reference_to_Solomon%27s_Temple_(42499943804).jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Letter,_Arad,_6th_Century_BC,_Ink_on_Pottery,_Earliest_Reference_to_Solomon%27s_Temple_(42499943804).jpg",
+   "depicts": "object"
   }
  },
  {
@@ -2111,7 +2121,8 @@ export const DISCOVERIES = [
    "author": "Osama Shukir Muhammed Amin FRCP(Glasg)",
    "licence": "CC BY-SA 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:The_Gezer_Calendar_tablet,_early_iron_age,_10th_century_BCE,_Museum_of_Archaeology,_Istanbul,_Turkey.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:The_Gezer_Calendar_tablet,_early_iron_age,_10th_century_BCE,_Museum_of_Archaeology,_Istanbul,_Turkey.jpg",
+   "depicts": "object"
   }
  },
  {
@@ -2176,7 +2187,8 @@ export const DISCOVERIES = [
    "author": "Bachrach44",
    "licence": "CC BY-SA 3.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Ketef_hinom_scrolls.JPG"
+   "source": "https://commons.wikimedia.org/wiki/File:Ketef_hinom_scrolls.JPG",
+   "depicts": "object"
   }
  },
  {
@@ -2491,7 +2503,8 @@ export const DISCOVERIES = [
    "author": "AVRAMGR",
    "licence": "CC BY-SA 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:TEL_HATZOR_AERIAL.JPG"
+   "source": "https://commons.wikimedia.org/wiki/File:TEL_HATZOR_AERIAL.JPG",
+   "depicts": "site"
   }
  },
  {
@@ -2561,7 +2574,8 @@ export const DISCOVERIES = [
    "author": "AVRAM GRAICER",
    "licence": "CC BY-SA 3.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-   "source": "https://commons.wikimedia.org/wiki/File:%D7%AA%D7%9C_%D7%9E%D7%92%D7%99%D7%93%D7%95.JPG"
+   "source": "https://commons.wikimedia.org/wiki/File:%D7%AA%D7%9C_%D7%9E%D7%92%D7%99%D7%93%D7%95.JPG",
+   "depicts": "site"
   }
  },
  {
@@ -2687,7 +2701,8 @@ export const DISCOVERIES = [
    "author": "Wilson44691",
    "licence": "CC BY-SA 3.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-   "source": "https://commons.wikimedia.org/wiki/File:LachishFrontGate.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:LachishFrontGate.jpg",
+   "depicts": "site"
   }
  },
  {
@@ -2813,7 +2828,8 @@ export const DISCOVERIES = [
    "author": "Davidbena",
    "licence": "CC0",
    "licenceUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
-   "source": "https://commons.wikimedia.org/wiki/File:Excavations_at_Khirbet_Qeiyafa.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Excavations_at_Khirbet_Qeiyafa.jpg",
+   "depicts": "site"
   }
  },
  {
@@ -2878,7 +2894,8 @@ export const DISCOVERIES = [
    "author": "Oren Rozen",
    "licence": "CC BY-SA 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Tel_Arad_280321_01_Temple_Dvir.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Tel_Arad_280321_01_Temple_Dvir.jpg",
+   "depicts": "site-replica"
   }
  },
  {
@@ -3055,7 +3072,8 @@ export const DISCOVERIES = [
    "author": "Carole Raddato from Frankfurt, Germany",
    "licence": "CC BY-SA 2.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/2.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Dedicatory_inscription_found_reused_in_the_staircase_of_the_theatre_of_Caesarea,_the_first_and_only_mention_of_Pontius_Pilates%27_name_ever_unearthed,_26-36_AD,_Israel_Museum,_Jerusalem_(15655925251).jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Dedicatory_inscription_found_reused_in_the_staircase_of_the_theatre_of_Caesarea,_the_first_and_only_mention_of_Pontius_Pilates%27_name_ever_unearthed,_26-36_AD,_Israel_Museum,_Jerusalem_(15655925251).jpg",
+   "depicts": "object"
   }
  },
  {
@@ -3127,7 +3145,8 @@ export const DISCOVERIES = [
    "author": "deror_avi",
    "licence": "CC BY-SA 3.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Ossuary_of_the_high_priest_Joseph_Caiaphas_P1180839.JPG"
+   "source": "https://commons.wikimedia.org/wiki/File:Ossuary_of_the_high_priest_Joseph_Caiaphas_P1180839.JPG",
+   "depicts": "object"
   }
  },
  {
@@ -3201,7 +3220,8 @@ export const DISCOVERIES = [
    "author": "Markbarnes",
    "licence": "CC BY-SA 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:The_Second_Temple_Pool_of_Siloam.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:The_Second_Temple_Pool_of_Siloam.jpg",
+   "depicts": "site"
   }
  },
  {
@@ -3320,7 +3340,8 @@ export const DISCOVERIES = [
    "author": "oncenawhile",
    "licence": "CC BY-SA 3.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Jerusalem_Temple_Warning_Inscription.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Jerusalem_Temple_Warning_Inscription.jpg",
+   "depicts": "object"
   }
  },
  {
@@ -3383,7 +3404,8 @@ export const DISCOVERIES = [
    "author": "Bukvoed",
    "licence": "CC BY 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Herodium-551.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Herodium-551.jpg",
+   "depicts": "site"
   }
  },
  {
@@ -3446,7 +3468,8 @@ export const DISCOVERIES = [
    "author": "Travellers & Tinkers",
    "licence": "CC BY-SA 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:JesusBoat.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:JesusBoat.jpg",
+   "depicts": "object"
   }
  },
  {

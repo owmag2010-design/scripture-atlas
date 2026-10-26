@@ -7,6 +7,11 @@ import { readFileSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import { fileId } from "../public/js/books.js";
 
+// Tidy publisher metadata for display: "German, Standard" → "German"; "ENGLISH" → "English";
+// "Bengali Indian Revised Version Bible: <native title>" → the English name only (the native title is kept in `title`).
+const cleanLang = l => { let x = String(l || "").replace(/,\s*Standard$/i, "").trim(); if (x && x === x.toUpperCase() && /^[A-Z ]+$/.test(x)) x = x.charAt(0) + x.slice(1).toLowerCase(); return x; };
+const cleanName = n => { const s = String(n || "").trim(); const i = s.indexOf(":"); return i > 0 && /[^\u0000-\u024F]/.test(s.slice(i + 1)) ? s.slice(0, i).trim() : s; };
+
 export const EBIBLE_BOOKS = "GEN EXO LEV NUM DEU JOS JDG RUT 1SA 2SA 1KI 2KI 1CH 2CH EZR NEH EST JOB PSA PRO ECC SOL ISA JER LAM EZE DAN HOS JOE AMO OBA JON MIC NAH HAB ZEP HAG ZEC MAL MAT MAR LUK JOH ACT ROM 1CO 2CO GAL EPH PHI COL 1TH 2TH 1TI 2TI TIT PHM HEB JAM 1PE 2PE 1JO 2JO 3JO JUD REV".split(" ");
 const CODE = new Map(EBIBLE_BOOKS.map((c, i) => [c, i]));
 
@@ -80,7 +85,7 @@ function main() {
     books.forEach((chs, i) => writeFileSync(new URL(`${id}/${fileId(i)}.bin`, out), gzipSync(JSON.stringify({ book: i, chapters: chs }), { level: 9 })));
     const verses = books.reduce((n, b) => n + b.reduce((x, c) => x + c.filter(Boolean).length, 0), 0);
     catalogue.push({
-      id, name: m.shortTitle || m.title, title: m.title, language: m.languageName, languageEn: m.languageNameInEnglish, code: m.languageCode,
+      id, name: cleanName(m.shortTitle || m.title), title: m.title, language: cleanLang(m.languageName), languageEn: cleanLang(m.languageNameInEnglish), code: m.languageCode,
       dir: m.textDirection === "rtl" ? "rtl" : "ltr", script: m.script, licence: LICENCES[lic], licenceKey: lic, copyright: m.Copyright,
       source: `https://ebible.org/${id}/`, details: m.publicationURL || "", description: m.description, numbering: NUMBERING[id] || "",
       verses, extraBooks: other ? "Deuterocanonical books are in this edition but not yet shown here." : ""

@@ -15,10 +15,10 @@ import { CONTEXT } from "./context.js";
 import { DAILY, QUESTIONS, TEXT_NOTES, SOURCES, MANUSCRIPTS, SOON } from "./content.js";
 import { yearText, dateCertainty, PRECISION, inMapBox, project, MAP_SIZE } from "./history.js";
 import { mountMap } from "./atlas-map.js";
-import { renderAtlas } from "./atlas-app.js";
-import { COURSES, PLANNED, STATUS } from "./courses.js";
+let COURSES = [], PLANNED = [], STATUS = {};
+const loadCourses = () => import("./courses.js").then(m => { COURSES = m.COURSES; PLANNED = m.PLANNED; STATUS = m.STATUS; });
 import { SECTIONS } from "./ai-core.js";
-import { drawCard, canvasBlob, SIZES, STYLES } from "./share.js";
+import { go, setPath, currentRoute, setRouter, startNavigation } from "./nav.js";
 import { HISTORY, NOT_HOSTED } from "./translations-info.js";
 import { KID_STORIES } from "./kids.js";
 import { JOURNEYS } from "./journeys.js";
@@ -26,7 +26,7 @@ import { sermonRefs, sermonMarkdown } from "./sermon.js";
 import { wordDiff, variantsFor, editionDifferences, lessonMarkdown } from "./lens.js";
 import { stem, glossStems, distribution, sharedStrongs, radialLayout, NODE_TYPES, clip } from "./research.js";
 import { repeatedWords, keyLemmas, mergeCrossRefs, interpretQuestions, guideMarkdown, OBSERVE, APPLY } from "./guide.js";
-import { KINDS, STATUS as DSTATUS, DATING, parseRange, forVerse as discForVerse, forChapter as discForChapter, forPerson as discForPerson, forPlace as discForPlace, inEra as discInEra, related as discRelated, filterList as discFilter } from "./discoveries.js";
+import { KINDS, DEPICTS, STATUS as DSTATUS, DATING, parseRange, forVerse as discForVerse, forChapter as discForChapter, forPerson as discForPerson, forPlace as discForPlace, inEra as discInEra, related as discRelated, filterList as discFilter } from "./discoveries.js";
 import { DISCOVERIES } from "./discoveries-data.js";
 import { describeMorph, languageOf, normaliseStrong, shardOf, displayStrong, isGrammaticalStrong, editionNote } from "./lang.js";
 
@@ -38,6 +38,7 @@ function pic(slot, { cls = "", sizes = "100vw", eager = false } = {}) {
   return `<img class="${cls}" src="img/${slot}-sm.webp" srcset="img/${slot}-sm.webp 640w, img/${slot}.webp 1600w" sizes="${sizes}" alt="${esc(m.alt || m.title)}" width="${m.w}" height="${m.h}" style="object-position:${m.focus || "50% 50%"}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
 }
 const artHead = slot => (IMAGES[slot] ? `<div class="pagehead art">${pic(slot, { cls: "headart", sizes: "(max-width: 720px) 100vw, 62vw", eager: true })}` : `<div class="pagehead">`);
+const pl = (n, one, many) => `${typeof n === "number" ? n.toLocaleString() : n} ${Number(String(n).replace(/[^0-9.-]/g, "")) === 1 ? one : many}`;
 const credit = slot => { const m = IMAGES[slot]; return m ? `${esc(m.artist)}, ${esc(m.title)}${m.date ? ` (${esc(m.date)})` : ""}` : ""; };
 
 // Gustave Doré's Bible engravings (1866, public domain), one per book and for major people, from art.js when present.
@@ -54,6 +55,26 @@ const artCredit = (kind, key) => { const m = (kind === "books" ? BOOK_ART : PEOP
 // A horizontal, swipeable row of picture cards. items: [{ href, img, title, sub }]
 const carousel = (label, items, cls = "") => items.length ? `<div class="snap ${cls}" role="list" aria-label="${esc(label)}">${items.map(c => `<a class="scard" role="listitem" href="${c.href}"><span class="simg">${c.img || `<span class="sfall"></span>`}</span><span class="scap"><b>${c.title}</b>${c.sub ? `<span>${c.sub}</span>` : ""}</span></a>`).join("")}</div>` : "";
 
+/* ---------- zoom viewer for documentary images ---------- */
+function zoomViewer(src, alt, captionHtml) {
+  const prev = document.activeElement;
+  document.body.insertAdjacentHTML("beforeend", `<div class="zoomer" role="dialog" aria-modal="true" aria-label="Image viewer"><div class="zbar"><span class="small">Scroll, pinch or use + and − to zoom; drag to move.</span><button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out">−</button><button type="button" data-z="reset">Fit</button><button type="button" data-z="close" aria-label="Close viewer">×</button></div><div class="zstage"><img src="${esc(src)}" alt="${esc(alt)}" draggable="false"></div><p class="zcap">${captionHtml}</p></div>`);
+  const z = document.querySelector(".zoomer"), img = z.querySelector("img"), stage = z.querySelector(".zstage");
+  let k = 1, x = 0, y = 0, drag = null; const pts = new Map(); let pinch = null;
+  const apply = () => { img.style.transform = `translate(${x}px, ${y}px) scale(${k})`; };
+  const zoom = (f, cx = 0, cy = 0) => { const nk = Math.min(8, Math.max(1, k * f)); x = cx - (cx - x) * nk / k; y = cy - (cy - y) * nk / k; k = nk; if (k === 1) { x = 0; y = 0; } apply(); };
+  const close = () => { z.remove(); removeEventListener("keydown", key); prev?.focus?.(); };
+  const key = e => { if (e.key === "Escape") close(); else if (e.key === "+" || e.key === "=") zoom(1.4); else if (e.key === "-") zoom(1 / 1.4); else if (e.key === "0") { k = 1; x = y = 0; apply(); } };
+  addEventListener("keydown", key);
+  z.querySelector(".zbar").addEventListener("click", e => { const b = e.target.closest("[data-z]"); if (!b) return; const a = b.dataset.z; if (a === "close") close(); else if (a === "in") zoom(1.4); else if (a === "out") zoom(1 / 1.4); else { k = 1; x = y = 0; apply(); } });
+  stage.addEventListener("wheel", e => { e.preventDefault(); const r = stage.getBoundingClientRect(); zoom(e.deltaY < 0 ? 1.15 : 1 / 1.15, e.clientX - r.left - r.width / 2, e.clientY - r.top - r.height / 2); }, { passive: false });
+  stage.addEventListener("pointerdown", e => { stage.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); if (pts.size === 1) drag = [e.clientX - x, e.clientY - y]; else if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = Math.hypot(a[0] - b[0], a[1] - b[1]); } });
+  stage.addEventListener("pointermove", e => { if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, [e.clientX, e.clientY]); if (pts.size === 2 && pinch) { const [a, b] = [...pts.values()]; const d2 = Math.hypot(a[0] - b[0], a[1] - b[1]); zoom(d2 / pinch); pinch = d2; } else if (drag && k > 1) { x = e.clientX - drag[0]; y = e.clientY - drag[1]; apply(); } });
+  const up = e => { pts.delete(e.pointerId); if (pts.size < 2) pinch = null; if (!pts.size) drag = null; };
+  stage.addEventListener("pointerup", up); stage.addEventListener("pointercancel", up);
+  z.querySelector('[data-z="close"]').focus();
+}
+
 /* ---------- discoveries: archaeology, inscriptions, manuscripts, science ---------- */
 const DISC = new Map(DISCOVERIES.map(d => [d.id, d]));
 const bIdx = code => BOOKS.findIndex(b => b.osis === code);
@@ -61,7 +82,8 @@ function discImg(d, { cls = "", sizes = "100vw", eager = false } = {}) {
   const m = d?.image; if (!m?.local) return "";
   return `<img class="${cls}" src="img/disc/${d.id}-sm.webp" srcset="img/disc/${d.id}-sm.webp 640w, img/disc/${d.id}.webp 1400w" sizes="${sizes}" alt="${esc(m.alt || d.name)}" width="${m.w}" height="${m.h}" style="object-position:${m.focus || "50% 50%"}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
 }
-const discCredit = d => { const m = d?.image; if (!m?.local) return ""; const lic = m.licenceUrl ? `<a href="${esc(m.licenceUrl)}" target="_blank" rel="noopener noreferrer">${esc(m.licence)}</a>` : esc(m.licence || ""); return `Photo: ${esc(m.author || "unknown")}, ${lic}${m.source ? `, <a href="${esc(m.source)}" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a>` : ", via Wikimedia Commons"}`; };
+const DEPICT_SHORT = { site: "Site photograph, not an artefact", "site-replica": "Site photograph; the objects shown are replicas", replica: "Photograph of a replica" };
+const discCredit = d => { const m = d?.image; if (!m?.local) return ""; const lic = m.licenceUrl ? `<a href="${esc(m.licenceUrl)}" target="_blank" rel="noopener noreferrer">${esc(m.licence)}</a>` : esc(m.licence || ""); return `${DEPICT_SHORT[m.depicts] ? `<b>${DEPICT_SHORT[m.depicts]}.</b> ` : ""}Photo: ${esc(m.author || "unknown")}, ${lic}${m.source ? `, <a href="${esc(m.source)}" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a>` : ", via Wikimedia Commons"}`; };
 const dChip = d => `<span class="dstat s-${d.status}" title="${esc(DSTATUS[d.status]?.note || "")}">${DSTATUS[d.status]?.label || d.status}</span>`;
 /** "2Kgs.9.14-9.29" → "2 Kings 9:14–29" */
 function rangeLabel(r) {
@@ -71,7 +93,7 @@ function rangeLabel(r) {
   return c1 === c2 ? formatRef(b, c1, v1, v2 !== v1 ? v2 : undefined) : `${formatRef(b, c1, v1)}–${c2}:${v2}`;
 }
 const rangeHref = r => { const p = parseRange(r, bIdx); return p ? readUrl("kjv", p.b, Math.floor(p.from / 1e3) % 1e3, p.from % 1e3 || null) : "#/"; };
-const discCard = (d, sizes = "(max-width: 520px) 100vw, 300px") => `<a class="dcard" href="#/discoveries/${d.id}"><span class="dimg">${discImg(d, { sizes }) || `<span class="dfall k-${d.kind}"><b>${esc(KINDS[d.kind] || "")}</b></span>`}</span>
+const discCard = (d, sizes = "(max-width: 520px) 100vw, 300px") => `<a class="dcard" href="#/discoveries/${d.id}"><span class="dimg">${discImg(d, { sizes }) || `<span class="dfall k-${d.kind}"><b>${esc(KINDS[d.kind] || "")}</b></span>`}${DEPICT_SHORT[d.image?.depicts] ? `<span class="dbadge">${d.image.depicts === "site" ? "Site photo" : "Site, replicas"}</span>` : ""}</span>
   <span class="dbody"><span class="dmeta">${dChip(d)}<span>${esc(KINDS[d.kind] || "")}</span>${d.objectDate?.text ? `<span>${esc(d.objectDate.text)}</span>` : ""}</span><b>${esc(d.name)}</b><span class="dsum">${esc(d.summary)}</span>
   ${(d.passages || []).length ? `<span class="dpass">${d.passages.slice(0, 2).map(rangeLabel).join(" · ")}${d.passages.length > 2 ? ` +${d.passages.length - 2}` : ""}</span>` : ""}</span></a>`;
 /** A compact list of discoveries for side panels (Lens, reader, person, place). */
@@ -108,7 +130,7 @@ async function renderDiscoveries(id) {
   if ($("#dmap")) {
     const base = await H.base();
     const rows = DISCOVERIES.filter(d => d.location).map(d => [d.id, d.name, d.location.lat, d.location.lon, "Discovery", "located", 40]);
-    mountMap($("#dmap"), { base, places: rows, onPick: s => (location.hash = `#/discoveries/${s}`) }).fit(new Set(rows.map(r => r[0])));
+    mountMap($("#dmap"), { base, places: rows, onPick: s => go(`#/discoveries/${s}`) }).fit(new Set(rows.map(r => r[0])));
   }
 }
 
@@ -135,9 +157,11 @@ async function renderDiscovery(id) {
     <aside class="dside">
       <section class="card"><h2>At a glance</h2><dl class="dfacts">
         ${fact("Date of the object", esc(d.objectDate?.text || ""))}
-        ${fact("Found", d.found ? esc([d.found.year, d.found.by].filter(Boolean).join(", ")) : "")}
+        ${fact("Year found", d.found?.year ? esc(String(d.found.year)) : "")}
         ${fact("Where found", d.location?.placeSlug && lm.get(d.location.placeSlug) ? `<a href="#/place/${d.location.placeSlug}">${esc(d.found?.where || lm.get(d.location.placeSlug)[1])}</a>` : esc(d.found?.where || ""))}
-        ${fact("Where it is now", esc([d.heldAt?.institution, d.heldAt?.ref].filter(Boolean).join(", ")))}
+        ${fact("Where it is now", esc(d.heldAt?.institution || ""))}
+        ${fact("Accession or reference", esc(d.heldAt?.ref || ""))}
+        ${fact("Found by", esc(d.found?.by || ""))}
         ${fact("Language", esc(d.language || ""))}
         ${fact("Dated by", (d.dating || []).map(m => esc(DATING[m] || m)).join(", "))}
       </dl></section>
@@ -147,6 +171,18 @@ async function renderDiscovery(id) {
     </aside>
   </div>
   ${rel.length ? `<section class="shelf"><div class="ribbon-head"><h2>Related discoveries</h2></div><div class="dgrid">${rel.map(x => discCard(x)).join("")}</div></section>` : ""}`;
+  // Events tagged in the passages this find relates to.
+  (async () => {
+    const em = await H.eventMap().catch(() => null); if (!em) return;
+    const ev = new Map();
+    for (const r of (d.passages || []).slice(0, 4)) { const p = parseRange(r, bIdx); if (!p) continue; const vx = await H.vx(p.b).catch(() => ({})); for (let k = p.from; k <= p.to; k++) (vx[p.b * 1e6 + k] || [[], [], []])[2].forEach(i => { const e = em.get(i); if (e) ev.set(i, e); }); }
+    const E = [...ev.values()].sort((a, b) => a.year - b.year).slice(0, 6);
+    if (E.length && view.querySelector(".dside")) view.querySelector(".dside").insertAdjacentHTML("beforeend", `<section class="card"><h2>Related events</h2><ul class="evlist">${E.map(e => `<li><span class="yr">${yearText(e.year)}</span> ${certChip(e.year)}<br><a href="#/history/timeline#e${e.id}">${esc(e.title)}</a></li>`).join("")}</ul><p class="small">Events tagged in the linked passages (Theographic). Dates follow a traditional chronology.</p></section>`);
+  })();
+  const hero = view.querySelector(".pagehead img.headart");
+  if (hero && d.image?.local) { hero.classList.add("zoomable"); hero.setAttribute("tabindex", "0"); hero.setAttribute("role", "button"); hero.setAttribute("aria-label", `Open the photograph of ${d.name} full size`);
+    const openZ = () => zoomViewer(`img/disc/${d.id}.webp`, d.image.alt || d.name, discCredit(d));
+    hero.addEventListener("click", openZ); hero.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openZ(); } }); }
   view.querySelectorAll("#dverses .tx").forEach(async el => {
     const p = parseRange(el.dataset.r, bIdx); if (!p) return;
     const t = await verseText("kjv", toOsis(p.b, Math.floor(p.from / 1e3) % 1e3, p.from % 1e3 || 1)).catch(() => "");
@@ -154,7 +190,7 @@ async function renderDiscovery(id) {
   });
   if (d.location && $("#dpmap")) {
     const base = await H.base();
-    mountMap($("#dpmap"), { base, places: [[d.id, d.name, d.location.lat, d.location.lon, "Discovery", "located", 40], ...DISCOVERIES.filter(x => x.location && x.id !== d.id).map(x => [x.id, x.name, x.location.lat, x.location.lon, "Discovery", "located", 10])], focus: d.id, onPick: s => (location.hash = `#/discoveries/${s}`) }).focusOn(d.id, 10);
+    mountMap($("#dpmap"), { base, places: [[d.id, d.name, d.location.lat, d.location.lon, "Discovery", "located", 40], ...DISCOVERIES.filter(x => x.location && x.id !== d.id).map(x => [x.id, x.name, x.location.lat, x.location.lon, "Discovery", "located", 10])], focus: d.id, onPick: s => go(`#/discoveries/${s}`) }).focusOn(d.id, 10);
   }
 }
 
@@ -175,7 +211,9 @@ const TR = { kjv: "KJV", web: "WEB" };
 const META = { kjv: { id: "kjv", name: "King James Version", languageEn: "English", language: "English", code: "eng", dir: "ltr", licence: "Public domain (Crown patent in the UK)", source: "https://github.com/thiagobodruk/bible" }, web: { id: "web", name: "World English Bible", languageEn: "English", language: "English", code: "eng", dir: "ltr", licence: "Public domain", source: "https://ebible.org/web/" } };
 let CATALOGUE = [];
 const dirOf = t => META[t]?.dir || "ltr";
-const langOf = t => META[t]?.code || "en";
+// BCP 47 language tags for the lang attribute (eBible gives ISO 639-3 codes).
+const LANG_TAG = { arb: "ar", ben: "bn", ces: "cs", cmn: "zh", deu: "de", eng: "en", epo: "eo", fra: "fr", hat: "ht", hau: "ha", heb: "he", hin: "hi", hrv: "hr", ibo: "ig", ita: "it", jpn: "ja", kor: "ko", lat: "la", mal: "ml", mya: "my", nde: "nd", nld: "nl", nya: "ny", pes: "fa", pol: "pl", por: "pt", rus: "ru", spa: "es", srp: "sr", swh: "sw", tam: "ta", tel: "te", tgl: "tl", tha: "th", tur: "tr", ukr: "uk", urd: "ur", vie: "vi" };
+const langOf = t => { const c = META[t]?.code || "en"; return LANG_TAG[c] || c; };
 const compareWith = () => { const c = store.setting("compare", store.setting("parallel", false) ? "web" : ""); return c && TR[c] ? c : ""; };
 function translationOptions(selected, { none = "" } = {}) {
   const groups = new Map([["English", []]]);
@@ -255,17 +293,53 @@ function toast(msg) {
   const t = $("#toast"); t.textContent = msg; t.hidden = false;
   clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 2200);
 }
+// Main navigation: five groups (Read, Research, Explore, Library, My study) plus Learn, Sermons and Kids.
+const NAV_GROUP = { home: "", read: "read", books: "read", bibles: "read", compare: "read", translation: "read", guide: "read",
+  lens: "research", languages: "research", word: "research", research: "research", ai: "research", search: "research",
+  atlas: "explore", history: "explore", timeline: "explore", journeys: "explore", people: "explore", person: "explore", place: "explore", discoveries: "explore",
+  library: "library", credits: "library", study: "study", learn: "learn", sermon: "sermon", kids: "kids", share: "" };
 function setNav(key) {
-  document.querySelectorAll("nav.main a, nav.tabbar a").forEach(a => a.classList.toggle("on", a.dataset.nav === key));
-  const inBar = [...document.querySelectorAll("nav.tabbar a")].some(a => a.dataset.nav === key);
-  document.querySelector("#morebtn")?.classList.toggle("on", !inBar && key !== "home");
+  const g = NAV_GROUP[key] ?? "";
+  document.querySelectorAll("nav.main .navgroup").forEach(el => el.querySelector(".navtop").classList.toggle("on", el.dataset.group === g));
+  document.querySelectorAll("nav.main .navlink").forEach(a => a.classList.toggle("on", a.dataset.group === g));
+  document.querySelectorAll("nav.main .navmenu a, nav.main .navsecondary a").forEach(a => { const on = a.dataset.nav === key; a.classList.toggle("on", on); if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  document.querySelectorAll("nav.tabbar a").forEach(a => a.classList.toggle("on", a.dataset.group === g));
+  const inBar = [...document.querySelectorAll("nav.tabbar a")].some(a => a.dataset.group === g);
+  document.querySelector("#morebtn")?.classList.toggle("on", !!g && !inBar);
+  document.querySelectorAll("#moresheet a").forEach(a => a.classList.toggle("on", a.dataset.nav === key));
 }
-// Phone "More" sheet: the full section list, as large picture-free tiles.
+function closeMenus(except) {
+  document.querySelectorAll("nav.main .navgroup").forEach(el => { if (el === except) return; el.querySelector(".navtop").setAttribute("aria-expanded", "false"); el.querySelector(".navmenu").hidden = true; });
+}
+(function wireMenus() {
+  const groups = [...document.querySelectorAll("nav.main .navgroup")];
+  groups.forEach(el => {
+    const btn = el.querySelector(".navtop"), menu = el.querySelector(".navmenu"), links = () => [...menu.querySelectorAll("a")];
+    const open = (focus) => { closeMenus(el); menu.hidden = false; btn.setAttribute("aria-expanded", "true"); if (focus) links()[focus === "last" ? links().length - 1 : 0]?.focus(); };
+    const shut = (refocus) => { menu.hidden = true; btn.setAttribute("aria-expanded", "false"); if (refocus) btn.focus(); };
+    btn.addEventListener("click", () => (menu.hidden ? open() : shut()));
+    btn.addEventListener("keydown", e => { if (e.key === "ArrowDown") { e.preventDefault(); open("first"); } else if (e.key === "ArrowUp") { e.preventDefault(); open("last"); } });
+    menu.addEventListener("keydown", e => {
+      const l = links(), i = l.indexOf(document.activeElement);
+      if (e.key === "Escape") { e.preventDefault(); shut(true); }
+      else if (e.key === "ArrowDown") { e.preventDefault(); l[(i + 1) % l.length].focus(); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); l[(i - 1 + l.length) % l.length].focus(); }
+      else if (e.key === "Home") { e.preventDefault(); l[0].focus(); } else if (e.key === "End") { e.preventDefault(); l[l.length - 1].focus(); }
+    });
+    el.addEventListener("focusout", e => { if (!el.contains(e.relatedTarget)) shut(); });
+    menu.addEventListener("click", e => { if (e.target.closest("a")) shut(); });
+  });
+  document.addEventListener("click", e => { if (!e.target.closest("nav.main .navgroup")) closeMenus(); });
+  addEventListener("keydown", e => { if (e.key === "Escape") { const open = groups.find(g => !g.querySelector(".navmenu").hidden); if (open) { closeMenus(); open.querySelector(".navtop").focus(); } } });
+  addEventListener("routechange", () => closeMenus());
+})();
+// Phone "More" sheet: every section, grouped as in the desktop menus.
 function closeMore() { const s = document.querySelector("#moresheet"); if (s && !s.hidden) { s.hidden = true; document.querySelector("#morebtn")?.setAttribute("aria-expanded", "false"); } }
 (function wireTabbar() {
   const btn = document.querySelector("#morebtn"), sheet = document.querySelector("#moresheet"); if (!btn || !sheet) return;
-  sheet.querySelector(".sheetlinks").innerHTML = [...document.querySelectorAll("nav.main a")].map(a => `<a href="${a.getAttribute("href")}" data-nav="${a.dataset.nav}">${a.textContent}</a>`).join("") + `<a href="#/books" data-nav="read">All 66 books</a>`;
-  btn.addEventListener("click", () => { const open = sheet.hidden; sheet.hidden = !open; btn.setAttribute("aria-expanded", String(open)); });
+  const groups = [...document.querySelectorAll("nav.main .navgroup")].map(g => `<div class="sheetgroup"><h3>${g.querySelector(".navtop").textContent}</h3>${[...g.querySelectorAll(".navmenu a")].map(a => `<a href="${a.getAttribute("href")}" data-nav="${a.dataset.nav}">${a.querySelector("b").textContent}</a>`).join("")}</div>`).join("");
+  sheet.querySelector(".sheetlinks").innerHTML = `<a class="sheethome" href="/" data-nav="home">Home</a>` + groups + `<div class="sheetgroup"><h3>Learn and teach</h3><a href="/learn" data-nav="learn">Courses</a><a href="/sermon" data-nav="sermon">Sermon studio</a><a href="/kids" data-nav="kids">Kids</a><a href="/share" data-nav="share">Share cards</a></div><div class="sheetgroup"><h3>My study</h3><a href="/study" data-nav="study">Notes, highlights and trails</a></div>`;
+  btn.addEventListener("click", () => { const open = sheet.hidden; sheet.hidden = !open; btn.setAttribute("aria-expanded", String(open)); if (open) sheet.querySelector("a")?.focus(); });
   sheet.addEventListener("click", e => { if (e.target === sheet || e.target.closest("a, .sheetclose")) closeMore(); });
   addEventListener("keydown", e => { if (e.key === "Escape") closeMore(); });
 })();
@@ -279,10 +353,10 @@ async function copyText(s) {
 function goSearch(q) {
   q = q.trim(); if (!q) return;
   const sk = normaliseStrong(q);
-  if (sk) { location.hash = `#/word/${sk}`; return; }
+  if (sk) { go(`#/word/${sk}`); return; }
   const r = parseReference(q, chapterCount);
-  if (r) location.hash = readUrl(store.setting("translation", "kjv"), r.book, r.chapter, r.verse);
-  else location.hash = `#/search/${encodeURIComponent(q)}`;
+  if (r) go(readUrl(store.setting("translation", "kjv"), r.book, r.chapter, r.verse));
+  else go(`#/search/${encodeURIComponent(q)}`);
 }
 
 /* ---------- theme ---------- */
@@ -299,22 +373,24 @@ $("#gsearch").addEventListener("submit", e => { e.preventDefault(); goSearch($("
 const THREADS = [["Gen.1.1", "Genesis 1:1"], ["John.1.1", "John 1:1"], ["Ps.23.1", "Psalm 23:1"], ["John.3.16", "John 3:16"]];
 async function renderHome() {
   setNav("home"); setTitle("");
+  document.body.classList.add("home");
   await getIndex();
   const day = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 864e5);
   const votd = DAILY[day % DAILY.length], vr = fromOsis(votd);
   const pos = store.position(), posRef = pos && fromOsis(pos.osis);
-  const tile = (href, slot, title, desc, cls = "") => `<a class="tile ${cls}" href="${href}">${pic(slot, { cls: "tart", sizes: "(max-width: 760px) 100vw, 40vw" }) || `<span class="tart fallback"></span>`}<span class="tcap"><b>${title}</b><span>${desc}</span></span></a>`;
-  const ms = MANUSCRIPTS.filter(m => IMAGES[m.img]);
+  const nT = allTranslations().length, nL = new Set(allTranslations().map(t => t.languageEn)).size;
+  const MS = ["Dead Sea Scrolls", "Rylands Papyrus P52", "Leningrad Codex"].map(n => MANUSCRIPTS.find(m => m.name === n)).filter(m => m && IMAGES[m.img]);
+  const FINDS = ["tel-dan-stele", "cyrus-cylinder", "pilate-stone"].map(id => DISC.get(id)).filter(d => d?.image?.local);
   view.innerHTML = `
-  <section class="hero2">
+  <section class="hero2 obs-hero">
     ${pic("creation-light", { cls: "heroart", eager: true, sizes: "100vw" })}
-    <div class="hero-in">
-      <div class="hero-copy">
-        <h1>Every word of the Bible, traced to its source.</h1>
-        <p>Read ${allTranslations().length} Bibles in ${new Set(allTranslations().map(t => t.languageEn)).size} languages. Tap an English word to reach the Hebrew or Greek behind it, then follow it through history, manuscripts and every verse it touches.</p>
-        <form class="bigsearch" id="bigsearch" role="search"><label class="sr" for="bq">Search</label>
-          <input id="bq" type="search" placeholder="A verse, a word or a topic: Romans 8:28, shepherd, covenant" autocomplete="off"><button>Search</button></form>
-        <div class="tryline"><span>Try</span>${["Psalm 23", "John 1", "covenant", "Abraham", "\"bread of life\""].map(q => `<button type="button" data-q="${esc(q)}">${esc(q)}</button>`).join("")}</div>
+    <div class="hero-in obs-in">
+      <div class="hero-copy obs-copy">
+        <h1>Ancient Scripture. <em>A new depth of discovery.</em></h1>
+        <p class="obs-promise">Every word of the Bible, traced to its source.</p>
+        <form class="bigsearch" id="bigsearch" role="search"><label class="sr" for="bq">Search passages, words, topics, people and places</label>
+          <input id="bq" type="search" placeholder="John 1:1, logos, covenant, Abraham, Jerusalem" autocomplete="off"><button>Search</button></form>
+        <div class="tryline"><span>Try</span>${["John 1:1", "Psalm 23", "shepherd", "Abraham", "Lachish"].map(q => `<button type="button" data-q="${esc(q)}">${esc(q)}</button>`).join("")}</div>
       </div>
       <figure class="threads" id="threads" aria-label="How English words come from the original language">
         <div class="th-tabs" role="tablist">${THREADS.map(([o, l], i) => `<button type="button" role="tab" data-th="${o}" aria-selected="${i === 0}">${l}</button>`).join("")}</div>
@@ -325,46 +401,75 @@ async function renderHome() {
     ${IMAGES["creation-light"] ? `<p class="herocredit">${credit("creation-light")}</p>` : ""}
   </section>
 
-  <section class="home-row">
+  <section class="paths" aria-label="Where to start">
+    <a class="path" href="${posRef ? readUrl(pos.translation || "kjv", posRef.book, posRef.chapter) : "#/read/kjv/John.1"}"><span class="pn">Read Scripture</span><b>${posRef ? `Continue ${formatRef(posRef.book, posRef.chapter)}` : "Open the reader"}</b><span>${nT} complete Bibles in ${nL} languages, with parallel reading.</span></a>
+    <a class="path" href="#/read/kjv/John.1.1?panel=words"><span class="pn">Research a passage</span><b>Trace a verse to its sources</b><span>Original words, translations, connections, history and manuscripts beside the text.</span></a>
+    <a class="path" href="#/atlas"><span class="pn">Explore the biblical world</span><b>Places, journeys and finds</b><span>1,267 places, Paul's journeys and ${DISCOVERIES.length} documented discoveries.</span></a>
+  </section>
+
+  <section class="desk-demo" id="deskdemo" aria-labelledby="ddh">
+    <div class="dd-copy"><span class="eyebrow">The Research Desk</span><h2 id="ddh">One passage. Every layer, side by side.</h2>
+      <p>Select a verse and the panel beside the text follows it: the original words, other translations, connected passages, people and places, history and manuscript witnesses. Every layer names its source.</p>
+      <a class="btn gold" href="#/read/kjv/John.1.1">Open John 1:1 in the Research Desk</a></div>
+    <div class="dd-frame" aria-label="A live preview using John 1:1">
+      <div class="dd-text"><span class="chip scripture">Scripture · King James Version</span><p id="ddv" class="dd-verse">In the beginning was the Word…</p><span class="dd-ref">John 1:1</span></div>
+      <div class="dd-panel"><div class="dd-tabs" role="tablist" aria-label="Research layers">${[["words", "Greek"], ["compare", "Translations"], ["xref", "Connections"], ["people", "People"]].map(([k, l], i) => `<button type="button" role="tab" data-dd="${k}" aria-selected="${i === 0}">${l}</button>`).join("")}</div><div class="dd-body" id="ddbody" role="tabpanel"><p class="small">Loading…</p></div></div>
+    </div>
+  </section>
+
+  <section class="today">
     <div class="votd2"><span class="eyebrow">Verse for today</span><blockquote id="votd">…</blockquote>
-      <div class="actions"><a class="btn pri" href="${readUrl("kjv", vr.book, vr.chapter, vr.verse)}">Read in context</a><a class="btn" href="#/research/${votd}">See its connections</a><a class="btn" href="#/compare/${votd}">In every Bible</a><a class="btn" href="#/share/v/${votd}/kjv">Share as a card</a></div></div>
-    <div class="resume2">${posRef
-      ? `<span class="eyebrow">Continue reading</span><h2>${formatRef(posRef.book, posRef.chapter)}</h2><p class="small">${TR[pos.translation] || "KJV"}, last opened ${new Date(pos.at).toLocaleDateString()}</p><a class="btn gold" href="${readUrl(pos.translation || "kjv", posRef.book, posRef.chapter, pos.verse ? fromOsis(pos.verse)?.verse : null)}">Resume reading</a>`
-      : `<span class="eyebrow">Start reading</span><h2>Genesis 1</h2><p class="small">Or choose any book in the reader.</p><a class="btn gold" href="#/read/kjv/Gen.1">Open the reader</a>`}
-      ${store.streak() ? `<p class="small streak">Study streak: ${store.streak()} day${store.streak() === 1 ? "" : "s"}</p>` : ""}</div>
+      <div class="actions"><a class="btn pri" href="${readUrl("kjv", vr.book, vr.chapter, vr.verse)}">Read in context</a><a class="btn" href="#/compare/${votd}">In every Bible</a><a class="btn" href="#/share/v/${votd}/kjv">Share as a card</a></div></div>
   </section>
 
-  <section class="mosaic" aria-label="Explore">
-    ${tile("#/lens/John.1.1", "sinaiticus", "Scripture Lens", "One verse, every layer: plain meaning, context, the Hebrew or Greek, manuscripts and 11 English translations compared", "t-big")}
-    ${tile("#/history/journeys/paul2", "map-paul", "Journeys and maps", "Follow Abraham, the Exodus and Paul stop by stop, with 1,267 places and 450 dated events", "t-tall")}
-    ${tile("#/languages", "leningrad", "Hebrew and Greek", "Interlinear for every verse, grammar and lexicon")}
-    ${tile("#/bibles", "gutenberg", "54 Bibles, 38 languages", "Each with the story of its translation")}
-    <a class="tile t-kids" href="#/kids">${kidImg("hero", "tart")}<span class="tcap"><b>Kids</b><span>Eight Bible stories to read, hear and play</span></span></a>
-    ${tile("#/sermon", "era-gospels", "Sermon studio", "Record a sermon, catch every verse, make study notes")}
-    ${tile("#/research", "vaticanus", "Research", "Follow a verse into its words, people, places and links")}
-    ${tile("#/library", "isaiah-scroll", "The manuscripts", "From the Dead Sea Scrolls to the printed page")}
-    ${DISCOVERIES.length ? tile("#/discoveries", "aleppo", "Discoveries", `${DISCOVERIES.length} finds from archaeology, inscriptions and science, each linked to its passages and sources`, "t-wide") : ""}
-    ${tile("#/atlas", "map-holyland", "Interactive atlas", "Places, journeys and periods on one map, with the finds made at each site")}
-    ${tile("#/learn", "era-exodus", "Courses", "Lessons with readings, questions and a short quiz")}
+  <section class="archive" aria-labelledby="arh">
+    <div class="ribbon-head"><h2 id="arh">From the living archive</h2><p class="small">Real manuscripts and documented finds, each with what it shows, what it doesn't, and who holds it today.</p></div>
+    <div class="arc-grid">
+      ${MS.map(m => `<a class="arc" href="#/library"><span class="arc-img">${pic(m.img, { sizes: "(max-width: 720px) 50vw, 280px" })}</span><span class="arc-k">Manuscript</span><b>${esc(m.name)}</b><span class="arc-d">${esc(m.date.replace(/^about /, "c. "))}</span><span class="arc-c">${credit(m.img)}</span></a>`).join("")}
+      ${FINDS.map(d => `<a class="arc" href="#/discoveries/${d.id}"><span class="arc-img">${discImg(d, { sizes: "(max-width: 720px) 50vw, 280px" })}</span><span class="arc-k">Discovery · ${esc(DSTATUS[d.status]?.label || "")}</span><b>${esc(d.name)}</b><span class="arc-d">${esc(d.objectDate?.text || "")}</span><span class="arc-c">Photo: ${esc(d.image.author)}, ${esc(d.image.licence)}</span></a>`).join("")}
+    </div>
+    <div class="actions"><a class="btn" href="#/library">All manuscripts</a><a class="btn" href="#/discoveries">All ${DISCOVERIES.length} discoveries</a></div>
   </section>
 
-  ${Object.keys(BOOK_ART).length ? `<section class="shelf"><div class="ribbon-head"><h2>The library of 66 books</h2><a class="seeall" href="#/books">See all 66 ›</a></div>
-    ${carousel("Books of the Bible", BOOKS.map((b, i) => ({ i, b })).filter(({ b }) => BOOK_ART[b.osis] && !BOOK_ART[b.osis].related).map(({ b, i }) => ({ href: `#/read/kjv/${b.osis}.1`, img: bookArt(i, { sizes: "260px" }), title: esc(NAMES[i]), sub: esc(groupOf(i)) })))}</section>` : ""}
+  <section class="standards" aria-labelledby="sth">
+    <h2 id="sth">How Ereunia handles evidence</h2>
+    <div><span class="eyebrow">Sources</span><h3>Every layer names where it comes from</h3><p>Bible texts are public domain or openly licensed. Hebrew and Greek come from STEPBible (Tyndale House), cross references from OpenBible.info, people and places from Theographic. Each panel shows its source.</p><a href="#/credits">Credits and licences ›</a></div>
+    <div><span class="eyebrow">Editorial standards</span><h3>Scripture first, interpretation labelled</h3><p>The text comes first. Background notes give traditional and academic views side by side. Each discovery says what it establishes, what it doesn't, and where experts disagree.</p><a href="#/discoveries">How evidence is graded ›</a></div>
+    <div><span class="eyebrow">AI, with limits</span><h3>Answers only from cited sources</h3><p>The research assistant answers from the passages and notes it shows you. Statements without a supporting source are removed, and every answer is labelled as AI. It can still be wrong: check it against the text.</p><a href="#/ai">Try the assistant ›</a></div>
+  </section>
 
-  ${Object.keys(PEOPLE_ART).length ? `<section class="shelf"><div class="ribbon-head"><h2>People of the Bible</h2><a class="seeall" href="#/history/people">All 3,000+ people ›</a></div>
-    ${carousel("People of the Bible", Object.keys(PEOPLE_ART).map(s => ({ href: `#/person/${s}`, img: personArt(s, { sizes: "200px" }), title: esc(PEOPLE_ART[s].name || s.replace(/_\d+$/, "").replace(/^./, c => c.toUpperCase())), sub: esc(PEOPLE_ART[s].title) })), "portrait")}</section>` : ""}
-
-  ${ms.length ? `<section class="ribbon"><div class="ribbon-head"><h2>From scroll to screen</h2><p class="small">No original manuscript of any biblical book survives. These copies, oldest first, are how the text reached us.</p></div>
-    <ol class="ribbon-track">${ms.map(m => `<li><a href="#/library"><span class="rimg">${pic(m.img, { sizes: "220px" })}</span><span class="rdate">${esc(m.date.replace(/^about /, "c. "))}</span><b>${esc(m.name)}</b></a></li>`).join("")}</ol></section>` : ""}`;
+  <nav class="more-row" aria-label="More from Ereunia"><a href="#/books">Books of the Bible</a><a href="#/history/people">People</a><a href="#/learn">Courses</a><a href="#/sermon">Sermon studio</a><a href="#/kids">Kids</a><a href="#/share">Share cards</a></nav>`;
 
   $("#bigsearch").addEventListener("submit", e => { e.preventDefault(); goSearch($("#bq").value); });
   view.querySelectorAll(".tryline button").forEach(b => b.addEventListener("click", () => goSearch(b.dataset.q)));
   view.querySelectorAll("[data-th]").forEach(b => b.addEventListener("click", () => { view.querySelectorAll("[data-th]").forEach(x => x.setAttribute("aria-selected", x === b)); drawThreads(b.dataset.th); }));
   drawThreads(THREADS[0][0]);
+  deskDemo();
+  addEventListener("routechange", () => document.body.classList.remove("home"), { once: true });
   try {
     const t = await verseText("kjv", votd);
     $("#votd").innerHTML = `${esc(t)}<cite>${labelOf(votd)}, King James Version</cite>`;
   } catch { $("#votd").textContent = labelOf(votd); }
+}
+
+// The homepage preview of the Research Desk, using real data for John 1:1.
+async function deskDemo() {
+  const B = 42, C = 1, V = 1, osis = "John.1.1", body = $("#ddbody"); if (!body) return;
+  const [kjv, web, orig, xr, vx, pm, lm] = await Promise.all([verseText("kjv", osis), verseText("web", osis), loadOrig(B, C), loadXref(B), H.vx(B), H.peopleMap(), H.placeMap()].map(p => p.catch(() => null)));
+  if ($("#ddv") && kjv) $("#ddv").textContent = kjv;
+  const words = orig?.verses?.[V - 1] || [];
+  const xrefs = (xr?.[B * 1e6 + C * 1e3 + V] || []).slice(0, 4);
+  const xt = await Promise.all(xrefs.map(async ([to]) => { const r = unpackRef(to); return [r, await verseText("kjv", toOsis(r.book, r.chapter, r.verse)).catch(() => "")]; }));
+  const tag = vx?.[B * 1e6 + C * 1e3 + V] || [[], [], []];
+  const panes = {
+    words: () => `<div class="dd-words" lang="grc">${words.map(w => `<a href="#/word/${w[3]}" class="ddw"><span class="ow">${esc(w[0])}</span><span class="gl">${esc(w[2])}</span></a>`).join("")}</div><p class="small">Greek New Testament, word by word, from STEPBible (CC BY 4.0). Tap a word for its lexicon entry and every other use.</p>`,
+    compare: () => `<dl class="dd-cmp"><dt>King James Version</dt><dd>${esc(kjv || "")}</dd><dt>World English Bible</dt><dd>${esc(web || "")}</dd></dl><p class="small">Compare any verse in all ${allTranslations().length} Bibles.</p>`,
+    xref: () => `<ul class="dd-x">${xt.map(([r, t]) => `<li><a href="${readUrl("kjv", r.book, r.chapter, r.verse)}">${formatRef(r.book, r.chapter, r.verse)}</a> <span>${esc(t.slice(0, 90))}${t.length > 90 ? "…" : ""}</span></li>`).join("")}</ul><p class="small">Ranked by reader votes, OpenBible.info (CC BY). A link means readers saw a connection, not a claim about the author's intent.</p>`,
+    people: () => `<div class="plist">${tag[0].map(s => pm?.get(s)).filter(Boolean).map(r => `<a href="#/person/${r[0]}"><b>${esc(r[1])}</b><span class="small">${esc(r[3] || "")}</span></a>`).join("") || `<p class="small">No people tagged.</p>`}</div><p class="small">Tagging: Theographic Bible Metadata (CC BY-SA 4.0).</p>`
+  };
+  const show = k => { body.innerHTML = panes[k](); view.querySelectorAll("[data-dd]").forEach(b => b.setAttribute("aria-selected", b.dataset.dd === k)); };
+  view.querySelectorAll("[data-dd]").forEach(b => b.addEventListener("click", () => show(b.dataset.dd)));
+  show("words");
 }
 
 // The hero diagram: English words (KJV, Strong's-tagged) joined by gold threads to the Hebrew or Greek words they translate.
@@ -526,7 +631,7 @@ async function originCard(v, k, words) {
       <dl class="facts">
         ${f ? `<dt>In this verse</dt><dd><b dir="${rtl ? "rtl" : "ltr"}" lang="${lang}">${esc(f[0])}</b> <span class="small">${esc(f[1])}</span>, “${esc(f[2])}”<br><span class="small">${esc(describeMorph(f[5], morph).map(p => p.summary).join(" + "))}</span></dd>` : ""}
         <dt>Dictionary form</dt><dd><span class="lemma" dir="${rtl ? "rtl" : "ltr"}" lang="${lang}">${esc(e.lemma)}</span> <span class="small">${esc(e.translit.replace(/\./g, ""))}</span><br>${esc(e.gloss)}</dd>
-        <dt>Strong's</dt><dd><a href="#/word/${e.key}">${displayStrong(e.key)}</a> · ${rtl ? "Hebrew or Aramaic" : "Greek"} · used ${e.n.toLocaleString()} times</dd>
+        <dt>Strong's</dt><dd><a href="#/word/${e.key}">${displayStrong(e.key)}</a> · ${rtl ? "Hebrew or Aramaic" : "Greek"} · used ${pl(e.n.toLocaleString(), "time", "times")}</dd>
       </dl>
       ${top.length ? `<div class="rend"><h3>How the KJV translates it</h3><p class="small">${rend.n.toLocaleString()} tagged uses, ${top.length < 12 ? top.length : "12 most common"} English renderings:</p>
         <ul>${top.map(([w, n]) => `<li><span class="w">${esc(w)}</span><span class="bar"><i style="width:${Math.max(3, Math.round(n / max * 100))}%"></i></span><span class="n">${n.toLocaleString()}</span></li>`).join("")}</ul></div>` : ""}
@@ -667,9 +772,100 @@ async function renderChapterText() {
       }
     }
   } catch {
-    box.innerHTML = `<p class="loading">This chapter could not load. Check your connection and <a href="${location.hash}">try again</a>.</p>`;
+    box.innerHTML = `<p class="loading">This chapter could not load. Check your connection and <a href="${esc(location.pathname)}">try again</a>.</p>`;
   }
 }
+
+/* ---------- Research Desk: shared passage context, depth modes, manuscripts and inline research assistant ---------- */
+const DESK_TABS = [["verse", "Passage"], ["words", null], ["xref", "Connections"], ["people", "People & places"], ["bg", "History"], ["ms", "Manuscripts"], ["ask", "Ask"]];
+const DEPTHS = [["discover", "Discover", "Plain meaning and the essentials"], ["study", "Study", "Words, connections and background"], ["scholar", "Scholar", "Grammar, lexicons and textual evidence"], ["teach", "Teach", "Questions and outlines for a group"]];
+const depth = () => { const d = store.setting("depth", "study"); return DEPTHS.some(x => x[0] === d) ? d : "study"; };
+const deskUrl = () => `${readUrl(R.t, R.book, R.chapter, R.verse)}${R.tab && R.tab !== "verse" ? `?panel=${R.tab}${R.word != null ? `&w=${R.word}` : ""}${R.origin != null ? `&o=${R.origin}` : ""}` : ""}`;
+function rememberDesk() { try { sessionStorage.setItem("ereunia:desk", JSON.stringify({ href: deskUrl().replace(/^#/, ""), label: formatRef(R.book, R.chapter, R.verse) })); } catch {} }
+
+// Which surviving witnesses contain a passage. Book indexes: 0 Genesis … 38 Malachi, 39 Matthew … 65 Revelation.
+const MS_COVER = {
+  "Dead Sea Scrolls": (b) => b < 39 ? (b === 16 ? ["no", "Esther is the one book of the Hebrew Bible not found at Qumran."] : ["part", "Fragments of this book survive; most books are incomplete."]) : null,
+  "Septuagint": (b) => b < 39 ? ["yes", "Greek translation of this book, known from later copies such as Vaticanus and Sinaiticus."] : null,
+  "Rylands Papyrus P52": (b, c) => b === 42 ? (c === 18 ? ["yes", "Contains John 18:31–33 and 37–38 only."] : ["no", "Preserves only a few verses of John 18."]) : null,
+  "Papyrus P46": (b) => (b >= 44 && b <= 51) || b === 57 ? ["part", "Contains most of Paul's letters and Hebrews; some leaves are lost."] : null,
+  "Codex Vaticanus": (b, c, v) => (b === 0 && (c < 46 || (c === 46 && (v || 1) < 28))) || [53, 54, 55, 56, 65].includes(b) || (b === 57 && (c > 9 || (c === 9 && (v || 1) > 14))) ? ["no", "Lost or absent here: Vaticanus lacks Genesis 1:1–46:28, Hebrews after 9:14, 1–2 Timothy, Titus, Philemon and Revelation."] : ["yes", "Contains this passage (Greek)."],
+  "Codex Sinaiticus": (b) => b >= 39 ? ["yes", "The complete New Testament survives in Sinaiticus."] : ["part", "Only parts of the Old Testament survive in Sinaiticus."],
+  "Latin Vulgate": () => ["yes", "Jerome's Latin translation of the whole Bible."],
+  "Aleppo Codex": (b, c) => b < 39 ? (b < 4 || (b === 4 && c < 28) ? ["no", "Lost: most of the Torah, up to Deuteronomy 28:16, has been missing since 1947."] : ["part", "Survives in part; about 40 percent of the codex was lost after 1947."]) : null,
+  "Leningrad Codex": (b) => b < 39 ? ["yes", "The complete Hebrew Bible; the Hebrew text shown in Ereunia."] : null,
+  "Textus Receptus": (b) => b >= 39 ? ["yes", "The printed Greek text behind the KJV New Testament."] : null,
+  "Critical editions (Nestle–Aland)": (b) => b >= 39 ? ["yes", "The Greek text most modern translations follow."] : null
+};
+async function msPane() {
+  const scope = R.verse ? formatRef(R.book, R.chapter, R.verse) : formatRef(R.book, R.chapter);
+  const rank = { yes: 0, part: 1, no: 2 };
+  const rows = MANUSCRIPTS.map(m => [m, MS_COVER[m.name]?.(R.book, R.chapter, R.verse)]).filter(([, c]) => c).sort((a, b) => rank[a[1][0]] - rank[b[1][0]]);
+  const label = { yes: "Contains this", part: "Partly preserved", no: "Not here" };
+  const osis = R.verse ? toOsis(R.book, R.chapter, R.verse) : null;
+  const note = osis ? TEXT_NOTES[osis] : null;
+  const kjvNotes = R.verse ? ((await loadKjvs(R.book, R.chapter).catch(() => null))?.notes?.[R.verse] || []) : [];
+  let variants = [];
+  if (R.verse) { const o = await loadOrig(R.book, R.chapter).catch(() => null); variants = (o?.verses?.[R.verse - 1] || []).filter(w => w[6]).map(w => [w[0], editionNote(w[6])]).filter(x => x[1]); }
+  return `<div class="pane"><div><span class="chip">Manuscript witnesses</span><div class="vref" style="margin-top:6px">${scope}</div></div>
+    ${note ? `<div class="textnote"><b>Textual note</b><br>${note === "absent" ? "Present in the Textus Receptus behind the KJV; absent from the oldest Greek manuscripts and from the text behind most modern translations." : "Manuscripts place this doxology in different positions."}</div>` : ""}
+    ${variants.length ? `<div class="textnote d-scholar-open"><b>Edition differences in this verse</b><ul>${variants.map(([w, n]) => `<li><span lang="${R.book < 39 ? "hbo" : "grc"}">${esc(w)}</span>: ${n}</li>`).join("")}</ul></div>` : ""}
+    ${kjvNotes.length ? `<div class="textnote margnote"><b>KJV translators' margin (1611)</b><br>${kjvNotes.map(esc).join("<br>")}</div>` : ""}
+    <ul class="mslist">${rows.map(([m, [k, txt]]) => `<li class="ms-${k}"><span class="mschip">${label[k]}</span><div><b>${esc(m.name)}</b> <span class="small">${esc(m.date)}</span><p class="small">${esc(txt)}</p></div></li>`).join("")}</ul>
+    <p class="small">Coverage is summarised at book level from published descriptions of each manuscript; "partly preserved" does not mean this verse survives. <a href="#/library">About each manuscript</a></p></div>`;
+}
+function askPane() {
+  const ref = R.verse ? formatRef(R.book, R.chapter, R.verse) : formatRef(R.book, R.chapter);
+  const lvl = { discover: "beginner", study: "intermediate", scholar: "academic", teach: "intermediate" }[depth()];
+  return `<div class="pane"><div><span class="chip draftchip">AI research assistant</span><div class="vref" style="margin-top:6px">${ref}</div></div>
+    <form id="deskask" class="deskask"><label for="dq" class="small">Ask about ${ref}</label><textarea id="dq" rows="3">What does ${ref} mean in its context?</textarea>
+      <div class="actions"><button class="btn pri" type="submit">Ask</button><span class="small">Answers only from cited sources, each labelled as AI.</span></div></form>
+    <div id="deskout"></div></div>`;
+}
+function wireAskPane() {
+  const f = $("#deskask"); if (!f) return;
+  const ref = R.verse ? formatRef(R.book, R.chapter, R.verse) : formatRef(R.book, R.chapter);
+  const lvl = { discover: "beginner", study: "intermediate", scholar: "academic", teach: "intermediate" }[depth()];
+  f.addEventListener("submit", async e => {
+    e.preventDefault(); const q = $("#dq").value.trim(); if (q.length < 5) return;
+    const out = $("#deskout"); out.innerHTML = `<p class="loading">Searching the sources…</p>`;
+    try {
+      const r = await fetch("api/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q, ref, level: lvl }) });
+      const res = await r.json().catch(() => ({ error: "The assistant sent an unreadable reply." }));
+      if (!r.ok || res.error) { out.innerHTML = `<p class="empty">${esc(res.error || (r.status === 429 ? "Too many questions just now. Wait a moment and try again." : "The assistant is unavailable. Reading and every other panel still work."))}</p>`; return; }
+      out.innerHTML = renderAnswer(res); wireAnswer(out); store.saveAnswer({ question: q, ref, result: res });
+      store.trailAdd({ kind: "ai", label: `Asked: ${q}`, href: deskUrl().replace(/^#/, "") });
+    } catch { out.innerHTML = `<p class="empty">Could not reach the assistant. Reading and every other panel still work offline.</p>`; }
+  });
+}
+async function historyPane() {
+  const [vx, em] = await Promise.all([H.vx(R.book), H.eventMap()]).catch(() => [{}, new Map()]);
+  const evs = new Set();
+  for (const [k, r] of Object.entries(vx || {})) if (Math.floor(k / 1e3) % 1e3 === R.chapter) r[2].forEach(x => evs.add(x));
+  const E = [...evs].map(i => em.get(i)).filter(Boolean).sort((a, b) => a.year - b.year).slice(0, 8);
+  return backgroundPane().replace(/<\/div>\s*$/, "") + (E.length ? `<div><h3>Events in ${formatRef(R.book, R.chapter)}</h3><ul class="evlist">${E.map(e => `<li><span class="yr">${yearText(e.year)}</span> ${certChip(e.year)}<br><a href="#/history/timeline#e${e.id}">${esc(e.title)}</a></li>`).join("")}</ul></div>` : "") + `</div>`;
+}
+function railHtml() {
+  const osis = R.verse ? toOsis(R.book, R.chapter, R.verse) : toOsis(R.book, R.chapter, 1);
+  const steps = store.trailSteps().slice(-6).reverse();
+  return `<nav class="rail" aria-label="Research tools">
+    <button type="button" class="railtoggle" id="railtoggle" aria-expanded="true" aria-controls="railbody"><span class="sr">Hide research tools</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <div id="railbody" class="railbody">
+      <span class="eyebrow">Passage</span><b class="railref">${formatRef(R.book, R.chapter, R.verse)}</b>
+      <ul class="raillinks">
+        <li><a href="#/lens/${osis}">Scripture Lens</a></li>
+        <li><a href="#/compare/${osis}">Compare all ${allTranslations().length} Bibles</a></li>
+        <li><a href="#/research/${osis}">Connections graph</a></li>
+        <li><a href="#/guide/${BOOKS[R.book].osis}.${R.chapter}">Study guide</a></li>
+        <li><a href="#/atlas/book/${BOOKS[R.book].osis}">${NAMES[R.book]} on the atlas</a></li>
+        <li><a href="#/history/timeline">Timeline</a></li>
+      </ul>
+      <span class="eyebrow">Research trail</span>
+      ${steps.length ? `<ol class="railtrail">${steps.map(t => `<li><a href="${esc(t.href)}"><span class="tk tk-${esc(t.kind)}">${esc(TRAIL_KIND[t.kind] || "Page")}</span>${esc(t.label)}</a></li>`).join("")}</ol>` : `<p class="small">The passages, words and sources you open are listed here, so you can retrace your steps.</p>`}
+      <a class="btn" href="#/study/trails">Save or export trail</a>
+    </div></nav>`;
+}
+const TRAIL_KIND = { verse: "Verse", passage: "Passage", word: "Word", source: "Source", note: "Note", ai: "AI", page: "Page", place: "Place", person: "Person", discovery: "Find" };
 
 async function renderMargin() {
   const m = $("#margin");
@@ -677,13 +873,17 @@ async function renderMargin() {
   const pane = $("#pane");
   pane.innerHTML = '<p class="small" style="padding:16px 18px">Loading…</p>';
   try {
-    pane.innerHTML = R.tab === "bg" ? backgroundPane() : R.tab === "words" ? await wordsPane() : R.tab === "xref" ? await xrefPane() : R.tab === "people" ? await peoplePane() : await versePane();
+    pane.innerHTML = R.tab === "bg" ? await historyPane() : R.tab === "words" ? await wordsPane() : R.tab === "xref" ? await xrefPane() : R.tab === "people" ? await peoplePane() : R.tab === "ms" ? await msPane() : R.tab === "ask" ? askPane() : await versePane();
     // Discoveries linked to the selected verse (Verse tab) or to this chapter (Book tab).
     const dl = R.tab === "verse" && R.verse ? discForVerse(DISCOVERIES, R.book, R.chapter, R.verse, bIdx) : R.tab === "bg" ? discForChapter(DISCOVERIES, R.book, R.chapter, bIdx) : [];
     if (dl.length) pane.querySelector(".pane")?.insertAdjacentHTML("beforeend", discMini(dl, R.tab === "bg" ? `Discoveries linked to ${formatRef(R.book, R.chapter)}` : "Archaeology and discoveries"));
   } catch { pane.innerHTML = `<div class="pane"><p class="small">This could not load. Check your connection and try again.</p></div>`; }
   pane.querySelectorAll("[data-gotab]").forEach(a => a.addEventListener("click", e => { e.preventDefault(); R.tab = a.dataset.gotab; renderMargin(); }));
   if (R.tab === "verse" && R.verse) wireVersePane();
+  if (R.tab === "ask") wireAskPane();
+  m.dataset.depth = depth();
+  if (store.setting("depth", "study") === "scholar") pane.querySelectorAll("details").forEach(d => (d.open = true));
+  if (location.pathname.startsWith("/read/")) { setPath(deskUrl()); rememberDesk(); }
 }
 
 function wireVersePane() {
@@ -711,7 +911,7 @@ function wireVersePane() {
   let timer;
   $("#note").addEventListener("input", e => {
     clearTimeout(timer);
-    timer = setTimeout(() => { store.setNote(osis, e.target.value); $("#saved").textContent = "Saved"; refresh(); }, 300);
+    timer = setTimeout(() => { store.setNote(osis, e.target.value); $("#saved").textContent = "Saved on this device"; refresh(); store.trailAdd({ kind: "note", label: `Note on ${labelOf(osis)}`, href: readUrl(R.t, R.book, R.chapter, R.verse).replace(/^#/, "") + "#note", detail: e.target.value }); }, 600);
   });
 }
 
@@ -724,8 +924,9 @@ function selectVerse(v, { scroll = false, open = true, word = null, tab = null, 
   document.querySelectorAll("#text .wb.on").forEach(el => el.classList.remove("on"));
   if (word != null) document.querySelector(`#text .wb[data-v="${v}"][data-w="${word}"]`)?.classList.add("on");
   const osis = toOsis(R.book, R.chapter, v);
-  history.replaceState(null, "", readUrl(R.t, R.book, R.chapter, v));
+  setPath(readUrl(R.t, R.book, R.chapter, v));
   store.setPositionVerse(osis);
+  store.trailAdd({ kind: "verse", label: formatRef(R.book, R.chapter, v), href: readUrl(R.t, R.book, R.chapter, v).replace(/^#/, ""), detail: TR[R.t] });
   if (open) $("#margin").classList.add("open");
   if (open && matchMedia("(max-width: 960px)").matches) document.getElementById(`${R.t}-v${v}`)?.scrollIntoView({ block: "start", behavior: "smooth" });
   else if (scroll) document.getElementById(`${R.t}-v${v}`)?.scrollIntoView({ block: "center" });
@@ -740,7 +941,11 @@ async function renderRead(t, osis) {
   R.t = TR[t] ? t : store.setting("translation", "kjv");
   R.book = r.book; R.chapter = Math.min(Math.max(r.chapter, 1), chapterCount(r.book));
   R.word = null; R.origin = null;
-  R.verse = r.verse; if (!["verse", "words", "xref", "people", "bg"].includes(R.tab)) R.tab = "verse";
+  R.verse = r.verse; if (!DESK_TABS.some(([k]) => k === R.tab)) R.tab = "verse";
+  const qp = new URLSearchParams(location.search);
+  if (qp.get("panel") && DESK_TABS.some(([k]) => k === qp.get("panel"))) R.tab = qp.get("panel");
+  if (qp.get("w") != null && R.verse) R.word = +qp.get("w");
+  if (qp.get("o") != null && R.verse) R.origin = +qp.get("o");
   store.setSetting("translation", R.t);
   store.visit(toOsis(R.book, R.chapter), R.t);
   setTitle(formatRef(R.book, R.chapter));
@@ -762,7 +967,8 @@ async function renderRead(t, osis) {
     <button class="btn ${lines ? "on" : ""}" type="button" id="linesbtn" aria-pressed="${lines}" title="One verse per line">Verse lines</button>
     <button class="btn" type="button" id="focusbtn" title="Hide everything except the text">Focus</button>
   </div>
-  <div class="reader">
+  <div class="reader desk ${store.setting("rail", true) ? "" : "norail"}">
+    ${railHtml()}
     <article class="page" aria-labelledby="chh">
       ${BOOK_ART[BOOKS[R.book].osis] ? `<figure class="bookban ${R.chapter === 1 ? "" : "slim"}"><a href="#/books" aria-label="All books of the Bible">${bookArt(R.book, { sizes: "(max-width: 960px) 100vw, 760px", eager: true })}</a><figcaption>${artCredit("books", BOOKS[R.book].osis)}</figcaption></figure>` : ""}
       <div class="runhead"><div><span class="eyebrow">${testamentOf(R.book)} · ${groupOf(R.book)}</span><h1 id="chh">${R.book === 18 ? "Psalm" : NAMES[R.book]} <span class="cn">${R.chapter}</span></h1></div>
@@ -776,17 +982,18 @@ async function renderRead(t, osis) {
         <button class="btn" type="button" id="next" ${lastBook ? "disabled" : ""}>Next ›</button>
       </nav>
     </article>
-    <aside class="margin" id="margin" aria-label="Study margin">
-      <div class="tabs" role="tablist"><button role="tab" type="button" data-tab="verse">Verse</button><button role="tab" type="button" data-tab="words">${R.book < 39 ? "Hebrew" : "Greek"}</button><button role="tab" type="button" data-tab="xref">Refs</button><button role="tab" type="button" data-tab="people">People</button><button role="tab" type="button" data-tab="bg">Book</button><button class="close" type="button" aria-label="Close study panel">×</button></div>
-      <div id="pane"></div>
+    <aside class="margin" id="margin" aria-label="Research panel" data-depth="${depth()}">
+      <div class="deskhead"><div class="depth" role="radiogroup" aria-label="Depth">${DEPTHS.map(([k, l, d]) => `<button type="button" role="radio" data-depth="${k}" aria-checked="${depth() === k}" title="${d}">${l}</button>`).join("")}</div><button class="close" type="button" aria-label="Close research panel">×</button></div>
+      <div class="tabs" role="tablist" aria-label="Research layers">${DESK_TABS.map(([k, l]) => `<button role="tab" type="button" data-tab="${k}">${l || (R.book < 39 ? "Hebrew" : "Greek")}</button>`).join("")}</div>
+      <div id="pane" role="tabpanel"></div>
     </aside>
   </div>`;
-  const go = (b, c, v = null) => (location.hash = readUrl(R.t, b, c, v));
-  $("#bk").addEventListener("change", e => go(+e.target.value, 1));
-  $("#cp").addEventListener("change", e => go(R.book, +e.target.value));
-  $("#prev").addEventListener("click", () => { if (R.chapter > 1) go(R.book, R.chapter - 1); else if (R.book > 0) go(R.book - 1, chapterCount(R.book - 1)); });
-  $("#next").addEventListener("click", () => { if (R.chapter < chapterCount(R.book)) go(R.book, R.chapter + 1); else if (R.book < 65) go(R.book + 1, 1); });
-  $("#trsel").addEventListener("change", e => { location.hash = readUrl(e.target.value, R.book, R.chapter, R.verse); });
+  const goCh = (b, c, v = null) => go(readUrl(R.t, b, c, v));
+  $("#bk").addEventListener("change", e => goCh(+e.target.value, 1));
+  $("#cp").addEventListener("change", e => goCh(R.book, +e.target.value));
+  $("#prev").addEventListener("click", () => { if (R.chapter > 1) goCh(R.book, R.chapter - 1); else if (R.book > 0) goCh(R.book - 1, chapterCount(R.book - 1)); });
+  $("#next").addEventListener("click", () => { if (R.chapter < chapterCount(R.book)) goCh(R.book, R.chapter + 1); else if (R.book < 65) goCh(R.book + 1, 1); });
+  $("#trsel").addEventListener("change", e => { go(readUrl(e.target.value, R.book, R.chapter, R.verse)); });
   $("#cmpsel").addEventListener("change", e => { store.setSetting("compare", e.target.value); store.setSetting("parallel", false); renderRead(R.t, toOsis(R.book, R.chapter, R.verse)); });
   view.querySelectorAll("[data-size]").forEach(b => b.addEventListener("click", () => {
     store.setSetting("size", b.dataset.size); document.documentElement.dataset.size = b.dataset.size;
@@ -803,11 +1010,24 @@ async function renderRead(t, osis) {
     document.querySelectorAll("#pane .wb.on").forEach(x => x.classList.remove("on")); wb.classList.add("on");
     document.querySelectorAll("#text .wb.on").forEach(x => x.classList.remove("on"));
     document.querySelector(`#text .wb[data-v="${R.verse}"][data-w="${R.word}"]`)?.classList.add("on");
-    loadOrig(R.book, R.chapter).then(c => wordCard(c.verses[R.verse - 1][R.word], R.book)).then(h => { $("#wordcard").innerHTML = h; });
+    loadOrig(R.book, R.chapter).then(c => { const w = c.verses[R.verse - 1][R.word]; store.trailAdd({ kind: "word", label: `${w[0]} (${w[1]}) in ${formatRef(R.book, R.chapter, R.verse)}`, href: deskUrl().replace(/^#/, "").replace(/\?.*/, "") + `?panel=words&w=${R.word}` }); return wordCard(w, R.book); }).then(h => { $("#wordcard").innerHTML = h; });
+    setPath(deskUrl()); rememberDesk();
   });
-  $("#margin .tabs").addEventListener("click", e => {
-    if (e.target.closest(".close")) { $("#margin").classList.remove("open"); return; }
-    const b = e.target.closest("[data-tab]"); if (b) { R.tab = b.dataset.tab; renderMargin(); }
+  $("#margin .close").addEventListener("click", () => $("#margin").classList.remove("open"));
+  $("#margin .tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) { R.tab = b.dataset.tab; if (R.tab !== "words") { R.word = null; R.origin = null; } renderMargin(); } });
+  $("#margin .tabs").addEventListener("keydown", e => {
+    const tabs = [...$("#margin .tabs").querySelectorAll("[data-tab]")], i = tabs.indexOf(document.activeElement); if (i < 0) return;
+    const n = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? tabs.length - 1 : null;
+    if (n == null) return; e.preventDefault(); const t = tabs[(n + tabs.length) % tabs.length]; t.focus(); t.click();
+  });
+  $("#margin .depth").addEventListener("click", e => { const b = e.target.closest("[data-depth]"); if (!b) return; store.setSetting("depth", b.dataset.depth); $("#margin .depth").querySelectorAll("[data-depth]").forEach(x => x.setAttribute("aria-checked", x === b)); renderMargin(); });
+  $("#railtoggle").addEventListener("click", () => { const on = !store.setting("rail", true); store.setSetting("rail", on); view.querySelector(".desk").classList.toggle("norail", !on); $("#railtoggle").setAttribute("aria-expanded", on); });
+  $("#railtoggle").setAttribute("aria-expanded", store.setting("rail", true));
+  $("#pane").addEventListener("click", e => {
+    const a = e.target.closest("a[href]"); if (!a) return;
+    const href = a.getAttribute("href").replace(/^#/, ""), text = (a.querySelector(".ref, b")?.textContent || a.textContent).trim().slice(0, 100);
+    const kind = href.startsWith("/read/") ? "passage" : href.startsWith("/word/") ? "word" : href.startsWith("/person/") ? "person" : href.startsWith("/place/") ? "place" : href.startsWith("/discoveries/") ? "discovery" : "source";
+    store.trailAdd({ kind, label: text, href });
   });
   const pick = el => {
     const ew = el.closest(".ew");
@@ -820,6 +1040,7 @@ async function renderRead(t, osis) {
   $("#text").addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(e.target); } });
   await renderChapterText();
   await renderMargin();
+  if (R.verse) store.trailAdd({ kind: "verse", label: formatRef(R.book, R.chapter, R.verse), href: readUrl(R.t, R.book, R.chapter, R.verse).replace(/^#/, ""), detail: TR[R.t] });
   if (R.verse) {
     try { await document.fonts?.ready; } catch {}
     const phone = matchMedia("(max-width: 960px)").matches;
@@ -839,45 +1060,108 @@ function enterFocus() {
 }
 
 /* ---------- search ---------- */
+// Unified search: exact matches first, grouped by kind; partial matches are labelled as suggestions.
+const fold = t => String(t || "").normalize("NFD").replace(/[̀-֑ͯ-ׇ]/g, "").replace(/[ʼʽ’'·.,;]/g, "").toLowerCase().trim();
+let WORDS = null;
 async function renderSearch(q) {
+  q = (q || "").trim();
   const sk = normaliseStrong(q);
-  if (sk) { location.replace(`#/word/${sk}`); return; }
-  setNav(""); setTitle(`Search: ${q}`);
+  if (sk) { go(`#/word/${sk}`, { replace: true }); return; }
+  setNav("search"); setTitle(q ? `Search: ${q}` : "Search");
   await getIndex();
   $("#gq").value = q;
+  if (!q) {
+    view.innerHTML = `<div class="pagehead"><span class="eyebrow">Search</span><h1>Search the Scriptures</h1><p class="small">One search covers passages, original words, people, places, discoveries, manuscripts and your own notes.</p>
+      <form class="bigsearch" id="sform" role="search" style="max-width:640px"><label class="sr" for="sq">Search</label><input id="sq" type="search" placeholder="John 1:1, logos, shepherd, Abraham, Lachish" autocomplete="off"><button>Search</button></form>
+      <div class="tryline"><span>Try</span>${["John 3:16", "λόγος", "covenant", "Moses", "Jerusalem", "Dead Sea Scrolls"].map(x => `<button type="button" data-q="${esc(x)}">${esc(x)}</button>`).join("")}</div></div>
+      <dl class="skinds">${[["A reference", "John 1:1, Ps 23, Romans 8:28-39", "Opens the passage in the Research Desk."], ["A word", "light, shepherd, grace", "Finds every verse in the translation you choose."], ["Hebrew or Greek", "λόγος, אֱלֹהִים, G3056", "Opens the word study with every place it appears."], ["A person or place", "Abraham, Bethlehem", "Opens their page, with family, journeys and verses."], ["A find or manuscript", "Lachish, Codex Sinaiticus", "Opens the record with its sources."], ["Your own notes", "anything you wrote", "Searched here on this device only."]].map(([a, b, c]) => `<div><dt>${a}</dt><dd><span>${b}</span>${c}</dd></div>`).join("")}</dl>`;
+    $("#sform").addEventListener("submit", e => { e.preventDefault(); goSearch($("#sq").value); });
+    view.querySelectorAll(".tryline button").forEach(b => b.addEventListener("click", () => goSearch(b.dataset.q))); return;
+  }
   const t = TR[store.setting("searchT", "kjv")] ? store.setting("searchT", "kjv") : "kjv";
-  const parsed = parseQuery(q);
-  const bookHits = NAMES.map((n, i) => i).filter(i => q.trim().length > 2 && NAMES[i].toLowerCase().includes(q.trim().toLowerCase()));
+  const fq = fold(q), ql = q.toLowerCase();
+  const ref = parseReference(q, chapterCount);
   view.innerHTML = `<div class="pagehead"><span class="eyebrow">Search</span><h1>${esc(q)}</h1>
-    <div class="actions"><label class="sr" for="stsel">Search in</label><select id="stsel" class="trsel">${translationOptions(t)}</select>
-    <span class="small">Words match whole words and word beginnings; put a phrase in "quotes" for an exact match.</span></div></div>
-    ${bookHits.length ? `<div class="card" style="margin-bottom:16px"><span class="chip">Book</span><ul class="linklist">${bookHits.map(i => `<li><a href="${readUrl(t, i, 1)}"><span><span class="t">${NAMES[i]}</span><span class="d">${esc(CONTEXT[i][1])}</span></span><span class="arr">›</span></a></li>`).join("")}</ul></div>` : ""}
-    <div id="res"><p class="loading">Searching the ${esc(META[t]?.name || "Bible")}…</p></div>`;
+    <div class="sfilters" role="toolbar" aria-label="Show results for">${[["all", "All"], ["passages", "Passages"], ["words", "Original words"], ["people", "People"], ["places", "Places"], ["disc", "Discoveries"], ["ms", "Manuscripts"], ["mine", "My notes"]].map(([k, l], i) => `<button type="button" data-sf="${k}" aria-pressed="${i === 0}">${l}<span class="n" data-n="${k}"></span></button>`).join("")}</div>
+    <p class="small">Exact matches come first. <b>Suggestions</b> are partial matches only: check they are what you mean. Nothing here is ranked by guesswork about meaning.</p></div>
+    <div id="sres" class="sres"><p class="loading">Searching…</p></div>`;
+  const sec = (k, title, kindLabel, items) => items.length ? `<section class="sgroup" data-k="${k}"><h2>${title} <span class="small">${items.length}</span></h2><span class="mtype ${kindLabel === "Suggestion" ? "sugg" : ""}">${kindLabel}</span><div class="sitems">${items.join("")}</div></section>` : "";
+  const [pp, plc] = await Promise.all([H.people().catch(() => []), H.places().catch(() => [])]);
+  WORDS ??= await loadJson("data/research/words.json").catch(() => []);
+  const stems = [...new Set(glossStems(q).length ? glossStems(q) : [stem(q)])].filter(Boolean);
+  const shards = await Promise.all([...new Set(stems.map(x => x[0]))].map(l => loadJson(`data/research/en/${l}.json`).catch(() => ({}))));
+  const idx = Object.assign({}, ...shards);
+  const enRows = new Map(); for (const st of stems) for (const row of idx[st] || []) if (!enRows.has(row[0])) enRows.set(row[0], row);
+  const wExact = WORDS.filter(w => fold(w[2]) === fq || fold(w[1]) === fq).sort((a, b) => b[4] - a[4]).slice(0, 12);
+  const wEn = [...enRows.values()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const nameExact = n => fold(n) === fq, nameWord = n => fold(n).split(/\s+/).includes(fq), namePart = n => fq.length > 2 && fold(n).includes(fq);
+  const P1 = pp.filter(r => nameExact(r[1]) || nameWord(r[1])).sort((a, b) => b[5] - a[5]).slice(0, 12), P2 = pp.filter(r => !P1.includes(r) && namePart(r[1])).sort((a, b) => b[5] - a[5]).slice(0, 8);
+  const L1 = plc.filter(r => nameExact(r[1]) || nameWord(r[1])).slice(0, 12), L2 = plc.filter(r => !L1.includes(r) && namePart(r[1])).slice(0, 8);
+  const D1 = DISCOVERIES.filter(d => fold(d.name).includes(fq)), D2 = DISCOVERIES.filter(d => !D1.includes(d) && fq.length > 3 && fold(`${d.summary} ${d.description}`).includes(fq)).slice(0, 8);
+  const M1 = MANUSCRIPTS.filter(m => fold(`${m.name} ${m.about}`).includes(fq));
+  const mine = store.notes().filter(n => fold(n.text).includes(fq) || fold(labelOf(n.osis)).includes(fq));
+  const bookHits = NAMES.map((n, i) => i).filter(i => q.length > 2 && fold(NAMES[i]).includes(fq));
+  const person = r => `<a class="sitem" href="#/person/${r[0]}"><b>${esc(r[1])}</b><span class="small">${esc(r[3] || "Person")}${r[5] ? ` · ${pl(r[5], "verse", "verses")}` : ""}</span></a>`;
+  const place = r => `<a class="sitem" href="#/place/${r[0]}"><b>${esc(r[1])}</b><span class="small">${esc(r[4] || "Place")} · ${PRECISION[r[5]]?.label || ""}</span></a>`;
+  const word = w => `<a class="sitem" href="#/word/${w[0]}"><b lang="${w[0][0] === "H" ? "hbo" : "grc"}">${esc(w[1])}</b><span class="small">${esc(w[2])} · “${esc(w[3])}” · ${displayStrong(w[0])} · ${pl(Number(w[4]).toLocaleString(), "use", "uses")}</span></a>`;
+  const enw = r => `<a class="sitem" href="#/word/${r[0]}"><b lang="${r[0][0] === "H" ? "hbo" : "grc"}">${esc(r[2])}</b><span class="small">${esc(r[3])} · “${esc(r[4])}” · rendered “${esc(q)}” ${pl(r[1], "time", "times")} in the KJV</span></a>`;
+  const disc = d => `<a class="sitem" href="#/discoveries/${d.id}"><b>${esc(d.name)}</b><span class="small">${esc(KINDS[d.kind] || "")} · ${esc(DSTATUS[d.status]?.label || "")} · ${esc(d.objectDate?.text || "")}</span></a>`;
+  const msx = m => `<a class="sitem" href="#/library"><b>${esc(m.name)}</b><span class="small">${esc(m.date)}</span></a>`;
+  const note = n => `<a class="sitem" href="${readUrl("kjv", fromOsis(n.osis).book, fromOsis(n.osis).chapter, fromOsis(n.osis).verse)}"><b>${labelOf(n.osis)}</b><span class="small">Your note: ${esc(n.text.slice(0, 120))}</span></a>`;
+  let html = "";
+  if (ref) html += sec("passages", "Passage", "Exact match", [`<a class="sitem big" href="${readUrl(store.setting("translation", "kjv"), ref.book, ref.chapter, ref.verse)}"><b>${formatRef(ref.book, ref.chapter, ref.verse, ref.verseEnd)}</b><span class="small">Open in the Research Desk</span></a>`]);
+  if (bookHits.length) html += sec("passages", "Books", "Exact match", bookHits.map(i => `<a class="sitem" href="${readUrl(t, i, 1)}"><b>${NAMES[i]}</b><span class="small">${chapterCount(i)} chapters · ${esc(groupOf(i))}</span></a>`));
+  html += sec("words", "Original words", "Exact match", wExact.map(word));
+  html += sec("words", `Hebrew and Greek words translated “${esc(q)}”`, "Index match", wEn.map(enw));
+  html += sec("people", "People", "Exact match", P1.map(person));
+  html += sec("places", "Places", "Exact match", L1.map(place));
+  html += sec("disc", "Discoveries", "Name match", D1.map(disc));
+  html += sec("ms", "Manuscripts", "Text match", M1.map(msx));
+  html += sec("mine", "My notes", "On this device", mine.map(note));
+  html += `<section class="sgroup" data-k="passages"><h2>Verses containing “${esc(q)}” <span class="small" id="pcount"></span></h2><span class="mtype">Literal text match</span>
+    <div class="actions"><label class="sr" for="stsel">Search in</label><select id="stsel" class="trsel">${translationOptions(t)}</select><span class="small">Whole words and word beginnings; put a phrase in "quotes" for an exact phrase.</span></div><div id="res"><p class="loading">Searching the ${esc(META[t]?.name || "Bible")}…</p></div></section>`;
+  html += sec("people", "People: suggestions", "Suggestion", P2.map(person));
+  html += sec("places", "Places: suggestions", "Suggestion", L2.map(place));
+  html += sec("disc", "Discoveries that mention it", "Suggestion", D2.map(disc));
+  html += `<p class="small" style="margin-top:18px"><a href="#/research/topic/${encodeURIComponent(q)}">Research “${esc(q)}” as a topic</a>: the Hebrew and Greek words behind it, the people and places it names, and where it is concentrated.</p>`;
+  $("#sres").innerHTML = html;
+  const counts = { all: 0 }; view.querySelectorAll(".sgroup").forEach(g => { const n = g.querySelectorAll(".sitem").length; counts[g.dataset.k] = (counts[g.dataset.k] || 0) + n; counts.all += n; });
+  const setCounts = () => view.querySelectorAll("[data-n]").forEach(el => { const n = counts[el.dataset.n] || 0; el.textContent = n ? ` ${n.toLocaleString()}` : ""; });
+  setCounts();
+  view.querySelectorAll("[data-sf]").forEach(b => b.addEventListener("click", () => {
+    view.querySelectorAll("[data-sf]").forEach(x => x.setAttribute("aria-pressed", x === b));
+    view.querySelectorAll(".sgroup").forEach(g => (g.hidden = b.dataset.sf !== "all" && g.dataset.k !== b.dataset.sf));
+  }));
   $("#stsel").addEventListener("change", e => { store.setSetting("searchT", e.target.value); renderSearch(q); });
   try {
     const corpus = await loadAll(t);
-    const hits = searchCorpus(corpus, q, { limit: 500 });
+    const parsed = parseQuery(q);
+    const hits = searchCorpus(corpus, q, { limit: 300 });
+    counts.passages = (counts.passages || 0) + hits.total; counts.all += hits.total; setCounts();
+    $("#pcount").textContent = hits.total ? hits.total.toLocaleString() : "";
     $("#res").innerHTML = hits.length
-      ? `<p class="small">${hits.total.toLocaleString()} verse${hits.total === 1 ? "" : "s"}${hits.total > hits.length ? `, showing the first ${hits.length}` : ""}. Refine with more words or a "phrase in quotes".</p>
-        <div class="results">${hits.map(h => `<a class="hit" href="${readUrl(t, h.book, h.chapter, h.verse)}"><span class="meta"><span class="ref">${formatRef(h.book, h.chapter, h.verse)}</span><span class="chip scripture">Scripture · ${TR[t]}</span></span><span class="tx" dir="${dirOf(t)}" lang="${langOf(t)}">${highlightTerms(h.text, parsed)}</span></a>`).join("")}</div>`
-      : `<p class="empty">No verses in the ${TR[t]} contain ${parsed.phrases.length ? "that phrase" : "all of those words"}. Try fewer words, the other translation, or a reference such as John 3:16.</p>`;
-  } catch { $("#res").innerHTML = `<p class="empty">The text could not load for searching. Check your connection and try again.</p>`; }
+      ? `<p class="small">${hits.total.toLocaleString()} verse${hits.total === 1 ? "" : "s"} in the ${esc(META[t]?.name || "")}${hits.total > hits.length ? `, showing the first ${hits.length}` : ""}.</p>
+        <div class="results">${hits.map(h => `<a class="hit" href="${readUrl(t, h.book, h.chapter, h.verse)}"><span class="meta"><span class="ref">${formatRef(h.book, h.chapter, h.verse)}</span></span><span class="tx">${highlightTerms(h.text, parsed)}</span></a>`).join("")}</div>`
+      : `<p class="empty">No verses in the ${esc(META[t]?.name || "")} contain ${parsed.phrases.length ? "that phrase" : "all of those words"}.</p>`;
+  } catch { $("#res").innerHTML = `<p class="empty">The text could not load for searching. Check your connection and try again; the other results above still work.</p>`; }
 }
 
 /* ---------- my study ---------- */
-async function renderStudy(tab = "notes") {
+async function renderStudy(tab = "trails") {
+  if (!["trails", "notes", "bookmarks", "highlights", "collections", "history"].includes(tab)) tab = "trails";
   setNav("study"); setTitle("My study");
+  if (tab === "trails") return renderTrails();
   await getIndex();
-  const lists = { notes: store.notes(), bookmarks: store.bookmarks(), highlights: store.highlights(), history: store.history(), collections: collLoad() };
+  const lists = { trails: store.trails(), notes: store.notes(), bookmarks: store.bookmarks(), highlights: store.highlights(), history: store.history(), collections: collLoad() };
   const sorted = tab === "history" || tab === "collections" ? lists[tab] : lists[tab].slice().sort((a, b) => orderOf(a.osis) - orderOf(b.osis));
   view.innerHTML = `${artHead("aleppo")}<span class="eyebrow">My study</span><h1>Your notes and saved verses</h1>
-    <p class="small">Kept in this browser on this device. Export them to keep a copy; accounts that sync across devices arrive in Phase 3.</p>
+    ${STORAGE_NOTE}
     <div class="actions"><span class="chip">Study streak: ${store.streak()} day${store.streak() === 1 ? "" : "s"}</span><span class="chip ext">${store.studyDays()} days studied</span><a class="small" href="#/learn">Courses</a></div></div>
-    <div class="tabsrow">${[["notes", "Notes"], ["bookmarks", "Bookmarks"], ["highlights", "Highlights"], ["collections", "Collections"], ["history", "Reading history"]].map(([k, l]) => `<button type="button" class="btn ${k === tab ? "on" : ""}" data-st="${k}">${l} (${lists[k].length})</button>`).join("")}
+    <div class="tabsrow">${[["trails", "Research trails"], ["notes", "Notes"], ["bookmarks", "Bookmarks"], ["highlights", "Highlights"], ["collections", "Collections"], ["history", "Reading history"]].map(([k, l]) => `<button type="button" class="btn ${k === tab ? "on" : ""}" data-st="${k}">${l} (${lists[k].length})</button>`).join("")}
       <span style="flex:1"></span><button class="btn" type="button" id="exp">Download as Markdown</button><button class="btn" type="button" id="cpyall">Copy all</button></div>
     <div class="card"><div class="results" id="slist"><p class="loading">Loading…</p></div></div>
     <p style="margin-top:20px"><button class="btn" type="button" id="clear">Delete all study data on this device</button></p><div id="confirm"></div>`;
-  view.querySelectorAll("[data-st]").forEach(b => b.addEventListener("click", () => renderStudy(b.dataset.st)));
+  view.querySelectorAll("[data-st]").forEach(b => b.addEventListener("click", () => go(`#/study/${b.dataset.st}`)));
   const rows = await Promise.all(sorted.map(async (it, ci) => {
     if (tab === "collections") return `<div class="hit coll"><span class="meta"><b>${esc(it.name)}</b><span class="small">${it.items.length} verse${it.items.length === 1 ? "" : "s"}</span><button class="linkbtn small" type="button" data-delc="${ci}">Delete</button></span>${(await Promise.all(it.items.map(async o => `<a class="cref" href="#/lens/${o}"><b>${labelOf(o)}</b> <span class="small">${esc(await anyText(o))}</span></a>`))).join("")}</div>`;
     if (tab === "history") { const r = fromOsis(it.osis); return `<a class="hit" href="${readUrl(it.translation || "kjv", r.book, r.chapter)}"><span class="meta"><span class="ref">${formatRef(r.book, r.chapter)}</span><span class="small">${TR[it.translation] || ""} · ${new Date(it.at).toLocaleString()}</span></span></a>`; }
@@ -894,7 +1178,7 @@ async function renderStudy(tab = "notes") {
   $("#exp").addEventListener("click", async () => {
     const blob = new Blob([await md()], { type: "text/markdown" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-    a.download = `scripture-atlas-notes-${new Date().toISOString().slice(0, 10)}.md`;
+    a.download = `ereunia-notes-${new Date().toISOString().slice(0, 10)}.md`;
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   });
   $("#cpyall").addEventListener("click", async () => copyText(await md()));
@@ -909,10 +1193,11 @@ async function renderStudy(tab = "notes") {
 async function renderWord(key, page = 0) {
   await getIndex();
   const k = normaliseStrong(key) || key;
-  setNav("languages"); setTitle(displayStrong(k));
+  setNav("word"); setTitle(displayStrong(k));
   let e = await loadLex(k).catch(() => null);
-  if (!e && !/[A-Z]$/.test(k)) for (const s of ["G", "A", "B", "H"]) { e = await loadLex(k + s).catch(() => null); if (e) { location.replace(`#/word/${k + s}`); return; } }
+  if (!e && !/[A-Z]$/.test(k)) for (const s of ["G", "A", "B", "H"]) { e = await loadLex(k + s).catch(() => null); if (e) { go(`#/word/${k + s}`, { replace: true }); return; } }
   if (!e) { view.innerHTML = `<div class="pagehead"><span class="eyebrow">Languages</span><h1>${esc(displayStrong(k) || key)}</h1><p class="empty">No word with this Strong's number appears in the Hebrew or Greek text here. Try another number, such as H7225 or G26.</p></div>`; return; }
+  setTitle(`${e.lemma} (${e.translit.replace(/\./g, "")}), ${displayStrong(k)}`);
   const greek = k[0] === "G", PAGE = 50;
   const refs = e.refs.slice(page * PAGE, page * PAGE + PAGE);
   const rows = await Promise.all(refs.map(async n => { const r = unpackRef(n); const t = await verseText("kjv", toOsis(r.book, r.chapter, r.verse)).catch(() => ""); return `<a class="hit" href="${readUrl("kjv", r.book, r.chapter, r.verse)}"><span class="meta"><span class="ref">${formatRef(r.book, r.chapter, r.verse)}</span></span><span class="tx">${esc(t)}</span></a>`; }));
@@ -952,7 +1237,7 @@ function renderLanguages() {
       <p class="small">Hebrew: Leningrad Codex (c. AD 1008). Greek: STEPBible's amalgamated New Testament, covering NA28 and the Textus Receptus. All tagging and lexicons from STEPBible.org (Tyndale House, Cambridge), CC BY 4.0.</p>
       <a class="btn pri" href="#/read/kjv/Gen.1.1">Try Genesis 1 interlinear</a></section>
   </div>`;
-  $("#lk").addEventListener("submit", ev => { ev.preventDefault(); const k = normaliseStrong($("#lkq").value); if (k) location.hash = `#/word/${k}`; else toast("Enter a number such as H7225 or G26"); });
+  $("#lk").addEventListener("submit", ev => { ev.preventDefault(); const k = normaliseStrong($("#lkq").value); if (k) go(`#/word/${k}`); else toast("Enter a number such as H7225 or G26"); });
 }
 
 /* ---------- history: map, timeline, people ---------- */
@@ -979,7 +1264,7 @@ async function renderHistory(tab = "map", sub = "") {
     <label class="small"><input type="checkbox" id="appx" checked> Show approximate locations</label>
     <div class="legend"><span><i class="pm located"></i>Identified site</span><span><i class="pm approximate"></i>Approximate</span><span><i class="pm related"></i>Placed by a related site</span></div>
     <div id="pinfo"><p class="small">${places.filter(p => p[2] != null).length.toLocaleString()} places are plotted. Tap one to see what happened there. Drag to move; pinch, scroll or use + and − to zoom.</p></div>
-    <p class="small">${places.filter(p => p[5] === "unknown").length} places have no known location and are not shown. Off this map: ${esc(off.slice(0, 6).join(", "))}${off.length > 6 ? " and others" : ""}.</p></aside></div>`;
+    <p class="small">${pl(places.filter(p => p[5] === "unknown").length, "place", "places")} have no known location and are not shown. Off this map: ${esc(off.slice(0, 6).join(", "))}${off.length > 6 ? " and others" : ""}.</p></aside></div>`;
   const map = mountMap($("#map"), { base, places, onPick: slug => showPlace(slug) });
   async function showPlace(slug) {
     const p = await H.place(slug); if (!p) return;
@@ -1016,7 +1301,7 @@ async function renderJourneys(box, id) {
     let i = 0; show(0); $("#jplay").textContent = "Pause";
     journeyTimer = setInterval(() => { i++; if (i >= slugs.length || !document.contains($("#jmap"))) return stop(); show(i); }, 2200);
   });
-  addEventListener("hashchange", stop, { once: true });
+  addEventListener("routechange", stop, { once: true });
 }
 
 async function renderTimeline(box) {
@@ -1030,7 +1315,7 @@ async function renderTimeline(box) {
       <ol class="tl">${g.items.map(e => { const f = e.first != null ? unpackRef(e.first) : null; return `<li id="e${e.id}"><span class="yr">${yearText(e.year)}</span><div><b>${esc(e.title)}</b> ${certChip(e.year)}
         <div class="tlmeta">${e.places.map(s => lm.get(s)).filter(Boolean).map(r => `<a class="chip ext" href="#/place/${r[0]}">${esc(r[1])}</a>`).join(" ")} ${e.people.map(s => pm.get(s)).filter(Boolean).filter(r => !["god_1324", "holy_spirit_7400", "jesus_905"].includes(r[0]) || e.year > -10).filter(r => r[0] !== "god_1324").slice(0, 4).map(r => `<a class="chip" href="#/person/${r[0]}">${esc(r[1])}</a>`).join(" ")}
         ${f ? `<a class="small" href="${readUrl("kjv", f.book, f.chapter, f.verse)}">${formatRef(f.book, f.chapter, f.verse)}</a>` : ""}</div></div></li>`; }).join("")}</ol></section>`).join("")}`;
-  const h = location.hash.split("#")[2];
+  const h = location.hash.slice(1);
   if (h) document.getElementById(h)?.scrollIntoView({ block: "center" });
 }
 
@@ -1108,7 +1393,7 @@ async function renderPlace(slug) {
       ${p.born.length || p.died.length ? `<p>${p.born.length ? `Born here: ${p.born.map(s => `<a href="#/person/${s}">${esc(pm.get(s)?.[1] || s)}</a>`).join(", ")}. ` : ""}${p.died.length ? `Died here: ${p.died.map(s => `<a href="#/person/${s}">${esc(pm.get(s)?.[1] || s)}</a>`).join(", ")}.` : ""}</p>` : ""}
       ${p.dict ? `<h3>Dictionary entry</h3><p class="dict">${esc(p.dict)}</p><p class="small">Easton's Bible Dictionary (1897), public domain. Some identifications have changed since it was written.</p>` : ""}</section>
     <section class="card"><h2 style="font-size:1.4rem">Verses</h2><div id="lv"></div></section></div>`;
-  if (plotted) mountMap($("#pmap"), { base, places, focus: slug, onPick: s => (location.hash = `#/place/${s}`) }).focusOn(slug, 16);
+  if (plotted) mountMap($("#pmap"), { base, places, focus: slug, onPick: s => go(`#/place/${s}`) }).focusOn(slug, 16);
   const page = async n => { const r = await versesList(p.verses, n, page); $("#lv").innerHTML = r.html; r.wire($("#lv")); };
   page(0);
 }
@@ -1133,11 +1418,11 @@ function renderLearn() {
   <div class="streak card"><div><span class="big">${streak}</span><span class="small">day study streak</span></div><div><span class="big">${days}</span><span class="small">day${days === 1 ? "" : "s"} studied</span></div><div><span class="big">${COURSES.reduce((n, c) => n + store.courseProgress(c.id, c.lessons.map(l => l.id)), 0)}</span><span class="small">lessons completed</span></div></div>
   <div class="coursegrid">${COURSES.map(c => { const done = store.courseProgress(c.id, c.lessons.map(l => l.id)), n = c.lessons.length; const next = c.lessons.find(l => !store.lessonResult(c.id, l.id)) || c.lessons[0];
     return `<article class="card course">${IMAGES[COURSE_ART[c.id]] ? `<span class="cart">${pic(COURSE_ART[c.id], { sizes: "(max-width: 760px) 100vw, 420px" })}</span>` : ""}<div class="actions"><span class="chip ext">${c.level}</span>${statusChip(c)}</div><h2>${c.title}</h2><p class="small">${c.summary}</p>
-      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${done}" aria-label="${done} of ${n} lessons done"><i style="width:${done / n * 100}%"></i></div><span class="small">${done} of ${n} lessons</span>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${done}" aria-label="${done} of ${pl(n, "lesson", "lessons")} done"><i style="width:${done / n * 100}%"></i></div><span class="small">${done} of ${pl(n, "lesson", "lessons")}</span>
       <div class="actions"><a class="btn pri" href="#/learn/${c.id}/${next.id}">${done ? (done === n ? "Review" : "Continue") : "Start"}</a><a class="btn" href="#/learn/${c.id}">All lessons</a></div></article>`; }).join("")}</div>
   <section class="card" style="margin-top:18px"><h2 style="font-size:1.4rem">Planned courses</h2><ul class="planned">${PLANNED.map(([t, d]) => `<li><b>${t}</b> <span class="small">${d}</span></li>`).join("")}</ul></section>`;
   wireFamily(renderLearn);
-  $("#gb").addEventListener("submit", e => { e.preventDefault(); const r = parseReference($("#gbq").value, chapterCount); if (r) location.hash = `#/guide/${guideSpec(r.book, r.chapter, r.verse, r.verseEnd)}`; else toast("Enter a passage such as Psalm 23 or John 15:1-17"); });
+  $("#gb").addEventListener("submit", e => { e.preventDefault(); const r = parseReference($("#gbq").value, chapterCount); if (r) go(`#/guide/${guideSpec(r.book, r.chapter, r.verse, r.verseEnd)}`); else toast("Enter a passage such as Psalm 23 or John 15:1-17"); });
 }
 
 function renderCourse(id) {
@@ -1251,7 +1536,7 @@ async function renderGuide(spec) {
     ${repeated.length ? `<p><b>Repeated words</b> (in the KJV): ${repeated.map(([w, n]) => `<span class="chip">${esc(w)} × ${n}</span>`).join(" ")}</p>` : ""}
     ${OBSERVE.map((q, i) => box("o" + i, q)).join("")}</section>
   <section class="gsec"><h2><span class="gn">4</span> Key words in the ${g.book < 39 ? "Hebrew" : "Greek"}</h2>
-    ${keys.length ? `<div class="kwgrid">${keys.map(k => `<a class="kw" href="#/word/${k.strong}"><span class="big" lang="${g.book < 39 ? "hbo" : "grc"}" dir="${g.book < 39 ? "rtl" : "ltr"}">${esc(k.form)}</span><span class="small">${esc(k.translit)}</span><b>“${esc(k.gloss)}”</b><span class="small">${k.inPassage > 1 ? `${k.inPassage} times here · ` : ""}${k.total.toLocaleString()} times in the Bible · ${displayStrong(k.strong)}</span></a>`).join("")}</div><p class="small">Chosen because they repeat in this passage or are rare in the Bible. Tap one for its full entry. Data: STEPBible, CC BY 4.0.</p>` : `<p class="small">No original-language data for this passage.</p>`}</section>
+    ${keys.length ? `<div class="kwgrid">${keys.map(k => `<a class="kw" href="#/word/${k.strong}"><span class="big" lang="${g.book < 39 ? "hbo" : "grc"}" dir="${g.book < 39 ? "rtl" : "ltr"}">${esc(k.form)}</span><span class="small">${esc(k.translit)}</span><b>“${esc(k.gloss)}”</b><span class="small">${k.inPassage > 1 ? `${pl(k.inPassage, "time", "times")} here · ` : ""}${pl(k.total.toLocaleString(), "time", "times")} in the Bible · ${displayStrong(k.strong)}</span></a>`).join("")}</div><p class="small">Chosen because they repeat in this passage or are rare in the Bible. Tap one for its full entry. Data: STEPBible, CC BY 4.0.</p>` : `<p class="small">No original-language data for this passage.</p>`}</section>
   <section class="gsec"><h2><span class="gn">5</span> Connect</h2><p class="small">Passages readers most often link to this one (OpenBible.info).</p>
     ${xrows.length ? `<div class="results">${xrows.map(([ref, txt, r]) => `<a class="hit" href="${readUrl("kjv", r.book, r.chapter, r.verse)}"><span class="meta"><span class="ref">${ref}</span></span><span class="tx">${esc(txt)}</span></a>`).join("")}</div>` : `<p class="small">No cross references recorded.</p>`}
     ${box("c0", "How do these passages shed light on this one?")}</section>
@@ -1262,7 +1547,7 @@ async function renderGuide(spec) {
   let tmr;
   view.querySelectorAll("[data-ans]").forEach(el => el.addEventListener("input", () => { clearTimeout(tmr); tmr = setTimeout(() => { store.setGuideAnswer(key, el.dataset.ans, el.value); $("#gsv").textContent = "Saved"; }, 400); }));
   $("#gtr").addEventListener("change", e => { store.setSetting("guideT", e.target.value); renderGuide(key); });
-  $("#gp").addEventListener("submit", e => { e.preventDefault(); const r = parseReference($("#gpq").value, chapterCount); if (r) location.hash = `#/guide/${guideSpec(r.book, r.chapter, r.verse, r.verseEnd)}`; else toast("Enter a passage such as Psalm 23 or Romans 8:28-39"); });
+  $("#gp").addEventListener("submit", e => { e.preventDefault(); const r = parseReference($("#gpq").value, chapterCount); if (r) go(`#/guide/${guideSpec(r.book, r.chapter, r.verse, r.verseEnd)}`); else toast("Enter a passage such as Psalm 23 or Romans 8:28-39"); });
   $("#gpr").addEventListener("click", () => window.print());
   $("#gdl").addEventListener("click", () => {
     view.querySelectorAll("[data-ans]").forEach(el => store.setGuideAnswer(key, el.dataset.ans, el.value));
@@ -1322,18 +1607,24 @@ async function renderTranslation(id) {
 
 /* ---------- AI Studio ---------- */
 const AI_EXAMPLES = [["John 3:16", "What does this verse mean, and how do the KJV and WEB differ?"], ["Genesis 15:6", "How do Paul and James use this verse?"], ["", "What does the Bible say about forgiveness?"], ["Ruth 1:16", "Explain this to a beginner, with its background."]];
+const SRC_TYPE = { scripture: ["Scripture", "scripture"], translation: ["Translation", "scripture"], dataset: ["Dataset", "data"], editorial: ["Editorial note", "ext"], archaeology: ["Archaeology", "arch"], lexicon: ["Lexicon", "lex"], reference: ["Reference work", "ext"] };
 function renderAnswer(res) {
   const src = new Map(res.sources.map(s => [s.id, s]));
+  const typeChip = s => { const [l, c] = SRC_TYPE[s?.type] || ["Source", "ext"]; return `<span class="chip ${c}">${l}</span>`; };
   const chip = id => `<button type="button" class="srcchip" data-src="${esc(id)}" title="${esc(src.get(id)?.label || "")}">${esc(id)}</button>`;
-  const secs = SECTIONS.filter(([k]) => res.sections[k]?.length).map(([k, title, desc]) => `<section class="ans ${k}"><h3>${title} <span class="small">${desc}</span></h3><ul>${res.sections[k].map(st => `<li>${esc(st.text)} ${st.cites.map(chip).join(" ")}</li>`).join("")}</ul></section>`).join("");
-  return `<div class="card answer"><div class="actions"><span class="chip draftchip">AI-generated</span><span class="small">Every statement links to the sources it used. ${res.dropped?.length ? `${res.dropped.length} statement${res.dropped.length === 1 ? " was" : "s were"} removed because ${res.dropped.length === 1 ? "it" : "they"} failed the citation check.` : "All statements passed the citation check."}</span></div>
+  const excerpt = id => { const s = src.get(id); if (!s) return ""; const t = s.text.length > 420 ? s.text.slice(0, 420) + "…" : s.text; return `<li>${typeChip(s)} <b>${esc(s.id)}</b> ${esc(s.label)}<p class="small">${esc(t)}</p></li>`; };
+  const stmt = (st, k) => `<li class="${st.kind === "inference" ? "inference" : ""}">${st.kind === "inference" ? `<span class="infchip" title="The assistant's own reading of the cited passages. No source states it.">Editorial inference</span> ` : ""}${esc(st.text)} ${st.cites.map(chip).join(" ")}
+    ${st.cites.length ? `<details class="ev"><summary>Inspect the evidence</summary><ul class="evsrc">${st.cites.map(excerpt).join("")}</ul><p class="small">A citation shows where a statement comes from. It does not by itself prove the statement is right.</p></details>` : ""}</li>`;
+  const secs = SECTIONS.filter(([k]) => res.sections[k]?.length).map(([k, title, desc]) => `<section class="ans ${k}"><h3>${title} <span class="small">${desc}</span></h3><ul>${res.sections[k].map(st => stmt(st, k)).join("")}</ul></section>`).join("");
+  const nInf = Object.values(res.sections).flat().filter(st => st.kind === "inference").length;
+  return `<div class="card answer"><div class="actions"><span class="chip draftchip">AI-generated</span><span class="small">Every statement links to the sources it used. ${res.dropped?.length ? `${res.dropped.length} statement${res.dropped.length === 1 ? " was" : "s were"} removed because ${res.dropped.length === 1 ? "it" : "they"} failed a check (see below).` : "All statements passed the checks."}${nInf ? ` ${nInf} statement${nInf === 1 ? " is" : "s are"} marked as editorial inference: the assistant's reading, not a cited view.` : ""}</span></div>
     ${secs}
-    <details class="srcs" open><summary>Sources (${res.sources.length})</summary><ol>${res.sources.map(s => `<li id="src-${esc(s.id)}"><b>${esc(s.id)}</b> <span class="chip ${s.type === "scripture" || s.type === "translation" ? "scripture" : "ext"}">${s.type === "scripture" ? "Scripture" : s.type === "translation" ? "Translation" : s.type === "dataset" ? "Dataset" : "Editorial"}</span> ${esc(s.label)}<p class="small">${esc(s.text)}</p></li>`).join("")}</ol></details>
+    <details class="srcs"><summary>All sources given to the assistant (${res.sources.length})</summary><ol>${res.sources.map(s => `<li id="src-${esc(s.id)}"><b>${esc(s.id)}</b> ${typeChip(s)} ${esc(s.label)}<p class="small">${esc(s.text)}</p></li>`).join("")}</ol></details>
     ${res.dropped?.length ? `<details><summary>Removed statements (${res.dropped.length})</summary><ul>${res.dropped.map(d => `<li><span class="small">${esc(d.reason)}:</span> ${esc(d.text)}</li>`).join("")}</ul></details>` : ""}
-    <p class="small">An AI summary of the sources above, not an authority. Read the passages yourself; for pastoral questions, talk with someone who knows you.</p></div>`;
+    <p class="small">An AI summary of the sources above, not an authority. The checks catch missing citations, misquotations and unsupported claims about what scholars or traditions hold; they cannot confirm every claim is true. Read the passages yourself; for pastoral questions, talk with someone who knows you.</p></div>`;
 }
 function wireAnswer(el) {
-  el.querySelectorAll(".srcchip").forEach(b => b.addEventListener("click", () => { const t = el.querySelector(`#src-${b.dataset.src}`); t?.scrollIntoView({ block: "center", behavior: "smooth" }); t?.classList.add("flash"); setTimeout(() => t?.classList.remove("flash"), 1200); }));
+  el.querySelectorAll(".srcchip").forEach(b => b.addEventListener("click", () => { const d = b.closest("li")?.querySelector("details.ev"); if (d) { d.open = true; d.querySelectorAll("li").forEach(li => li.classList.toggle("flash", li.textContent.includes(b.dataset.src + " "))); setTimeout(() => d.querySelectorAll(".flash").forEach(x => x.classList.remove("flash")), 1400); } }));
 }
 function renderAI(refArg) {
   setNav("ai"); setTitle("AI Studio");
@@ -1400,9 +1691,9 @@ function wireResearchForm() {
     e.preventDefault();
     const q = $("#rq").value.trim(); if (!q) return;
     const sk = normaliseStrong(q);
-    if (sk) { location.hash = `#/word/${sk}`; return; }
+    if (sk) { go(`#/word/${sk}`); return; }
     const r = parseReference(q, chapterCount);
-    location.hash = r ? `#/research/${toOsis(r.book, r.chapter, r.verse || 1)}` : `#/research/topic/${encodeURIComponent(q)}`;
+    go(r ? `#/research/${toOsis(r.book, r.chapter, r.verse || 1)}` : `#/research/topic/${encodeURIComponent(q)}`);
   });
 }
 
@@ -1470,7 +1761,7 @@ async function renderVerseGraph(osis) {
     <div class="two">
       <section class="card"><h2 style="font-size:1.4rem">Connected verses</h2><p class="small">The passages readers most often link to ${label}, and the Hebrew or Greek words each one shares with it.</p><div class="results">${xrows.join("") || `<p class="small">No cross references are recorded.</p>`}</div>
         <p class="small">Cross references: OpenBible.info, CC BY. A shared word is a fact about the text; whether the authors meant the link is a matter of interpretation.</p></section>
-      <section class="card"><h2 style="font-size:1.4rem">Key words</h2>${keys.length ? `<div class="plist">${keys.map(k => `<a href="#/word/${k.strong}"><b lang="${greek ? "grc" : "hbo"}">${esc(k.form)}</b><span class="small">${esc(k.translit)} · “${esc(k.gloss)}” · ${k.total.toLocaleString()} uses in the Bible</span></a>`).join("")}</div>` : `<p class="small">No key words found.</p>`}
+      <section class="card"><h2 style="font-size:1.4rem">Key words</h2>${keys.length ? `<div class="plist">${keys.map(k => `<a href="#/word/${k.strong}"><b lang="${greek ? "grc" : "hbo"}">${esc(k.form)}</b><span class="small">${esc(k.translit)} · “${esc(k.gloss)}” · ${pl(k.total.toLocaleString(), "use", "uses")} in the Bible</span></a>`).join("")}</div>` : `<p class="small">No key words found.</p>`}
         ${P.length || L.length ? `<h3>People and places</h3><div class="plist">${P.map(p => `<a href="#/research/person/${p[0]}"><b>${esc(p[1])}</b><span class="small">${esc(p[3] || "Person")}</span></a>`).join("")}${L.map(p => `<a href="#/research/place/${p[0]}"><b>${esc(p[1])}</b><span class="small">${esc(p[4] || "Place")}</span></a>`).join("")}</div>` : ""}
         ${E.length ? `<h3>Events</h3><ul class="evlist">${E.map(e => `<li><span class="yr">${yearText(e.year)}</span> ${certChip(e.year)}<br><a href="#/history/timeline#e${e.id}">${esc(e.title)}</a></li>`).join("")}</ul>` : ""}
         <p class="small">Word tagging: STEPBible TAHOT and TAGNT, CC BY 4.0. People, places and events: Theographic, CC BY-SA 4.0. Key words are nouns, verbs and adjectives, ranked by how rare they are.</p></section>
@@ -1532,7 +1823,7 @@ async function renderTopic(raw) {
     const top = d.map((n, i) => [n, i]).filter(([n]) => n).sort((a, b) => b[0] - a[0]).slice(0, 3);
     return `<article class="card tcard"><div class="wchead"><a class="big" href="#/word/${r[0]}" dir="${heb ? "rtl" : "ltr"}" lang="${heb ? "hbo" : "grc"}">${esc(r[2])}</a><span class="small">${esc(r[3])} · ${displayStrong(r[0])} · ${heb ? "Hebrew or Aramaic" : "Greek"}</span></div>
       <p class="wgloss">“${esc(r[4])}”</p>
-      <p class="small">Glossed with “${esc(q)}” ${r[1].toLocaleString()} time${r[1] === 1 ? "" : "s"} out of ${e.n.toLocaleString()} uses.</p>
+      <p class="small">Glossed with “${esc(q)}” ${r[1].toLocaleString()} time${r[1] === 1 ? "" : "s"} out of ${pl(e.n.toLocaleString(), "use", "uses")}.</p>
       ${distSvg(d)}<div class="distlab small"><span>Genesis</span><span>Matthew</span><span>Revelation</span></div>
       <p class="small">Most used in ${top.map(([n, i]) => `<a href="${readUrl("kjv", i, 1)}">${NAMES[i]}</a> (${n})`).join(", ")}.</p>
       <p class="small"><a href="#/word/${r[0]}">Lexicon entry and every verse ›</a></p></article>`;
@@ -1547,18 +1838,31 @@ async function renderTopic(raw) {
     <p class="small" style="margin-top:12px">Sources: STEPBible TAHOT, TAGNT, TBESH and TBESG (CC BY 4.0); Theographic Bible Metadata (CC BY-SA 4.0).</p>`;
 }
 
-function renderLibrary() {
+function renderLibrary(mode) {
   setNav("library"); setTitle("Library");
   const credit = (name, url) => `${esc(name)}<br><span class="mono small">${esc(url || "")}</span>`;
   const msLink = m => (m.see[0].startsWith("#") ? m.see[0] : `#/read/kjv/${m.see[0]}`);
-  view.innerHTML = `${artHead("isaiah-scroll")}<span class="eyebrow">Library</span><h1>The manuscripts behind the text, and where every source comes from.</h1>
-    <p class="small" style="max-width:72ch">Ereunia is self-contained: everything you read here is hosted here. Sources are credited below as their licences require.</p></div>
-    <section><h2 style="font-size:1.6rem;margin:0 0 10px">Manuscripts and editions</h2>
-      <p class="small" style="max-width:72ch">No original manuscript of any biblical book survives. What we have are copies, and copies of copies, which scholars compare to recover the earliest text. Dates are estimates; where they are debated a range is given.</p>
+  if (mode === "credits") return renderCredits(credit);
+  view.innerHTML = `${artHead("isaiah-scroll")}<span class="eyebrow">Library</span><h1>The manuscripts behind the text.</h1>
+    <p class="small" style="max-width:72ch">No original manuscript of any biblical book survives. These are the copies, translations and editions that scholars compare to recover the text, oldest first. Every passage in the Research Desk lists which of them contain it.</p></div>
+<section><h2 style="font-size:1.6rem;margin:0 0 10px">Manuscripts and editions</h2>
+      <p class="small" style="max-width:72ch">Dates are estimates; where they are debated, a range is given.</p>
       <div class="grid3">${MANUSCRIPTS.map(m => `<article class="card mscard">${IMAGES[m.img] ? `<span class="msimg">${pic(m.img, { sizes: "(max-width: 760px) 100vw, 400px" })}</span>` : ""}<span class="eyebrow">${esc(m.lang)}</span><h3 style="font-size:1.3rem;margin:4px 0">${esc(m.name)}</h3>
         <p class="small"><b>${esc(m.date)}</b> · ${esc(m.where)}</p><p>${esc(m.about)}</p><a class="small" href="${msLink(m)}">${esc(m.see[1])} ›</a></article>`).join("")}</div>
       <p class="small">Ereunia editorial summaries of widely published scholarship.</p></section>
-    <div class="card" id="credits" style="margin:22px 0 18px;scroll-margin-top:130px"><h2 style="font-size:1.5rem;margin-bottom:8px">Credits and source register</h2><div class="tablewrap"><table class="reg">
+    <section class="card libref"><h2 style="font-size:1.5rem">Reference works in Ereunia</h2>
+      <ul class="linklist">
+        ${inLink("Hebrew and Greek lexicons", "STEPBible brief lexicons (TBESH, based on BDB; TBESG, based on Abbott-Smith), CC BY 4.0", "#/languages")}
+        ${inLink("Translation histories", `How each of the ${allTranslations().length} Bibles was made, and its licence`, "#/bibles")}
+        ${inLink("Easton's Bible Dictionary (1897)", "Historic entries on people and places, labelled as historic", "#/history/people")}
+        ${inLink("Discoveries", `${DISCOVERIES.length} documented finds with sources and limits`, "#/discoveries")}
+        ${inLink("Credits and licences", "Every dataset, image and font, with its owner and licence", "#/credits")}
+      </ul></section>`;
+}
+function renderCredits(credit) {
+  setNav("credits"); setTitle("Credits and licences");
+  view.innerHTML = `<div class="pagehead"><span class="eyebrow">Library</span><h1>Credits and licences</h1><p class="small" style="max-width:72ch">Ereunia is self-contained: everything you read is hosted here. Each source below is credited as its licence requires, with what it is used for. Discovery photographs record what they show, who took them and under which licence.</p></div>
+    <div class="card" id="register" style="margin:22px 0 18px"><h2 style="font-size:1.5rem;margin-bottom:8px">Credits and source register</h2><div class="tablewrap"><table class="reg">
       <thead><tr><th>Source</th><th>Type</th><th>Owner</th><th>Licence</th><th>How it is used</th></tr></thead>
       <tbody>${SOURCES.map(s => `<tr><td>${credit(s.name, s.url)}</td><td>${s.type}</td><td>${s.owner}</td><td>${s.licence}</td><td>${s.use}</td></tr>`).join("")}
       <tr><td>${credit("54 Bibles from eBible.org", "https://ebible.org/")}</td><td>Scripture · translations</td><td>Each translation's publisher</td><td>Public domain, CC BY, CC BY-SA or CC BY-ND, shown on each Bible's page</td><td>Full text, unchanged</td></tr>
@@ -1578,13 +1882,13 @@ function renderLibrary() {
         <dt>Editorial</dt><dd>Ereunia notes on history and dating, showing each scholarly view.</dd>
         <dt>AI</dt><dd>Generated by the research assistant, with every claim tied to a cited source.</dd>
       </dl>
-      <p class="small">Translation versions in use: ${INDEX ? INDEX.translations.map(t => `${t.short} (checksum ${t.checksum})`).join(", ") : "loading"}.</p></section>`;
+      <p class="small">Translation versions in use: ${INDEX ? INDEX.translations.map(t => `${t.short} (checksum ${t.checksum})`).join(", ") : "loading"}.</p></section>
+    <section class="card" style="margin-top:18px"><h2 style="font-size:1.4rem">Corrections</h2><p>If you find an error in a text, a date, a source or an image credit, the cited source is the authority. Please tell us which page and what the source says; every correction is checked against the source before it is changed.</p><p class="small">A public corrections address has not been set up yet. Until it is, corrections can be sent to the Ereunia team through the contact details on <a href="https://owenmagocha.org/" target="_blank" rel="noopener noreferrer">owenmagocha.org</a>.</p></section>`;
 }
-
 /* ---------- one verse in every translation ---------- */
 async function renderCompare(osis) {
   await getIndex();
-  const r = fromOsis(osis || ""); if (!r) { location.replace("#/bibles"); return; }
+  const r = fromOsis(osis || ""); if (!r) { go("/bibles", { replace: true }); return; }
   const v = r.verse || 1, label = formatRef(r.book, r.chapter, v), o = toOsis(r.book, r.chapter, v);
   setNav("bibles"); setTitle(`${label} in every translation`);
   const list = allTranslations();
@@ -1643,7 +1947,7 @@ async function renderLens(osis, modeArg) {
   const ctx = CONTEXT[r.book];
   const chips = `${P.map(p => `<a class="chip" href="#/person/${p[0]}">${esc(p[1])}</a>`).join(" ")} ${L.map(p => `<a class="chip ext" href="#/place/${p[0]}">${esc(p[1])}</a>`).join(" ")}`;
   const renderingsOf = async k => { const rd = await loadRenderings(baseStrong(k)); return rd ? rd.top.slice(0, 5).map(([w, n]) => `${esc(w)} <span class="n">${n}</span>`).join(", ") : ""; };
-  const keyRows = await Promise.all(keys.map(async k => `<li><a href="#/word/${k.strong}"><b lang="${heb ? "hbo" : "grc"}" dir="${heb ? "rtl" : "ltr"}">${esc(k.form)}</b></a> <span class="small">${esc(k.translit)}</span>, “${esc(k.gloss)}”<span class="small"> · ${k.total.toLocaleString()} uses</span>${mode !== "discover" ? `<div class="small rendline">KJV: ${await renderingsOf(k.strong)}</div>` : ""}</li>`));
+  const keyRows = await Promise.all(keys.map(async k => `<li><a href="#/word/${k.strong}"><b lang="${heb ? "hbo" : "grc"}" dir="${heb ? "rtl" : "ltr"}">${esc(k.form)}</b></a> <span class="small">${esc(k.translit)}</span>, “${esc(k.gloss)}”<span class="small"> · ${pl(k.total.toLocaleString(), "use", "uses")}</span>${mode !== "discover" ? `<div class="small rendline">KJV: ${await renderingsOf(k.strong)}</div>` : ""}</li>`));
   const xrows = await Promise.all(X.map(async ([to, votes]) => { const u = unpackRef(to); return `<li><a href="#/lens/${toOsis(u.book, u.chapter, u.verse)}/${mode}"><b>${formatRef(u.book, u.chapter, u.verse)}</b></a> <span class="small">${esc(await verseText("kjv", toOsis(u.book, u.chapter, u.verse)).catch(() => ""))}</span></li>`; }));
 
   let main = "";
@@ -1896,7 +2200,7 @@ async function renderSermon(openId) {
     if ($("#interim")) $("#interim").textContent = "";
   }
   $("#rec").addEventListener("click", () => ($("#rec").getAttribute("aria-pressed") === "true" ? stop() : start()));
-  addEventListener("hashchange", () => sermonRec?.stop(), { once: true });
+  addEventListener("routechange", () => sermonRec?.stop(), { once: true });
 }
 
 /* ---------- kids: animated Bible stories ---------- */
@@ -1983,13 +2287,14 @@ function renderStory(id) {
   addEventListener("keydown", keys);
   let sx = null; $("#stage").addEventListener("touchstart", e => (sx = e.touches[0].clientX), { passive: true });
   $("#stage").addEventListener("touchend", e => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) go(i + (dx < 0 ? 1 : -1)); sx = null; });
-  addEventListener("hashchange", stop, { once: true });
+  addEventListener("routechange", stop, { once: true });
   go(0);
 }
 
 
 /* ---------- share cards: branded images of a verse or a discovery ---------- */
 async function renderShare(kind, a, b) {
+  const { drawCard, canvasBlob, SIZES, STYLES } = await import("./share.js");
   setNav(""); setTitle("Share a card");
   await getIndex();
   const day = Math.floor(Date.now() / 864e5);
@@ -2035,7 +2340,7 @@ async function renderShare(kind, a, b) {
     const res = await drawCard(cv, current, { size: state.size, style: state.style });
     $("#smsg").textContent = res.ok ? (state.style === "picture" && !current.image ? "No picture for this one yet, so it uses the Night look." : "") : res.reason;
     cv.style.aspectRatio = `${SIZES[state.size].w} / ${SIZES[state.size].h}`;
-    history.replaceState(null, "", state.kind === "v" ? `#/share/v/${state.osis}/${state.t}` : `#/share/d/${state.id}`);
+    setPath(state.kind === "v" ? `#/share/v/${state.osis}/${state.t}` : `#/share/d/${state.id}`);
   }
   view.querySelectorAll("[data-kind]").forEach(x => x.addEventListener("click", () => { state.kind = x.dataset.kind; if (state.kind === "d" && !state.id) state.id = $("#sdsel").value; draw(); }));
   view.querySelectorAll("[data-style]").forEach(x => x.addEventListener("click", () => { state.style = x.dataset.style; store.setSetting?.("sharestyle", state.style); draw(); }));
@@ -2054,12 +2359,124 @@ async function renderShare(kind, a, b) {
   draw();
 }
 
+
+/* ---------- My study: research trails, teaching packs, backup and restore ---------- */
+const STORAGE_NOTE = `<p class="small storenote"><b>Stored in this browser on this device only.</b> Nothing is uploaded. Clearing this browser's site data deletes it, and it does not follow you to other devices, so download a backup now and then. Optional accounts with sync across devices are not available yet.</p>`;
+const SITE = "https://ereunia.com";
+const absUrl = href => SITE + (href.startsWith("/") ? href : "/" + href.replace(/^#?\/?/, ""));
+async function trailMarkdown(t) {
+  const lines = [`# ${t.title}`, "", `Research trail from Ereunia. Started ${new Date(t.started || t.steps[0]?.at || Date.now()).toLocaleString()}. ${pl(t.steps.length, "step", "steps")}.`, ""];
+  const kinds = new Set();
+  for (const [i, st] of t.steps.entries()) {
+    kinds.add(st.kind);
+    lines.push(`${i + 1}. **${TRAIL_KIND[st.kind] || "Page"}:** ${st.label}  `, `   ${absUrl(st.href)}`);
+    if (st.kind === "verse" || st.kind === "passage") { const m = st.href.match(/\/read\/([^/]+)\/([^?#]+)/); if (m && fromOsis(m[2])?.verse) { const txt = await verseText(m[1], m[2]).catch(() => ""); if (txt) lines.push(`   > ${txt.replace(/\n/g, " ")} (${META[m[1]]?.name || m[1]})`); } }
+    if (st.kind === "note" && st.detail) lines.push(`   Note: ${st.detail.replace(/\n/g, " ")}`);
+  }
+  lines.push("", "## Sources", "");
+  lines.push("- Bible text: the translation named with each verse (public domain or openly licensed; see https://ereunia.com/bibles).");
+  if (kinds.has("word")) lines.push("- Hebrew and Greek words and lexicons: STEPBible.org, Tyndale House Cambridge, CC BY 4.0.");
+  if (kinds.has("passage")) lines.push("- Cross references: OpenBible.info, CC BY. A link means readers saw a connection, not a claim about the author's intent.");
+  if (kinds.has("person") || kinds.has("place")) lines.push("- People and places: Theographic Bible Metadata, CC BY-SA 4.0.");
+  if (kinds.has("discovery")) lines.push("- Discoveries: Ereunia summaries; each discovery page lists the museum, excavation or peer-reviewed sources it relies on.");
+  if (kinds.has("ai")) lines.push("- Research assistant answers are AI-generated from cited sources and are not included here; reopen them from the links.");
+  lines.push("", `Exported ${new Date().toISOString().slice(0, 10)} from ${SITE}`);
+  return lines.join("\n");
+}
+async function teachingPack(t) {
+  const verses = t.steps.filter(s => s.kind === "verse" || s.kind === "passage");
+  const words = t.steps.filter(s => s.kind === "word"), notes = t.steps.filter(s => s.kind === "note"), sources = t.steps.filter(s => ["discovery", "person", "place", "source"].includes(s.kind));
+  const L = [`# Teaching outline: ${t.title}`, "", "_Assembled automatically from a research trail on Ereunia. No AI was used; review and adapt it before teaching._", ""];
+  L.push("## Passages to read together", "");
+  for (const v of verses) { const m = v.href.match(/\/read\/([^/]+)\/([^?#]+)/); const txt = m ? await verseText(m[1], m[2]).catch(() => "") : ""; L.push(`- **${v.label}**${txt ? `: ${txt.replace(/\n/g, " ")}` : ""} (${absUrl(v.href)})`); }
+  if (words.length) { L.push("", "## Words to explain", ""); words.forEach(w => L.push(`- ${w.label} (${absUrl(w.href)})`)); }
+  if (sources.length) { L.push("", "## Background to share", ""); sources.forEach(s => L.push(`- ${TRAIL_KIND[s.kind]}: ${s.label} (${absUrl(s.href)})`)); }
+  if (notes.length) { L.push("", "## Your notes", ""); notes.forEach(n => L.push(`- ${n.label}: ${n.detail || ""}`)); }
+  L.push("", "## Questions for the group", ""); QUESTIONS.forEach((q, i) => L.push(`${i + 1}. ${q}`));
+  L.push("", "## Sources", "", "- Bible text in the translation named; Hebrew and Greek from STEPBible (CC BY 4.0); cross references from OpenBible.info (CC BY); people and places from Theographic (CC BY-SA 4.0).", `- Every link above opens the source on ${SITE}.`);
+  return L.join("\n");
+}
+function downloadText(name, text, type = "text/markdown") {
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+}
+function trailList(steps) {
+  return steps.length ? `<ol class="trail">${steps.map(st => `<li><span class="tk tk-${esc(st.kind)}">${esc(TRAIL_KIND[st.kind] || "Page")}</span><a href="${esc(st.href)}">${esc(st.label)}</a><span class="small">${new Date(st.at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</span>${st.kind === "note" && st.detail ? `<p class="small">${esc(st.detail)}</p>` : ""}</li>`).join("")}</ol>` : `<p class="empty">No steps yet. Open a passage in the reader and follow its words, connections and sources: each step is recorded here.</p>`;
+}
+async function renderTrails(openId) {
+  const cur = store.trailSteps(), saved = store.trails();
+  view.innerHTML = `${artHead("aleppo")}<span class="eyebrow">My study</span><h1>Research trails</h1>
+    <p class="small" style="max-width:68ch">Every passage, word, connection, source and note you open is recorded as a trail, so you can retrace your path, save it, and export it with citations.</p>${STORAGE_NOTE}</div>
+    <div class="tabsrow">${[["trails", "Research trails"], ["notes", "Notes"], ["bookmarks", "Bookmarks"], ["highlights", "Highlights"], ["collections", "Collections"], ["history", "Reading history"]].map(([k, l]) => `<a class="btn ${k === "trails" ? "on" : ""}" href="#/study/${k}">${l}</a>`).join("")}</div>
+    <div class="trailgrid">
+      <section class="card"><h2 style="font-size:1.35rem">Current trail <span class="small">${cur.length} step${cur.length === 1 ? "" : "s"}</span></h2>
+        ${trailList(cur.slice().reverse())}
+        ${cur.length ? `<form id="tsave" class="actions" style="margin-top:12px"><label class="sr" for="tname">Trail name</label><input id="tname" placeholder="Name this trail, e.g. The Word in John 1" maxlength="120"><button class="btn pri">Save trail</button><button class="btn" type="button" id="tclear">Start a new trail</button></form>` : ""}</section>
+      <section class="card"><h2 style="font-size:1.35rem">Saved trails</h2>
+        ${saved.length ? `<ul class="savedtrails">${saved.map(t => `<li${t.id === openId ? ' class="open"' : ""}><div class="st-h"><b>${esc(t.title)}</b><span class="small">${pl(t.steps.length, "step", "steps")} · saved ${new Date(t.saved).toLocaleDateString()}</span></div>
+          <div class="actions"><button class="btn" type="button" data-topen="${t.id}">${t.id === openId ? "Hide" : "Show"} steps</button><button class="btn" type="button" data-tmd="${t.id}">Export with citations</button><button class="btn" type="button" data-tteach="${t.id}">Teaching outline</button><button class="linkbtn small" type="button" data-tdel="${t.id}">Delete</button></div>
+          ${t.id === openId ? trailList(t.steps) : ""}</li>`).join("")}</ul>` : `<p class="empty">Saved trails appear here.</p>`}</section>
+    </div>
+    <section class="card backup"><h2 style="font-size:1.35rem">Backup and restore</h2>
+      <p>Download everything kept on this device (notes, highlights, bookmarks, collections, trails, saved answers and settings) as one file, and restore it here or in another browser.</p>
+      <div class="actions"><button class="btn pri" type="button" id="bk-dl">Download backup</button><label class="btn" for="bk-file">Restore from a backup…</label><input type="file" id="bk-file" accept="application/json,.json" hidden>
+        <label class="small"><input type="checkbox" id="bk-replace"> Replace what is here instead of merging</label></div><p class="small" id="bk-msg" role="status"></p></section>`;
+  const form = $("#tsave");
+  form?.addEventListener("submit", e => { e.preventDefault(); const t = store.saveTrail($("#tname").value.trim() || `Trail from ${new Date().toLocaleDateString()}`); if (t) { toast("Trail saved on this device"); renderTrails(t.id); } });
+  $("#tclear")?.addEventListener("click", () => { store.trailClear(); toast("New trail started"); renderTrails(); });
+  view.querySelectorAll("[data-topen]").forEach(b => b.addEventListener("click", () => renderTrails(b.dataset.topen === openId ? null : b.dataset.topen)));
+  view.querySelectorAll("[data-tmd]").forEach(b => b.addEventListener("click", async () => { const t = store.trail(b.dataset.tmd); downloadText(`ereunia-trail-${t.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40)}.md`, await trailMarkdown(t)); }));
+  view.querySelectorAll("[data-tteach]").forEach(b => b.addEventListener("click", async () => { const t = store.trail(b.dataset.tteach); downloadText(`ereunia-teaching-${t.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40)}.md`, await teachingPack(t)); }));
+  view.querySelectorAll("[data-tdel]").forEach(b => b.addEventListener("click", () => { store.removeTrail(b.dataset.tdel); renderTrails(); }));
+  $("#bk-dl").addEventListener("click", () => downloadText(`ereunia-backup-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ ...store.backup(), collections: collLoad() }, null, 1), "application/json"));
+  $("#bk-file").addEventListener("change", async e => {
+    const f = e.target.files[0]; if (!f) return;
+    if (f.size > 5e6) { $("#bk-msg").textContent = "That file is too large to be an Ereunia backup."; return; }
+    try {
+      const obj = JSON.parse(await f.text());
+      const r = store.restore(obj, { merge: !$("#bk-replace").checked });
+      if (Array.isArray(obj.collections)) { const clean = obj.collections.filter(c => c && typeof c.name === "string" && Array.isArray(c.items)).map(c => ({ name: c.name.slice(0, 80), items: c.items.filter(x => typeof x === "string" && fromOsis(x)).slice(0, 500) })); collSave($("#bk-replace").checked ? clean : [...collLoad(), ...clean.filter(c => !collLoad().some(x => x.name === c.name))]); }
+      $("#bk-msg").textContent = `Restored: ${r.notes} notes, ${r.bookmarks} bookmarks, ${r.highlights} highlights and ${r.trails} saved trails are now on this device.`;
+    } catch (err) { $("#bk-msg").textContent = err.message || "That file could not be read as an Ereunia backup."; }
+    e.target.value = "";
+  });
+}
+
+
+function renderPrivacy() {
+  setNav(""); setTitle("Privacy and your data");
+  view.innerHTML = `<div class="pagehead"><span class="eyebrow">Ereunia</span><h1>Privacy and your data</h1><p class="small" style="max-width:68ch">Last reviewed ${new Date(2026, 9, 26).toLocaleDateString(undefined, { dateStyle: "long" })}.</p></div>
+  <div class="prose card">
+    <h2>What stays on your device</h2>
+    <p>Notes, highlights, bookmarks, collections, research trails, saved assistant answers, reading position and settings are stored in your browser on your device (local storage). They are not sent to Ereunia. They do not follow you to other devices, and clearing this browser's site data deletes them. You can download a backup and restore it from <a href="#/study/trails">My study</a>, and delete everything there at any time.</p>
+    <h2>What is sent when you use a feature</h2>
+    <ul>
+      <li><b>Research assistant and sermon notes.</b> When you ask a question or make sermon notes, your question or transcript, the passage reference and the chosen level are sent to Ereunia's server, which sends them with the cited sources to an AI model (Anthropic Claude, through Netlify's AI Gateway) to write the answer. Do not include personal information you would not want processed this way.</li>
+      <li><b>Sermon recording.</b> Speech is turned into text by your browser's own speech service. Some browsers do this on the device; others send audio to the browser maker. Audio is not sent to Ereunia.</li>
+      <li><b>Everything else.</b> Bible texts, maps, images and fonts are served from ereunia.com. There are no advertising or analytics scripts and no third-party trackers.</li>
+    </ul>
+    <h2>Server records</h2>
+    <p>Ereunia is hosted on Netlify. Like any web server, it processes your IP address to deliver pages and to limit how often the assistant can be used, and the hosting provider may keep standard request logs. A daily count of assistant requests is kept without personal details.</p>
+    <h2>Accounts</h2>
+    <p>Ereunia has no accounts at present. If optional accounts with sync are added, this page will say what is stored and where before any data leaves your device.</p>
+    <h2>Questions and corrections</h2>
+    <p>See <a href="#/credits">Credits and licences</a> for how to report an error.</p>
+  </div>`;
+}
+
 /* ---------- router ---------- */
+let lastPath = null;
 async function route() {
   await Promise.all([imagesReady, artReady]);
   closeMore();
-  let h = location.hash.replace(/^#\/?/, "").split("#")[0]; try { h = decodeURIComponent(h); } catch {}
+  document.dispatchEvent(new Event("routechange")); dispatchEvent(new Event("routechange"));
+  let h = currentRoute();
+  // Netlify serves pre-rendered pages at lower-cased paths; restore the canonical case of translation ids.
+  if (/^(read|translation|share)\//i.test(h)) await getIndex().catch(() => {});
+  h = h.replace(/^(read|translation|share\/v\/[^/]+)\/([^/]+)/i, (m0, a, id) => { const k = Object.keys(TR).find(x => x.toLowerCase() === id.toLowerCase()); return `${a}/${k || id}`; });
   const [head, ...rest] = h.split("/");
+  const changed = document.body.dataset.route !== (head || "home") || lastPath !== location.pathname;
+  document.body.dataset.route = head || "home"; lastPath = location.pathname;
   document.body.classList.remove("focus", "kidsmode"); window.speechSynthesis?.cancel(); document.querySelector(".exitfocus")?.remove();
   try {
     if (head === "read") await renderRead(rest[0], rest[1]);
@@ -2072,28 +2489,42 @@ async function route() {
     else if (head === "translation") await renderTranslation(rest[0]);
     else if (head === "compare") await renderCompare(rest[0]);
     else if (head === "history") await renderHistory(rest[0] || "map", rest[1]);
-    else if (head === "learn") { if (rest[1]) await renderLesson(rest[0], rest[1]); else if (rest[0]) renderCourse(rest[0]); else renderLearn(); }
+    else if (head === "learn") { await loadCourses(); if (rest[1]) await renderLesson(rest[0], rest[1]); else if (rest[0]) renderCourse(rest[0]); else renderLearn(); }
     else if (head === "person") await renderPerson(rest[0]);
     else if (head === "place") await renderPlace(rest[0]);
-    else if (head === "study") await renderStudy();
+    else if (head === "study") await renderStudy(rest[0]);
     else if (head === "library") { await getIndex(); renderLibrary(); }
-    else if (head === "credits") { await getIndex(); renderLibrary(); document.getElementById("credits")?.scrollIntoView(); return; }
+    else if (head === "credits") { await getIndex(); renderLibrary("credits"); }
     else if (head === "research") await renderResearch(rest);
     else if (head === "lens") await renderLens(rest[0], rest[1]);
     else if (head === "sermon") await renderSermon(rest[0]);
     else if (head === "kids") await (rest[0] ? renderStory(rest[0]) : renderKids());
     else if (head === "soon") renderSoon(rest[0]);
     else if (head === "books") { await getIndex(); renderBooks(); }
+    else if (head === "privacy") renderPrivacy();
     else if (head === "share") await renderShare(rest[0], rest[1], rest[2]);
-    else if (head === "atlas") { await getIndex(); setNav("atlas"); setTitle("Atlas"); await renderAtlas({ view, H, esc, DISCOVERIES, JOURNEYS, NAMES, BOOKS, ERAS, unpackRef, readUrl, formatRef, PRECISION, toOsis, fromOsis, labelOf, discImg, discCredit, discMini, yearText, verseText, rangeHref, rangeLabel, project, MAP_SIZE, SECTIONS, parseRef: q => parseReference(q, chapterCount) }, rest); }
+    else if (head === "atlas") { await getIndex(); setNav("atlas"); setTitle("Atlas"); const { renderAtlas } = await import("./atlas-app.js"); await renderAtlas({ view, H, esc, go, DISCOVERIES, JOURNEYS, NAMES, BOOKS, ERAS, unpackRef, readUrl, formatRef, PRECISION, toOsis, fromOsis, labelOf, discImg, discCredit, discMini, yearText, verseText, rangeHref, rangeLabel, project, MAP_SIZE, SECTIONS, parseRef: q => parseReference(q, chapterCount) }, rest); }
     else if (head === "discoveries") { await getIndex(); await renderDiscoveries(rest[0]); }
     else await renderHome();
   } catch (e) {
     console.error(e);
-    view.innerHTML = `<p class="empty">Something did not load. Check your connection, then <a href="${esc(location.hash || "#/")}">try again</a>.</p>`;
+    view.innerHTML = `<p class="empty">Something did not load. Check your connection, then <a href="${esc(location.pathname)}">try again</a>.</p>`;
   }
-  if (head !== "read") window.scrollTo(0, 0);
+  if (head !== "read" && !location.hash) window.scrollTo(0, 0);
+  // One quiet arrival per page change, so the new page reads as a response to the click; skipped for reduced motion.
+  if (changed && view.animate && !matchMedia("(prefers-reduced-motion: reduce)").matches) view.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "cubic-bezier(.2,.7,.2,1)" });
+  // Research trail: record the sources and studies opened anywhere on the site.
+  const TRAIL_HEADS = { word: "word", discoveries: "discovery", person: "person", place: "place", lens: "passage", compare: "passage", translation: "source", research: "source" };
+  if (TRAIL_HEADS[head] && rest[0]) store.trailAdd({ kind: TRAIL_HEADS[head], label: document.title.replace(/ · Ereunia$/, ""), href: location.pathname });
+  // A way back to the passage being studied, from any page opened out of the Research Desk.
+  document.querySelector(".deskreturn")?.remove();
+  let desk = null; try { desk = JSON.parse(sessionStorage.getItem("ereunia:desk") || "null"); } catch {}
+  if (desk?.href && head !== "read" && head !== "" && head !== "kids") {
+    const back = `<a class="deskreturn${head === "atlas" ? " float" : ""}" href="${esc(desk.href)}"><span aria-hidden="true">↩</span> Back to ${esc(desk.label)}</a>`;
+    if (head === "atlas") document.body.insertAdjacentHTML("beforeend", back); else view.insertAdjacentHTML("afterbegin", back);
+  }
 }
-addEventListener("hashchange", route);
+setRouter(route);
+startNavigation();
 getIndex().catch(() => {});
 route();

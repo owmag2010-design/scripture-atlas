@@ -198,7 +198,8 @@
    "author": "AVRAMGR",
    "licence": "CC BY-SA 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:TEL_HATZOR_AERIAL.JPG"
+   "source": "https://commons.wikimedia.org/wiki/File:TEL_HATZOR_AERIAL.JPG",
+   "depicts": "site"
   }
  },
  {
@@ -268,7 +269,8 @@
    "author": "AVRAM GRAICER",
    "licence": "CC BY-SA 3.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-   "source": "https://commons.wikimedia.org/wiki/File:%D7%AA%D7%9C_%D7%9E%D7%92%D7%99%D7%93%D7%95.JPG"
+   "source": "https://commons.wikimedia.org/wiki/File:%D7%AA%D7%9C_%D7%9E%D7%92%D7%99%D7%93%D7%95.JPG",
+   "depicts": "site"
   }
  },
  {
@@ -394,7 +396,8 @@
    "author": "Wilson44691",
    "licence": "CC BY-SA 3.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-   "source": "https://commons.wikimedia.org/wiki/File:LachishFrontGate.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:LachishFrontGate.jpg",
+   "depicts": "site"
   }
  },
  {
@@ -520,7 +523,8 @@
    "author": "Davidbena",
    "licence": "CC0",
    "licenceUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
-   "source": "https://commons.wikimedia.org/wiki/File:Excavations_at_Khirbet_Qeiyafa.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Excavations_at_Khirbet_Qeiyafa.jpg",
+   "depicts": "site"
   }
  },
  {
@@ -585,7 +589,8 @@
    "author": "Oren Rozen",
    "licence": "CC BY-SA 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Tel_Arad_280321_01_Temple_Dvir.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Tel_Arad_280321_01_Temple_Dvir.jpg",
+   "depicts": "site-replica"
   }
  },
  {
@@ -762,7 +767,8 @@
    "author": "Carole Raddato from Frankfurt, Germany",
    "licence": "CC BY-SA 2.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/2.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Dedicatory_inscription_found_reused_in_the_staircase_of_the_theatre_of_Caesarea,_the_first_and_only_mention_of_Pontius_Pilates%27_name_ever_unearthed,_26-36_AD,_Israel_Museum,_Jerusalem_(15655925251).jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Dedicatory_inscription_found_reused_in_the_staircase_of_the_theatre_of_Caesarea,_the_first_and_only_mention_of_Pontius_Pilates%27_name_ever_unearthed,_26-36_AD,_Israel_Museum,_Jerusalem_(15655925251).jpg",
+   "depicts": "object"
   }
  },
  {
@@ -834,7 +840,8 @@
    "author": "deror_avi",
    "licence": "CC BY-SA 3.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Ossuary_of_the_high_priest_Joseph_Caiaphas_P1180839.JPG"
+   "source": "https://commons.wikimedia.org/wiki/File:Ossuary_of_the_high_priest_Joseph_Caiaphas_P1180839.JPG",
+   "depicts": "object"
   }
  },
  {
@@ -908,7 +915,8 @@
    "author": "Markbarnes",
    "licence": "CC BY-SA 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:The_Second_Temple_Pool_of_Siloam.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:The_Second_Temple_Pool_of_Siloam.jpg",
+   "depicts": "site"
   }
  },
  {
@@ -1027,7 +1035,8 @@
    "author": "oncenawhile",
    "licence": "CC BY-SA 3.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Jerusalem_Temple_Warning_Inscription.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Jerusalem_Temple_Warning_Inscription.jpg",
+   "depicts": "object"
   }
  },
  {
@@ -1090,7 +1099,8 @@
    "author": "Bukvoed",
    "licence": "CC BY 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:Herodium-551.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:Herodium-551.jpg",
+   "depicts": "site"
   }
  },
  {
@@ -1153,7 +1163,8 @@
    "author": "Travellers & Tinkers",
    "licence": "CC BY-SA 4.0",
    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-   "source": "https://commons.wikimedia.org/wiki/File:JesusBoat.jpg"
+   "source": "https://commons.wikimedia.org/wiki/File:JesusBoat.jpg",
+   "depicts": "object"
   }
  },
  {

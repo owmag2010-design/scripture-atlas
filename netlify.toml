@@ -7,7 +7,7 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
-  included_files = ["public/data/index.json", "public/data/kjv/**", "public/data/web/**", "public/data/xref/**", "public/data/hist/vx/**", "public/data/hist/people.json", "public/data/hist/events.json"]
+  included_files = ["public/data/index.json", "public/data/kjv/**", "public/data/web/**", "public/data/xref/**", "public/data/hist/vx/**", "public/data/hist/people.json", "public/data/hist/people/**", "public/data/hist/events.json", "public/data/orig/**", "public/data/lex/**"]
 
 [[headers]]
   for = "/data/bible/*"
@@ -60,3 +60,9 @@
   to = "https://ereunia.com/:splat"
   status = 301
   force = true
+
+# Pages live at real paths (/read/kjv/John.1). Static files are served first; every other path loads the app.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,3 +1,4 @@
+const pl = (n, one, many) => `${typeof n === "number" ? n.toLocaleString() : n} ${Number(String(n).replace(/[^0-9.-]/g, "")) === 1 ? one : many}`;
 // Study guide builder: pure helpers (tested in test/guide.test.mjs). The page itself lives in app.js.
 
 const STOP = new Set(("a about above after again against all also am an and any are as at be because been before being below between both but by can could did do does doing down during each few for from further had has have having he her here hers herself him himself his how i if in into is it its itself just let me more most my myself no nor not now of off on once only or other our ours out over own said same say says shall she should so some such than that the their theirs them then there these they this those through thus to too under until unto up upon us very was we were what when where which while who whom why will with would ye yet you your yours thee thou thy thine hath doth art shalt wilt hast didst dost unto lo behold also even every one came come went go saying").split(" "));
@@ -81,7 +82,7 @@ Repeated words: ${g.repeated.map(([w, n]) => `${w} (${n})`).join(", ") || "none"
 ${q(OBSERVE, "o")}
 ## 4. Key words in the original
 
-${g.keyWords.map(k => `- **${k.form}** (${k.translit}) "${k.gloss}", ${k.strong}, used ${k.total} times in the Bible`).join("\n") || "None found."}
+${g.keyWords.map(k => `- **${k.form}** (${k.translit}) "${k.gloss}", ${k.strong}, used ${pl(k.total, "time", "times")} in the Bible`).join("\n") || "None found."}
 
 ## 5. Connect
 

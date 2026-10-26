@@ -65,7 +65,8 @@ export const toOsis = (book, chapter, verse) => `${BOOKS[book].osis}.${chapter}$
 export function fromOsis(id) {
   const m = String(id || "").match(/^([1-3]?[A-Za-z]+)\.(\d+)(?:\.(\d+))?$/);
   if (!m) return null;
-  const book = BOOKS.findIndex(b => b.osis === m[1]);
+  let book = BOOKS.findIndex(b => b.osis === m[1]);
+  if (book < 0) { const lc = m[1].toLowerCase(); book = BOOKS.findIndex(b => b.osis.toLowerCase() === lc); } // links may arrive lower-cased
   if (book < 0) return null;
   return { book, chapter: +m[2], verse: m[3] ? +m[3] : null };
 }
