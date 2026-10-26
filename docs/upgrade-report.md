@@ -78,3 +78,13 @@ Preview: https://deploy-preview-1--scripture-atlas-om.netlify.app (Netlify team 
   - The Word file opens in python-docx with the expected styles.
   - axe reports no new violations on the new pages.
   - 152 tests pass.
+
+## Pastor tools, stage 2
+
+- **Sermon series planner** (`/prepare/series`): name, first Sunday, weekly or fortnightly; fill from the chapters of a book or type passages; each week links to its preparation and shows progress. Exports an `.ics` calendar and prints a plan. Deleting a plan keeps its preparations.
+- **Lectionary:** not included. The Revised Common Lectionary tables belong to the Consultation on Common Texts; they will be added only with its permission. Pastors can type readings into a plan.
+- **Preached record:** "Mark as preached" (date and service) on each preparation; `/prepare/preached` lists every occasion by date and shows coverage by book, with CSV download.
+- **Passage structure** in the Observe step: phrases set out with linking words marked and indented. Labelled as an English reading aid, not a grammatical analysis.
+- **Sourced illustrations:** a new Illustrations tab in the Research Desk and a section in the Context step: discoveries (with what they do not show), dated events, places with archaeology and manuscripts, each with its source and an "Add" button.
+- **Print menu:** handout, small-group guide, a passage study sheet (phrase layout with a ruled margin) and a family take-home sheet (reading in modern English, questions, the matching Ereunia Kids story, a drawing box).
+- No AI is used in any of these tools.

@@ -1,6 +1,6 @@
 // Prepare: a guided sermon and lesson preparation workspace, the "For pastors" page, and the outline's
 // Present, handout and Word exports. Everything is kept on this device. No AI is used here.
-import { STEPS, KIND_LABEL, cleanPrep, newPrep, doneCount, outlineDoc, slides, blockId } from "./prep-core.js";
+import { STEPS, KIND_LABEL, cleanPrep, newPrep, doneCount, outlineDoc, slides, blockId, clauses, linkCounts, cleanSeries, weekDates, seriesIcs, preachedLog } from "./prep-core.js";
 import { buildDocx } from "./docx.js";
 
 let C; // context from app.js
@@ -50,6 +50,9 @@ function wireStart(id = "pf") {
     C.go(`/prepare/${C.guideSpec(r.book, r.chapter, r.verse, r.verseEnd)}`);
   });
 }
+const planLinks = () => `<div class="actions planlinks"><a class="btn" href="/prepare/series">Plan a sermon series</a><a class="btn" href="/prepare/preached">Passages you have preached (${preachedLog(C.store.preps()).length})</a></div>`;
+const fmtDate = iso => iso ? new Date(iso + "T12:00:00").toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" }) : "";
+const today = () => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
 function prepList() {
   const list = C.store.preps();
   if (!list.length) return `<p class="small">Your preparations will be listed here. They are kept on this device.</p>`;
@@ -68,7 +71,7 @@ export function renderPastors(ctx) {
     <div><h3>An outline that keeps its sources</h3><p>Collect verses, word studies, commentary quotes and cross references as you study; each keeps its citation when you place it in a point.</p><a class="btn" href="/prepare/John.1.1-18?step=outline">See an outline</a></div>
     <div><h3>Ready for Sunday</h3><p>Download a Word document, print a handout or a small-group guide, or present slides and preach from a large-type view on a phone or tablet.</p><a class="btn" href="/prepare/John.1.1-18">Open the worked example</a></div>
   </section>
-  <section class="prepstart"><h2>Your preparations</h2>${prepList()}</section>`;
+  <section class="prepstart"><h2>Your preparations</h2>${prepList()}${planLinks()}</section>`;
   wireStart("pf0");
 }
 
@@ -76,13 +79,17 @@ export async function renderPrepare(ctx, spec, sub) {
   C = ctx; C.setNav("pastors"); await C.getIndex();
   if (!spec) {
     C.setTitle("Prepare");
-    C.view.innerHTML = `<div class="pagehead"><span class="eyebrow"><a href="/pastors">For pastors and teachers</a></span><h1>Prepare a sermon or lesson</h1><p class="small">Choose a passage. Ereunia walks you through it in eight steps and keeps your work on this device.</p>${startForm()}</div><section class="prepstart"><h2>Your preparations</h2>${prepList()}</section>`;
+    C.view.innerHTML = `<div class="pagehead"><span class="eyebrow"><a href="/pastors">For pastors and teachers</a></span><h1>Prepare a sermon or lesson</h1><p class="small">Choose a passage. Ereunia walks you through it in eight steps and keeps your work on this device.</p>${startForm()}</div><section class="prepstart"><h2>Your preparations</h2>${prepList()}${planLinks()}</section>`;
     wireStart(); return;
   }
+  if (spec === "series") return sub ? seriesPage(sub) : seriesIndex();
+  if (spec === "preached") return preachedPage();
   const g = passageOf(spec);
   if (!g) { C.view.innerHTML = `<div class="pagehead"><h1>Passage not found</h1><p class="small">Try a passage such as John 1:1-18.</p>${startForm()}</div>`; wireStart(); return; }
   if (sub === "present") return present(g);
   if (sub === "handout" || sub === "group") return handout(g, sub);
+  if (sub === "sheet") return passageSheet(g);
+  if (sub === "family") return familySheet(g);
   return workspace(g);
 }
 
@@ -100,9 +107,9 @@ async function workspace(g) {
     <div class="actions prepacts"><label class="sr" for="ptr">Translation</label><select id="ptr" class="trsel">${C.translationOptions(t)}</select>
       <a class="btn" href="${C.readUrl(t, g.book, g.chapter, g.from)}">Open in the Research Desk</a>
       <a class="btn pri" href="/prepare/${g.key}/present">Present</a>
-      <a class="btn" href="/prepare/${g.key}/handout">Handout</a>
-      <a class="btn" href="/prepare/${g.key}/group">Small-group guide</a>
-      <button class="btn" type="button" id="pdocx">Word document</button></div></div>
+      <details class="pmenu"><summary class="btn">Print</summary><div role="list"><a role="listitem" href="/prepare/${g.key}/handout">Handout with the outline</a><a role="listitem" href="/prepare/${g.key}/group">Small-group guide</a><a role="listitem" href="/prepare/${g.key}/sheet">Passage study sheet</a><a role="listitem" href="/prepare/${g.key}/family">Family take-home sheet</a></div></details>
+      <button class="btn" type="button" id="pdocx">Word document</button></div>
+    <div class="preached" id="preached">${preachedHtml(p)}</div></div>
   <div class="prep">
     <nav class="prepsteps" aria-label="Preparation steps"><ol>${STEPS.map(([k, l, d], i) => `<li><a href="/prepare/${g.key}?step=${k}" data-step="${k}" ${k === step ? 'aria-current="step"' : ""} class="${p.steps[k]?.done ? "done" : ""}"><span class="pn" aria-hidden="true">${p.steps[k]?.done ? "✓" : i + 1}</span><span><b>${l}</b><span class="small">${d}</span></span></a></li>`).join("")}</ol></nav>
     <section class="prepmain" id="prepmain" aria-live="polite"><p class="loading">Opening ${esc(STEPS.find(s => s[0] === step)[1])}…</p></section>
@@ -112,7 +119,43 @@ async function workspace(g) {
     const pp = loadPrep(g); const { verses } = await passageVerses(g, translation());
     download(`${g.key.replace(/\./g, "-")}-sermon.docx`, buildDocx(outlineDoc(pp, { passageText: verses, translation: C.META[translation()].name }), { title: g.title }), "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
   });
+  wirePreached(g);
   await renderStep(g, step);
+}
+
+/* ---------- preached record ---------- */
+function preachedHtml(p) {
+  const list = [...p.preached].sort((a, b) => b.date.localeCompare(a.date));
+  return `${list.length ? `<p class="small"><b>Preached</b> ${list.map((r, i) => `<span class="pchip">${esc(fmtDate(r.date))}${r.where ? ", " + esc(r.where) : ""}<button type="button" class="ib" data-unpreach="${esc(r.date)}|${esc(r.where)}" aria-label="Remove ${esc(fmtDate(r.date))}">×</button></span>`).join(" ")}</p>` : ""}
+    <details class="preachform"><summary class="small linkbtn">${list.length ? "Add another date" : "Mark as preached"}</summary>
+      <form id="preachf" class="actions"><label><span class="small">Date</span> <input type="date" id="prd" value="${today()}" required></label><label><span class="small">Where or which service (optional)</span> <input id="prw" maxlength="80" placeholder="e.g. Morning service"></label><button class="btn">Save</button></form></details>`;
+}
+function wirePreached(g) {
+  const box = document.getElementById("preached"); if (!box) return;
+  const redraw = () => { box.innerHTML = preachedHtml(loadPrep(g)); wirePreached(g); };
+  box.querySelector("#preachf")?.addEventListener("submit", e => {
+    e.preventDefault(); const date = box.querySelector("#prd").value, where = box.querySelector("#prw").value.trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return C.toast("Choose a date");
+    const q = loadPrep(g); if (!q.preached.some(r => r.date === date && r.where === where)) q.preached.push({ date, where }); savePrep(q, { now: true }); redraw(); C.toast("Saved to your preached passages");
+  });
+  box.querySelectorAll("[data-unpreach]").forEach(b => b.addEventListener("click", () => {
+    const [date, ...w] = b.dataset.unpreach.split("|"), where = w.join("|"); const q = loadPrep(g);
+    q.preached = q.preached.filter(r => !(r.date === date && r.where === where)); savePrep(q, { now: true }); redraw();
+  }));
+}
+function preachedPage() {
+  C.setTitle("Passages you have preached");
+  const preps = C.store.preps().map(r => cleanPrep(r, r.key, r.title || r.key)), log = preachedLog(preps);
+  const byBook = new Map(); for (const r of log) { const g = C.parseGuideSpec(r.key); if (!g) continue; const k = g.book; if (!byBook.has(k)) byBook.set(k, new Set()); byBook.get(k).add(r.key); }
+  C.view.innerHTML = `<div class="pagehead"><span class="eyebrow"><a href="/pastors">For pastors and teachers</a></span><h1>Passages you have preached</h1><p class="small">A record kept on this device. Mark a passage as preached from its preparation page. Use it to see what your church has heard and what it has not.</p></div>
+    ${log.length ? `<section><h2>By date</h2><ul class="preplist">${log.map(r => `<li><a href="/prepare/${esc(r.key)}"><b>${esc(r.title)}</b><span class="small">${esc(fmtDate(r.date))}${r.where ? " · " + esc(r.where) : ""}</span></a></li>`).join("")}</ul></section>
+      <section><h2>By book</h2><ul class="bookcov">${C.BOOKS.map((b, i) => `<li class="${byBook.has(i) ? "on" : ""}" title="${esc(C.NAMES[i])}${byBook.has(i) ? `: ${byBook.get(i).size} ${byBook.get(i).size === 1 ? "passage" : "passages"}` : ""}"><span>${esc(C.NAMES[i])}</span>${byBook.has(i) ? `<b>${byBook.get(i).size}</b>` : ""}</li>`).join("")}</ul><p class="small">Books with a number are ones you have preached from; the number counts passages.</p></section>`
+      : `<p class="empty">Nothing recorded yet. Open a preparation and use “Mark as preached” under its title.</p>`}
+    <div class="actions">${log.length ? `<button class="btn" type="button" id="prcsv">Download as a spreadsheet (CSV)</button>` : ""}<a class="btn" href="/prepare">Your preparations</a></div>`;
+  document.getElementById("prcsv")?.addEventListener("click", () => {
+    const q = v => `"${String(v).replace(/"/g, '""')}"`;
+    download("preached-passages.csv", "\ufeff" + ["Date,Passage,Where", ...log.map(r => [r.date, r.title, r.where].map(q).join(","))].join("\r\n"), "text/csv");
+  });
 }
 
 async function renderStep(g, step) {
@@ -160,7 +203,8 @@ const STEP_BODY = {
   async observe(g, p, t) {
     const { verses } = await passageVerses(g, "kjv");
     const rep = C.repeatedWords(verses.map(v => v[1]));
-    return `${rep.length ? `<p><b>Repeated words</b> (KJV): ${rep.map(([w, n]) => `<span class="chip">${esc(w)} × ${n}</span>`).join(" ")}</p>` : ""}
+    const st = C.langOf(t) === "en" ? t : "kjv", sv = st === "kjv" ? verses : (await passageVerses(g, st)).verses;
+    return `${structureHtml(sv, st)}${rep.length ? `<p><b>Repeated words</b> (KJV): ${rep.map(([w, n]) => `<span class="chip">${esc(w)} × ${n}</span>`).join(" ")}</p>` : ""}
       <ul class="prompts">${C.OBSERVE.map(q => `<li>${esc(q)}</li>`).join("")}</ul>
       <p class="small">Questions suited to ${esc(C.groupOf(g.book).toLowerCase())}:</p><ul class="prompts">${C.interpretQuestions(C.groupOf(g.book)).map(q => `<li>${esc(q)}</li>`).join("")}</ul>`;
   },
@@ -184,14 +228,14 @@ const STEP_BODY = {
     const pk = v => g.book * 1e6 + g.chapter * 1e3 + v, ppl = new Set(), pls = new Set(), evs = new Set();
     for (let v = from; v <= to; v++) { const r = vx?.[pk(v)]; if (r) { r[0].forEach(x => ppl.add(x)); r[1].forEach(x => pls.add(x)); r[2].forEach(x => evs.add(x)); } }
     const P = [...ppl].filter(x => x !== "god_1324").map(x => pm.get(x)).filter(Boolean).slice(0, 10), L = [...pls].map(x => lm.get(x)).filter(Boolean).slice(0, 8), E = [...evs].map(x => em.get(x)).filter(Boolean).slice(0, 6);
-    const disc = C.discForChapter(C.DISCOVERIES, g.book, g.chapter, C.bIdx);
+    const il = await C.illustrationsFor(g.book, g.chapter, g.from, g.to).catch(() => []);
     const bg = `${C.NAMES[g.book]}. Author: ${c[0]} Date: ${c[1]}. Setting: ${c[4]}`;
     return `<dl class="facts"><dt>Book</dt><dd>${C.NAMES[g.book]} · ${C.testamentOf(g.book)} · ${C.groupOf(g.book)}</dd><dt>Author</dt><dd>${esc(c[0])}</dd><dt>Date</dt><dd>${esc(c[1])}</dd><dt>Setting</dt><dd>${esc(c[4])}</dd><dt>Themes</dt><dd>${esc(c[5])}</dd></dl>
       <div class="actions">${addButton({ kind: "context", text: bg, cite: "Ereunia book notes", href: `/books` }, "Add background")}</div>
       ${E.length ? `<p><b>Events:</b> ${E.map(e => `${esc(e.title)} (${C.yearText(e.year)})`).join("; ")}</p>` : ""}
       ${P.length ? `<p><b>People:</b> ${P.map(r => `<a href="/person/${esc(r[0])}">${esc(r[1])}</a>`).join(", ")}</p>` : ""}
       ${L.length ? `<p><b>Places:</b> ${L.map(r => `<a href="/place/${esc(r[0])}">${esc(r[1])}</a>`).join(", ")}</p>` : ""}
-      ${disc.length ? `<h3>Discoveries linked to ${C.formatRef(g.book, g.chapter)}</h3><ul class="linklist">${disc.slice(0, 6).map(d => `<li><a href="/discoveries/${d.id}"><span><span class="t">${esc(d.name)}</span><span class="d">${esc(d.summary)}</span></span></a>${addButton({ kind: "discovery", text: `${d.name}: ${d.summary}`, cite: `Ereunia, Discoveries: ${d.name} (with its museum and study sources)`, href: `/discoveries/${d.id}` })}</li>`).join("")}</ul><p class="small">Each discovery page says what the find shows and what it does not. Use them as illustrations only with that in view.</p>` : ""}
+      ${il.length ? `<h3>Sourced illustrations</h3><p class="small">True, checkable material from Ereunia's records: discoveries, dated events, places with archaeology and manuscripts. Each says where it comes from and, for discoveries, what it does not show. Open its page before you use it.</p><ul class="illist">${C.ilList(il.slice(0, 8), it => `<div class="actions">${addButton({ kind: it.kind, text: it.text, cite: it.cite, href: it.href })}</div>`)}</ul>` : ""}
       <p class="small">Book notes give traditional and academic views side by side. People, places and events: Theographic (CC BY-SA 4.0).</p>`;
   },
   async commentaries(g, p, t) {
@@ -237,7 +281,7 @@ const STEP_BODY = {
   async apply(g, p) {
     return `<ul class="prompts">${C.APPLY.map(q => `<li>${esc(q)}</li>`).join("")}</ul>
       <p>When the outline is ready, prepare for Sunday and after:</p>
-      <div class="actions"><a class="btn pri" href="/prepare/${g.key}/present">Present or preach from it</a><a class="btn" href="/prepare/${g.key}/handout">Print a handout</a><a class="btn" href="/prepare/${g.key}/group">Print a small-group guide</a></div>`;
+      <div class="actions"><a class="btn pri" href="/prepare/${g.key}/present">Present or preach from it</a><a class="btn" href="/prepare/${g.key}/handout">Print a handout</a><a class="btn" href="/prepare/${g.key}/group">Print a small-group guide</a><a class="btn" href="/prepare/${g.key}/family">Print a family take-home sheet</a></div>`;
   }
 };
 
@@ -340,4 +384,139 @@ async function handout(g, kind) {
     <footer class="small">Prepared with Ereunia · ereunia.com. ${esc(C.META[t].name)}: ${esc(C.META[t].licence)}.</footer>
   </article>`;
   document.getElementById("hprint").addEventListener("click", () => window.print());
+}
+
+/* ---------- passage structure ---------- */
+function structureHtml(verses, t) {
+  const cl = clauses(verses), lc = linkCounts(cl);
+  const mark = x => x.link ? `<b class="lw">${esc(x.text.slice(0, x.link.length))}</b>${esc(x.text.slice(x.link.length))}` : esc(x.text);
+  return `<details class="structure" open><summary><b>Structure</b> <span class="small">(${esc(C.META[t].name)})</span></summary>
+    <p class="small">The passage set out phrase by phrase. Linking words are in bold and the phrases they introduce are indented, so the flow of thought is easier to follow. This is a reading aid based on English punctuation, not a grammatical analysis of the original.</p>
+    ${lc.length ? `<p class="small">Linking words: ${lc.map(([w, n]) => `<span class="chip">${esc(w)} × ${n}</span>`).join(" ")}</p>` : ""}
+    <div class="struct">${cl.map(x => `<p class="cl i${x.indent}">${x.verse ? `<sup class="vn">${x.verse}</sup>` : ""}${mark(x)}</p>`).join("")}</div></details>`;
+}
+
+/* ---------- printable passage study sheet ---------- */
+async function passageSheet(g) {
+  const p = loadPrep(g), t0 = translation(), t = C.langOf(t0) === "en" ? t0 : "kjv", { verses } = await passageVerses(g, t);
+  C.setTitle(`Study sheet: ${g.title}`);
+  const rep = C.repeatedWords(verses.map(v => v[1])).slice(0, 8);
+  C.view.innerHTML = `<div class="actions noprint handoutbar"><a class="btn" href="/prepare/${g.key}?step=observe">‹ Back to preparation</a><button class="btn pri" type="button" id="hprint">Print or save as PDF</button><span class="small">The wide margin is for your own marks and notes.</span></div>
+  <article class="handout studysheet">
+    <header><p class="small">Passage study sheet · ${esc(C.META[t].name)}</p><h1>${esc(g.title)}</h1></header>
+    <div class="sheetgrid"><div class="struct">${clauses(verses).map(x => `<p class="cl i${x.indent}">${x.verse ? `<sup>${x.verse}</sup>` : ""}${esc(x.text)}</p>`).join("")}</div><div class="smargin" aria-hidden="true"></div></div>
+    ${rep.length ? `<p class="small"><b>Repeated words:</b> ${rep.map(([w, n]) => `${esc(w)} (${n})`).join(", ")}</p>` : ""}
+    <section><h2>Questions to ask</h2><ol class="hq">${C.OBSERVE.slice(0, 5).map(q => `<li>${esc(q)}<div class="hlines short" aria-hidden="true"></div></li>`).join("")}</ol></section>
+    <section><h2>Main idea</h2><div class="hlines" aria-hidden="true">${p.idea ? `<p>${esc(p.idea)}</p>` : ""}</div></section>
+    <footer class="small">Prepared with Ereunia · ereunia.com. ${esc(C.META[t].name)}: ${esc(C.META[t].licence)}. Phrases are set out by English punctuation as a reading aid.</footer>
+  </article>`;
+  document.getElementById("hprint").addEventListener("click", () => window.print());
+}
+
+/* ---------- family and children's take-home sheet ---------- */
+function storyFor(g) {
+  return C.KID_STORIES.find(s => {
+    const refs = [s.ref, ...s.scenes.map(x => x[1])].map(C.fromOsis).filter(r => r && r.book === g.book);
+    if (!refs.length) return false;
+    const lo = Math.min(...refs.map(r => r.chapter)), hi = Math.max(...refs.map(r => r.chapter));
+    return g.chapter >= lo && g.chapter <= hi;
+  }) || null;
+}
+async function familySheet(g) {
+  const p = loadPrep(g), t0 = translation(), t = t0 === "kjv" && C.TR.web ? "web" : t0, { verses } = await passageVerses(g, t), s = storyFor(g); // modern English reads more easily at home
+  C.setTitle(`Family sheet: ${g.title}`);
+  const short = verses.length > 12;
+  const qs = ["What happens in this passage? Tell it in your own words.", "What does it show us about God?", "Is there someone in the passage you would like to be like? Why?", "What is one thing we could do this week because of it?", "What could we thank God for, or ask him for, after reading it?"];
+  C.view.innerHTML = `<div class="actions noprint handoutbar"><a class="btn" href="/prepare/${g.key}?step=apply">‹ Back to preparation</a><button class="btn pri" type="button" id="hprint">Print or save as PDF</button><span class="small">For families to take home after the service.</span></div>
+  <article class="handout family">
+    <header><p class="small">To read together at home · ${esc(C.META[t].name)}</p><h1>${esc(g.title)}</h1>${p.idea ? `<p class="hidea">${esc(p.idea)}</p>` : ""}</header>
+    <section><h2>Read it together</h2><p class="htext">${(short ? verses.slice(0, 12) : verses).map(([n, v]) => `<sup>${n}</sup>${esc(v)}`).join(" ")}${short ? ` <i>Read on to the end of ${esc(g.title)} in your Bible.</i>` : ""}</p></section>
+    <section><h2>Talk about it</h2><ol class="hq">${qs.map(q => `<li>${esc(q)}<div class="hlines short" aria-hidden="true"></div></li>`).join("")}</ol></section>
+    ${s ? `<section class="fstory"><h2>A story to read with children</h2><p><b>${esc(s.title)}</b> (${esc(s.range)}) is an illustrated, read-aloud retelling on Ereunia: <b>ereunia.com/kids/${esc(s.id)}</b></p>${s.think ? `<p>${esc(s.think)}</p>` : ""}</section>` : ""}
+    <section><h2>Draw it</h2><p class="small">Draw a picture of something in the passage.</p><div class="drawbox" aria-hidden="true"></div></section>
+    <section><h2>Pray</h2><div class="hlines short" aria-hidden="true"></div></section>
+    <footer class="small">Prepared with Ereunia · ereunia.com. ${esc(C.META[t].name)}: ${esc(C.META[t].licence)}.</footer>
+  </article>`;
+  document.getElementById("hprint").addEventListener("click", () => window.print());
+}
+
+/* ---------- sermon series planner ---------- */
+const newId = () => Math.random().toString(36).slice(2, 10).padEnd(6, "0");
+function prepStatus(spec) {
+  if (!spec) return "";
+  const raw = C.store.prep(spec); if (!raw) return `<span class="small">Not started</span>`;
+  const p = cleanPrep(raw, spec, spec), n = doneCount(p);
+  return `<span class="small">${n} of ${STEPS.length} steps${p.preached.length ? " · preached" : ""}</span>`;
+}
+const LECTIONARY_NOTE = `<p class="small">Following a lectionary? Type each week's reading into the plan. Ereunia does not include the Revised Common Lectionary tables: they belong to the Consultation on Common Texts, and they will be added only with its permission.</p>`;
+
+function seriesIndex() {
+  C.setTitle("Plan a sermon series");
+  const list = C.store.seriesList().map(cleanSeries).filter(Boolean);
+  C.view.innerHTML = `<div class="pagehead"><span class="eyebrow"><a href="/pastors">For pastors and teachers</a></span><h1>Plan a sermon series</h1><p class="small">Give the series a name and a first Sunday, then a passage for each week. Each passage opens its own preparation. Plans are kept on this device and can go into your calendar.</p>
+    <form class="seriesnew" id="snew"><label><span>Series name</span><input id="snt" maxlength="120" required placeholder="e.g. The Gospel of Mark"></label>
+      <label><span>First Sunday</span><input type="date" id="sns"></label>
+      <label><span>Fill with the chapters of a book (optional)</span><select id="snb"><option value="">No, I will add passages</option>${C.BOOKS.map((b, i) => `<option value="${i}">${esc(C.NAMES[i])} (${C.chapterCount(i)})</option>`).join("")}</select></label>
+      <button class="btn pri">Create the series</button></form></div>
+    <section class="prepstart"><h2>Your series</h2>${list.length ? `<ul class="preplist">${list.map(x => { const d = weekDates(x); return `<li><a href="/prepare/series/${x.id}"><b>${esc(x.title)}</b><span class="small">${x.weeks.length} ${x.weeks.length === 1 ? "week" : "weeks"}${d[0] ? ` · ${esc(fmtDate(d[0]))} to ${esc(fmtDate(d.at(-1)))}` : ""}</span></a></li>`; }).join("")}</ul>` : `<p class="small">No series yet.</p>`}</section>
+    ${LECTIONARY_NOTE}`;
+  document.getElementById("snew").addEventListener("submit", e => {
+    e.preventDefault();
+    const b = document.getElementById("snb").value, weeks = [];
+    if (b !== "") { const bi = +b; for (let c = 1; c <= C.chapterCount(bi); c++) weeks.push({ spec: C.guideSpec(bi, c), label: C.formatRef(bi, c), title: "" }); }
+    const x = cleanSeries({ id: newId(), title: document.getElementById("snt").value.trim(), start: document.getElementById("sns").value, every: 7, weeks: weeks.slice(0, 60) });
+    C.store.saveSeries(x); C.go(`/prepare/series/${x.id}`);
+  });
+}
+
+function seriesPage(id) {
+  let x = cleanSeries(C.store.seriesGet(id));
+  if (!x) { C.setTitle("Series not found"); C.view.innerHTML = `<div class="pagehead"><h1>Series not found</h1><p class="small">It may have been made on another device. <a href="/prepare/series">See your series</a>.</p></div>`; return; }
+  C.setTitle(x.title);
+  const save = () => C.store.saveSeries(x);
+  const draw = () => {
+    const d = weekDates(x);
+    C.view.innerHTML = `<div class="pagehead noprint"><span class="eyebrow"><a href="/prepare/series">Sermon series</a></span>
+      <label class="stitle"><span class="sr">Series name</span><input id="st" value="${esc(x.title)}" maxlength="120"></label>
+      <div class="actions"><label><span class="small">First Sunday</span> <input type="date" id="ss" value="${esc(x.start)}"></label>
+        <label><span class="small">Every</span> <select id="se"><option value="7" ${x.every === 7 ? "selected" : ""}>week</option><option value="14" ${x.every === 14 ? "selected" : ""}>two weeks</option></select></label></div></div>
+    <ol class="weeks noprint">${x.weeks.map((w, i) => `<li class="week" data-i="${i}"><div class="wdate"><b>Week ${i + 1}</b><span class="small">${esc(fmtDate(d[i])) || "No date"}</span></div>
+        <div class="wfields"><label><span class="sr">Passage for week ${i + 1}</span><input data-pass value="${esc(w.label)}" placeholder="Passage, e.g. Mark 1:1-15"></label><label><span class="sr">Sermon title for week ${i + 1}</span><input data-title value="${esc(w.title)}" maxlength="120" placeholder="Sermon title (optional)"></label></div>
+        <div class="wact">${w.spec ? `<a class="btn" href="/prepare/${esc(w.spec)}">Prepare</a>${prepStatus(w.spec)}` : `<span class="small">Add a passage</span>`}
+          <span class="obact"><button type="button" class="ib" data-mv="-1" ${i === 0 ? "disabled" : ""} aria-label="Move week ${i + 1} up">↑</button><button type="button" class="ib" data-mv="1" ${i === x.weeks.length - 1 ? "disabled" : ""} aria-label="Move week ${i + 1} down">↓</button><button type="button" class="ib" data-del aria-label="Remove week ${i + 1}">×</button></span></div></li>`).join("")}</ol>
+    <div class="actions noprint"><button type="button" class="btn" id="addw">Add a week</button><button type="button" class="btn pri" id="ics" ${x.start && x.weeks.length ? "" : "disabled"}>Add to calendar (.ics)</button><button type="button" class="btn" id="sprint">Print the plan</button><button type="button" class="btn" id="sdel">Delete this series</button></div>
+    ${x.start ? "" : `<p class="small noprint">Choose a first Sunday to date each week and add the series to your calendar.</p>`}
+    <div class="noprint"><label class="stepnotes"><b>Notes on the series</b><textarea id="sn" rows="4" placeholder="Aim, audience, themes to carry through…">${esc(x.notes)}</textarea></label>${LECTIONARY_NOTE}</div>
+    <article class="handout printonly"><header><p class="small">Sermon series</p><h1>${esc(x.title)}</h1></header><table class="ptable"><thead><tr><th>Date</th><th>Passage</th><th>Title</th></tr></thead><tbody>${x.weeks.map((w, i) => `<tr><td>${esc(fmtDate(d[i]))}</td><td>${esc(w.label)}</td><td>${esc(w.title)}</td></tr>`).join("")}</tbody></table>${x.notes ? `<p>${esc(x.notes)}</p>` : ""}<footer class="small">Planned with Ereunia · ereunia.com</footer></article>`;
+    const $ = q => document.querySelector(q);
+    $("#st").addEventListener("change", e => { x.title = e.target.value.trim() || "Untitled series"; C.setTitle(x.title); save(); });
+    $("#ss").addEventListener("change", e => { x.start = e.target.value; save(); draw(); });
+    $("#se").addEventListener("change", e => { x.every = +e.target.value; save(); draw(); });
+    $("#sn").addEventListener("change", e => { x.notes = e.target.value; save(); });
+    $("#addw").addEventListener("click", () => { if (x.weeks.length >= 60) return C.toast("A series can have up to 60 weeks"); x.weeks.push({ spec: "", label: "", title: "" }); save(); draw(); document.querySelector(".week:last-child [data-pass]")?.focus(); });
+    $("#sprint").addEventListener("click", () => window.print());
+    $("#sdel").addEventListener("click", e => {
+      const btn = e.currentTarget;
+      if (!btn.dataset.armed) { btn.dataset.armed = "1"; btn.textContent = "Select again to delete the plan (preparations are kept)"; setTimeout(() => { if (btn.isConnected) { delete btn.dataset.armed; btn.textContent = "Delete this series"; } }, 5000); return; }
+      C.store.removeSeries(x.id); C.toast("Series deleted. Its preparations are kept."); C.go("/prepare/series");
+    });
+    $("#ics").addEventListener("click", () => {
+      const weeks = x.weeks.map((w, i) => ({ date: d[i], label: w.label, title: w.title, url: w.spec ? `https://ereunia.com/prepare/${w.spec}` : "" })).filter(w => w.date);
+      download(`${x.title.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "series"}.ics`, seriesIcs(x.title, weeks), "text/calendar");
+    });
+    document.querySelectorAll(".week").forEach(li => {
+      const i = +li.dataset.i;
+      li.querySelector("[data-pass]").addEventListener("change", e => {
+        const v = e.target.value.trim();
+        if (!v) { x.weeks[i] = { ...x.weeks[i], spec: "", label: "" }; save(); draw(); return; }
+        const r = C.parseReference(v, C.chapterCount);
+        if (!r) { C.toast("Enter a passage such as Mark 1:1-15"); return; }
+        x.weeks[i] = { ...x.weeks[i], spec: C.guideSpec(r.book, r.chapter, r.verse, r.verseEnd), label: C.formatRef(r.book, r.chapter, r.verse, r.verseEnd) }; save(); draw();
+      });
+      li.querySelector("[data-title]").addEventListener("change", e => { x.weeks[i].title = e.target.value.trim(); save(); });
+      li.querySelectorAll("[data-mv]").forEach(b => b.addEventListener("click", () => { const j = i + +b.dataset.mv; [x.weeks[i], x.weeks[j]] = [x.weeks[j], x.weeks[i]]; save(); draw(); }));
+      li.querySelector("[data-del]").addEventListener("click", () => { x.weeks.splice(i, 1); save(); draw(); });
+    });
+  };
+  draw();
 }

@@ -782,7 +782,7 @@ async function renderChapterText() {
 }
 
 /* ---------- Research Desk: shared passage context, depth modes, manuscripts and inline research assistant ---------- */
-const DESK_TABS = [["verse", "Passage"], ["words", null], ["xref", "Connections"], ["cm", "Commentaries"], ["people", "People & places"], ["bg", "History"], ["ms", "Manuscripts"], ["ask", "Ask"]];
+const DESK_TABS = [["verse", "Passage"], ["words", null], ["xref", "Connections"], ["cm", "Commentaries"], ["il", "Illustrations"], ["people", "People & places"], ["bg", "History"], ["ms", "Manuscripts"], ["ask", "Ask"]];
 const DEPTHS = [["discover", "Discover", "Plain meaning and the essentials"], ["study", "Study", "Words, connections and background"], ["scholar", "Scholar", "Grammar, lexicons and textual evidence"], ["teach", "Teach", "Questions and outlines for a group"]];
 const depth = () => { const d = store.setting("depth", "study"); return DEPTHS.some(x => x[0] === d) ? d : "study"; };
 const deskUrl = () => `${readUrl(R.t, R.book, R.chapter, R.verse)}${R.tab && R.tab !== "verse" ? `?panel=${R.tab}${R.word != null ? `&w=${R.word}` : ""}${R.origin != null ? `&o=${R.origin}` : ""}` : ""}`;
@@ -870,6 +870,43 @@ function wireCommentaryPane() {
   });
 }
 
+/* ---------- sourced illustrations: true, checkable material from Ereunia's own records ---------- */
+async function illustrationsFor(b, c, from, to) {
+  const items = [];
+  const seen = new Set();
+  const vs = from ? Array.from({ length: (to || from) - from + 1 }, (_, i) => from + i) : null;
+  const disc = vs ? [...new Set(vs.flatMap(v => discForVerse(DISCOVERIES, b, c, v, bIdx)))] : discForChapter(DISCOVERIES, b, c, bIdx);
+  const chapterDisc = vs ? discForChapter(DISCOVERIES, b, c, bIdx).filter(d => !disc.includes(d)) : [];
+  for (const d of [...disc, ...chapterDisc]) {
+    if (seen.has(d.id)) continue; seen.add(d.id);
+    items.push({ kind: "discovery", title: d.name, badge: DSTATUS[d.status]?.label || "", status: d.status, text: `${d.summary} What it shows: ${d.establishes}`, limits: d.limits, cite: `Ereunia, Discoveries: ${d.name} (${DSTATUS[d.status]?.label || ""}), with its museum and study sources`, href: `/discoveries/${d.id}` });
+  }
+  const [vx, em, lm] = await Promise.all([H.vx(b), H.eventMap(), H.placeMap()]).catch(() => [{}, new Map(), new Map()]);
+  const evs = new Set(), pls = new Set();
+  for (const [k, r] of Object.entries(vx || {})) { const ch = Math.floor(k / 1e3) % 1e3, v = k % 1e3; if (ch === c && (!vs || vs.includes(v))) { r[2].forEach(x => evs.add(x)); r[1].forEach(x => pls.add(x)); } }
+  for (const e of [...evs].map(i => em.get(i)).filter(Boolean).sort((x, y) => x.year - y.year).slice(0, 4))
+    items.push({ kind: "context", title: e.title, badge: `${yearText(e.year)}, ${dateCertainty(e.year).label.toLowerCase()}`, text: `${e.title}: ${yearText(e.year)} (${dateCertainty(e.year).label.toLowerCase()}).`, cite: "Theographic Bible Metadata (CC BY-SA 4.0); dates follow a traditional chronology", href: `/history/timeline#e${e.id}` });
+  for (const r of [...pls].map(x => lm.get(x)).filter(Boolean).filter(r => discForPlace(DISCOVERIES, r[0]).length).slice(0, 3))
+    items.push({ kind: "context", title: r[1], badge: "Place with archaeology", text: `${r[1]}: a place in the passage with documented archaeology. See the place page for its finds and how sure its location is.`, cite: "Ereunia atlas; places from Theographic and OpenBible.info", href: `/place/${r[0]}` });
+  for (const [m, x] of MANUSCRIPTS.map(m => [m, MS_COVER[m.name]?.(b, c, from)]).filter(([m, x]) => x && x[0] !== "no" && /P52|P46|Dead Sea|Leningrad|Sinaiticus/.test(m.name)).slice(0, 2))
+    items.push({ kind: "context", title: m.name, badge: "Manuscript", text: `${m.name} (${m.date}): ${x[1]}`, cite: "Ereunia Library: published descriptions of the manuscript", href: "/library" });
+  return items;
+}
+const ilList = (items, add) => items.map((it, i) => `<li class="ilitem"><div><b>${it.href ? `<a href="${esc(it.href)}">${esc(it.title)}</a>` : esc(it.title)}</b> ${it.status ? `<span class="dstat s-${esc(it.status)}">${esc(it.badge)}</span>` : `<span class="small">${esc(it.badge)}</span>`}</div><p>${esc(it.text)}</p>${it.limits ? `<p class="small"><b>What it does not show:</b> ${esc(it.limits)}</p>` : ""}${add(it, i)}</li>`).join("");
+async function illustrationsPane() {
+  const items = await illustrationsFor(R.book, R.chapter, R.verse, R.verse);
+  const scope = R.verse ? formatRef(R.book, R.chapter, R.verse) : formatRef(R.book, R.chapter);
+  return `<div class="pane"><div><span class="chip">Sourced illustrations</span><div class="vref" style="margin-top:6px">${scope}</div></div>
+    <p class="small">True, checkable material from Ereunia's records that could illustrate this passage. Each says where it comes from; open its page before you use it.</p>
+    ${items.length ? `<ul class="illist">${ilList(items, (it, i) => `<div class="actions"><button type="button" class="btn" data-il="${i}">Add to preparation</button></div>`)}</ul>` : `<p class="empty">No discoveries, dated events or manuscripts are linked to ${scope}. Try the whole chapter: choose another verse or the History tab.</p>`}</div>`;
+}
+function wireIllustrationsPane() {
+  $("#pane").querySelectorAll("[data-il]").forEach(b => b.addEventListener("click", async () => {
+    const it = (await illustrationsFor(R.book, R.chapter, R.verse, R.verse))[+b.dataset.il]; if (!it) return;
+    addToPrep({ kind: it.kind, text: it.text, cite: it.cite, href: it.href }); b.textContent = "Added"; b.disabled = true;
+  }));
+}
+
 /* ---------- adding material to the active preparation ---------- */
 function prepTitle(key) { const g = parseGuideSpec(key); return g ? formatRef(g.book, g.chapter, g.from, g.to) : key; }
 function addToPrep(block) {
@@ -942,7 +979,7 @@ async function renderMargin() {
   const pane = $("#pane");
   pane.innerHTML = '<p class="small" style="padding:16px 18px">Loading…</p>';
   try {
-    pane.innerHTML = R.tab === "bg" ? await historyPane() : R.tab === "words" ? await wordsPane() : R.tab === "xref" ? await xrefPane() : R.tab === "people" ? await peoplePane() : R.tab === "ms" ? await msPane() : R.tab === "cm" ? await commentaryPane() : R.tab === "ask" ? askPane() : await versePane();
+    pane.innerHTML = R.tab === "bg" ? await historyPane() : R.tab === "words" ? await wordsPane() : R.tab === "xref" ? await xrefPane() : R.tab === "people" ? await peoplePane() : R.tab === "ms" ? await msPane() : R.tab === "cm" ? await commentaryPane() : R.tab === "il" ? await illustrationsPane() : R.tab === "ask" ? askPane() : await versePane();
     // Discoveries linked to the selected verse (Verse tab) or to this chapter (Book tab).
     const dl = R.tab === "verse" && R.verse ? discForVerse(DISCOVERIES, R.book, R.chapter, R.verse, bIdx) : R.tab === "bg" ? discForChapter(DISCOVERIES, R.book, R.chapter, bIdx) : [];
     if (dl.length) pane.querySelector(".pane")?.insertAdjacentHTML("beforeend", discMini(dl, R.tab === "bg" ? `Discoveries linked to ${formatRef(R.book, R.chapter)}` : "Archaeology and discoveries"));
@@ -951,6 +988,7 @@ async function renderMargin() {
   if (R.tab === "verse" && R.verse) wireVersePane();
   if (R.tab === "ask") wireAskPane();
   if (R.tab === "cm") wireCommentaryPane();
+  if (R.tab === "il") wireIllustrationsPane();
   m.dataset.depth = depth();
   if (store.setting("depth", "study") === "scholar") pane.querySelectorAll("details").forEach(d => (d.open = true));
   if (location.pathname.startsWith("/read/")) { setPath(deskUrl()); rememberDesk(); }
@@ -2517,7 +2555,7 @@ async function renderTrails(openId) {
 
 
 function prepCtx() {
-  return { view, esc, go, setPath, store, toast, setTitle, setNav, getIndex, parseReference, chapterCount, formatRef, toOsis, readUrl, loadBook, loadOrig, loadXref, loadLex, H, CONTEXT, NAMES, BOOKS, groupOf, testamentOf, META, TR, translationOptions, unpackRef, verseText, keyLemmas, repeatedWords, mergeCrossRefs, OBSERVE, APPLY, interpretQuestions, discForChapter, DISCOVERIES, bIdx, displayStrong, langOf, dirOf, parseGuideSpec, guideSpec, loadComm, commentaryChoice, commentFor, cmOn, plainText, CM_SHORT, yearText };
+  return { view, esc, go, setPath, store, toast, setTitle, setNav, getIndex, parseReference, chapterCount, formatRef, toOsis, readUrl, loadBook, loadOrig, loadXref, loadLex, H, CONTEXT, NAMES, BOOKS, groupOf, testamentOf, META, TR, translationOptions, unpackRef, verseText, keyLemmas, repeatedWords, mergeCrossRefs, OBSERVE, APPLY, interpretQuestions, discForChapter, DISCOVERIES, bIdx, displayStrong, langOf, dirOf, parseGuideSpec, guideSpec, loadComm, commentaryChoice, commentFor, cmOn, plainText, CM_SHORT, yearText, illustrationsFor, ilList, KID_STORIES, fromOsis, dateCertainty };
 }
 function renderAbout() {
   setNav(""); setTitle("About Ereunia");

@@ -31,3 +31,36 @@ test("outlineDoc lists sources once and keeps study notes out of handouts", () =
   assert.equal(s[1].notes[0].kind, "commentary");
   assert.equal(STEPS.length, 8);
 });
+
+import { clauses, linkCounts, seriesIcs, addDays } from "../public/js/prep-core.js";
+test("clauses split at strong punctuation and before linking words", () => {
+  const c = clauses([[16, "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."]]);
+  assert.equal(c[0].verse, 16);
+  assert.equal(c[0].link, "for");
+  assert.ok(c.some(x => x.link === "that" && x.indent === 1));
+  assert.ok(c.some(x => x.link === "but"));
+  assert.deepEqual(linkCounts(c).map(x => x[0]).slice(0, 1), ["that"]);
+});
+test("seriesIcs writes one all-day event per week and escapes text", () => {
+  const ics = seriesIcs("Gospel; of John", [{ date: "2026-11-01", label: "John 1:1–18", title: "The Word", url: "https://ereunia.com/prepare/John.1.1-18" }, { date: addDays("2026-11-01", 7), label: "John 1:19–34" }], "20261027T000000Z");
+  assert.equal((ics.match(/BEGIN:VEVENT/g) || []).length, 2);
+  assert.match(ics, /DTSTART;VALUE=DATE:20261101/);
+  assert.match(ics, /DTSTART;VALUE=DATE:20261108/);
+  assert.ok(ics.includes("SUMMARY:Gospel\\; of John: The Word"));
+  assert.match(ics, /\r\n$/);
+});
+
+import { cleanSeries, weekDates, preachedLog } from "../public/js/prep-core.js";
+test("cleanSeries drops bad ids, bad passages and odd intervals; weekDates steps by the interval", () => {
+  assert.equal(cleanSeries({ id: "../x" }), null);
+  const s = cleanSeries({ id: "abc123", title: "", start: "2026-11-01", every: 3, weeks: [{ spec: "John.1.1-18", title: "The Word" }, { spec: "javascript:x" }] });
+  assert.equal(s.title, "Untitled series"); assert.equal(s.every, 7);
+  assert.equal(s.weeks[1].spec, "");
+  assert.deepEqual(weekDates(s), ["2026-11-01", "2026-11-08"]);
+  assert.deepEqual(weekDates({ ...s, start: "" }), ["", ""]);
+});
+test("preachedLog lists every occasion newest first", () => {
+  const log = preachedLog([{ key: "a", title: "A", preached: [{ date: "2025-01-05", where: "" }] }, { key: "b", title: "B", preached: [{ date: "2026-02-01", where: "Evening" }, { date: "2024-03-03", where: "" }] }]);
+  assert.deepEqual(log.map(x => x.date), ["2026-02-01", "2025-01-05", "2024-03-03"]);
+  assert.equal(log[0].title, "B");
+});
