@@ -27,7 +27,7 @@ import { sermonRefs, sermonMarkdown } from "./sermon.js";
 import { wordDiff, variantsFor, editionDifferences, lessonMarkdown } from "./lens.js";
 import { stem, glossStems, distribution, sharedStrongs, radialLayout, NODE_TYPES, clip } from "./research.js";
 import { repeatedWords, keyLemmas, mergeCrossRefs, interpretQuestions, guideMarkdown, OBSERVE, APPLY } from "./guide.js";
-import { KINDS, STATUS as DSTATUS, DATING, parseRange, forVerse as discForVerse, forChapter as discForChapter, forPerson as discForPerson, forPlace as discForPlace, inEra as discInEra, related as discRelated, filterList as discFilter } from "./discoveries.js";
+import { KINDS, DEPICTS, STATUS as DSTATUS, DATING, parseRange, forVerse as discForVerse, forChapter as discForChapter, forPerson as discForPerson, forPlace as discForPlace, inEra as discInEra, related as discRelated, filterList as discFilter } from "./discoveries.js";
 import { DISCOVERIES } from "./discoveries-data.js";
 import { describeMorph, languageOf, normaliseStrong, shardOf, displayStrong, isGrammaticalStrong, editionNote } from "./lang.js";
 
@@ -55,6 +55,26 @@ const artCredit = (kind, key) => { const m = (kind === "books" ? BOOK_ART : PEOP
 // A horizontal, swipeable row of picture cards. items: [{ href, img, title, sub }]
 const carousel = (label, items, cls = "") => items.length ? `<div class="snap ${cls}" role="list" aria-label="${esc(label)}">${items.map(c => `<a class="scard" role="listitem" href="${c.href}"><span class="simg">${c.img || `<span class="sfall"></span>`}</span><span class="scap"><b>${c.title}</b>${c.sub ? `<span>${c.sub}</span>` : ""}</span></a>`).join("")}</div>` : "";
 
+/* ---------- zoom viewer for documentary images ---------- */
+function zoomViewer(src, alt, captionHtml) {
+  const prev = document.activeElement;
+  document.body.insertAdjacentHTML("beforeend", `<div class="zoomer" role="dialog" aria-modal="true" aria-label="Image viewer"><div class="zbar"><span class="small">Scroll, pinch or use + and − to zoom; drag to move.</span><button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out">−</button><button type="button" data-z="reset">Fit</button><button type="button" data-z="close" aria-label="Close viewer">×</button></div><div class="zstage"><img src="${esc(src)}" alt="${esc(alt)}" draggable="false"></div><p class="zcap">${captionHtml}</p></div>`);
+  const z = document.querySelector(".zoomer"), img = z.querySelector("img"), stage = z.querySelector(".zstage");
+  let k = 1, x = 0, y = 0, drag = null; const pts = new Map(); let pinch = null;
+  const apply = () => { img.style.transform = `translate(${x}px, ${y}px) scale(${k})`; };
+  const zoom = (f, cx = 0, cy = 0) => { const nk = Math.min(8, Math.max(1, k * f)); x = cx - (cx - x) * nk / k; y = cy - (cy - y) * nk / k; k = nk; if (k === 1) { x = 0; y = 0; } apply(); };
+  const close = () => { z.remove(); removeEventListener("keydown", key); prev?.focus?.(); };
+  const key = e => { if (e.key === "Escape") close(); else if (e.key === "+" || e.key === "=") zoom(1.4); else if (e.key === "-") zoom(1 / 1.4); else if (e.key === "0") { k = 1; x = y = 0; apply(); } };
+  addEventListener("keydown", key);
+  z.querySelector(".zbar").addEventListener("click", e => { const b = e.target.closest("[data-z]"); if (!b) return; const a = b.dataset.z; if (a === "close") close(); else if (a === "in") zoom(1.4); else if (a === "out") zoom(1 / 1.4); else { k = 1; x = y = 0; apply(); } });
+  stage.addEventListener("wheel", e => { e.preventDefault(); const r = stage.getBoundingClientRect(); zoom(e.deltaY < 0 ? 1.15 : 1 / 1.15, e.clientX - r.left - r.width / 2, e.clientY - r.top - r.height / 2); }, { passive: false });
+  stage.addEventListener("pointerdown", e => { stage.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); if (pts.size === 1) drag = [e.clientX - x, e.clientY - y]; else if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = Math.hypot(a[0] - b[0], a[1] - b[1]); } });
+  stage.addEventListener("pointermove", e => { if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, [e.clientX, e.clientY]); if (pts.size === 2 && pinch) { const [a, b] = [...pts.values()]; const d2 = Math.hypot(a[0] - b[0], a[1] - b[1]); zoom(d2 / pinch); pinch = d2; } else if (drag && k > 1) { x = e.clientX - drag[0]; y = e.clientY - drag[1]; apply(); } });
+  const up = e => { pts.delete(e.pointerId); if (pts.size < 2) pinch = null; if (!pts.size) drag = null; };
+  stage.addEventListener("pointerup", up); stage.addEventListener("pointercancel", up);
+  z.querySelector('[data-z="close"]').focus();
+}
+
 /* ---------- discoveries: archaeology, inscriptions, manuscripts, science ---------- */
 const DISC = new Map(DISCOVERIES.map(d => [d.id, d]));
 const bIdx = code => BOOKS.findIndex(b => b.osis === code);
@@ -62,7 +82,8 @@ function discImg(d, { cls = "", sizes = "100vw", eager = false } = {}) {
   const m = d?.image; if (!m?.local) return "";
   return `<img class="${cls}" src="img/disc/${d.id}-sm.webp" srcset="img/disc/${d.id}-sm.webp 640w, img/disc/${d.id}.webp 1400w" sizes="${sizes}" alt="${esc(m.alt || d.name)}" width="${m.w}" height="${m.h}" style="object-position:${m.focus || "50% 50%"}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
 }
-const discCredit = d => { const m = d?.image; if (!m?.local) return ""; const lic = m.licenceUrl ? `<a href="${esc(m.licenceUrl)}" target="_blank" rel="noopener noreferrer">${esc(m.licence)}</a>` : esc(m.licence || ""); return `Photo: ${esc(m.author || "unknown")}, ${lic}${m.source ? `, <a href="${esc(m.source)}" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a>` : ", via Wikimedia Commons"}`; };
+const DEPICT_SHORT = { site: "Site photograph, not an artefact", "site-replica": "Site photograph; the objects shown are replicas", replica: "Photograph of a replica" };
+const discCredit = d => { const m = d?.image; if (!m?.local) return ""; const lic = m.licenceUrl ? `<a href="${esc(m.licenceUrl)}" target="_blank" rel="noopener noreferrer">${esc(m.licence)}</a>` : esc(m.licence || ""); return `${DEPICT_SHORT[m.depicts] ? `<b>${DEPICT_SHORT[m.depicts]}.</b> ` : ""}Photo: ${esc(m.author || "unknown")}, ${lic}${m.source ? `, <a href="${esc(m.source)}" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a>` : ", via Wikimedia Commons"}`; };
 const dChip = d => `<span class="dstat s-${d.status}" title="${esc(DSTATUS[d.status]?.note || "")}">${DSTATUS[d.status]?.label || d.status}</span>`;
 /** "2Kgs.9.14-9.29" → "2 Kings 9:14–29" */
 function rangeLabel(r) {
@@ -72,7 +93,7 @@ function rangeLabel(r) {
   return c1 === c2 ? formatRef(b, c1, v1, v2 !== v1 ? v2 : undefined) : `${formatRef(b, c1, v1)}–${c2}:${v2}`;
 }
 const rangeHref = r => { const p = parseRange(r, bIdx); return p ? readUrl("kjv", p.b, Math.floor(p.from / 1e3) % 1e3, p.from % 1e3 || null) : "#/"; };
-const discCard = (d, sizes = "(max-width: 520px) 100vw, 300px") => `<a class="dcard" href="#/discoveries/${d.id}"><span class="dimg">${discImg(d, { sizes }) || `<span class="dfall k-${d.kind}"><b>${esc(KINDS[d.kind] || "")}</b></span>`}</span>
+const discCard = (d, sizes = "(max-width: 520px) 100vw, 300px") => `<a class="dcard" href="#/discoveries/${d.id}"><span class="dimg">${discImg(d, { sizes }) || `<span class="dfall k-${d.kind}"><b>${esc(KINDS[d.kind] || "")}</b></span>`}${DEPICT_SHORT[d.image?.depicts] ? `<span class="dbadge">${d.image.depicts === "site" ? "Site photo" : "Site, replicas"}</span>` : ""}</span>
   <span class="dbody"><span class="dmeta">${dChip(d)}<span>${esc(KINDS[d.kind] || "")}</span>${d.objectDate?.text ? `<span>${esc(d.objectDate.text)}</span>` : ""}</span><b>${esc(d.name)}</b><span class="dsum">${esc(d.summary)}</span>
   ${(d.passages || []).length ? `<span class="dpass">${d.passages.slice(0, 2).map(rangeLabel).join(" · ")}${d.passages.length > 2 ? ` +${d.passages.length - 2}` : ""}</span>` : ""}</span></a>`;
 /** A compact list of discoveries for side panels (Lens, reader, person, place). */
@@ -136,9 +157,11 @@ async function renderDiscovery(id) {
     <aside class="dside">
       <section class="card"><h2>At a glance</h2><dl class="dfacts">
         ${fact("Date of the object", esc(d.objectDate?.text || ""))}
-        ${fact("Found", d.found ? esc([d.found.year, d.found.by].filter(Boolean).join(", ")) : "")}
+        ${fact("Year found", d.found?.year ? esc(String(d.found.year)) : "")}
         ${fact("Where found", d.location?.placeSlug && lm.get(d.location.placeSlug) ? `<a href="#/place/${d.location.placeSlug}">${esc(d.found?.where || lm.get(d.location.placeSlug)[1])}</a>` : esc(d.found?.where || ""))}
-        ${fact("Where it is now", esc([d.heldAt?.institution, d.heldAt?.ref].filter(Boolean).join(", ")))}
+        ${fact("Where it is now", esc(d.heldAt?.institution || ""))}
+        ${fact("Accession or reference", esc(d.heldAt?.ref || ""))}
+        ${fact("Found by", esc(d.found?.by || ""))}
         ${fact("Language", esc(d.language || ""))}
         ${fact("Dated by", (d.dating || []).map(m => esc(DATING[m] || m)).join(", "))}
       </dl></section>
@@ -148,6 +171,18 @@ async function renderDiscovery(id) {
     </aside>
   </div>
   ${rel.length ? `<section class="shelf"><div class="ribbon-head"><h2>Related discoveries</h2></div><div class="dgrid">${rel.map(x => discCard(x)).join("")}</div></section>` : ""}`;
+  // Events tagged in the passages this find relates to.
+  (async () => {
+    const em = await H.eventMap().catch(() => null); if (!em) return;
+    const ev = new Map();
+    for (const r of (d.passages || []).slice(0, 4)) { const p = parseRange(r, bIdx); if (!p) continue; const vx = await H.vx(p.b).catch(() => ({})); for (let k = p.from; k <= p.to; k++) (vx[p.b * 1e6 + k] || [[], [], []])[2].forEach(i => { const e = em.get(i); if (e) ev.set(i, e); }); }
+    const E = [...ev.values()].sort((a, b) => a.year - b.year).slice(0, 6);
+    if (E.length && view.querySelector(".dside")) view.querySelector(".dside").insertAdjacentHTML("beforeend", `<section class="card"><h2>Related events</h2><ul class="evlist">${E.map(e => `<li><span class="yr">${yearText(e.year)}</span> ${certChip(e.year)}<br><a href="#/history/timeline#e${e.id}">${esc(e.title)}</a></li>`).join("")}</ul><p class="small">Events tagged in the linked passages (Theographic). Dates follow a traditional chronology.</p></section>`);
+  })();
+  const hero = view.querySelector(".pagehead img.headart");
+  if (hero && d.image?.local) { hero.classList.add("zoomable"); hero.setAttribute("tabindex", "0"); hero.setAttribute("role", "button"); hero.setAttribute("aria-label", `Open the photograph of ${d.name} full size`);
+    const openZ = () => zoomViewer(`img/disc/${d.id}.webp`, d.image.alt || d.name, discCredit(d));
+    hero.addEventListener("click", openZ); hero.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openZ(); } }); }
   view.querySelectorAll("#dverses .tx").forEach(async el => {
     const p = parseRange(el.dataset.r, bIdx); if (!p) return;
     const t = await verseText("kjv", toOsis(p.b, Math.floor(p.from / 1e3) % 1e3, p.from % 1e3 || 1)).catch(() => "");
@@ -1733,18 +1768,31 @@ async function renderTopic(raw) {
     <p class="small" style="margin-top:12px">Sources: STEPBible TAHOT, TAGNT, TBESH and TBESG (CC BY 4.0); Theographic Bible Metadata (CC BY-SA 4.0).</p>`;
 }
 
-function renderLibrary() {
+function renderLibrary(mode) {
   setNav("library"); setTitle("Library");
   const credit = (name, url) => `${esc(name)}<br><span class="mono small">${esc(url || "")}</span>`;
   const msLink = m => (m.see[0].startsWith("#") ? m.see[0] : `#/read/kjv/${m.see[0]}`);
-  view.innerHTML = `${artHead("isaiah-scroll")}<span class="eyebrow">Library</span><h1>The manuscripts behind the text, and where every source comes from.</h1>
-    <p class="small" style="max-width:72ch">Ereunia is self-contained: everything you read here is hosted here. Sources are credited below as their licences require.</p></div>
-    <section><h2 style="font-size:1.6rem;margin:0 0 10px">Manuscripts and editions</h2>
+  if (mode === "credits") return renderCredits(credit);
+  view.innerHTML = `${artHead("isaiah-scroll")}<span class="eyebrow">Library</span><h1>The manuscripts behind the text.</h1>
+    <p class="small" style="max-width:72ch">No original manuscript of any biblical book survives. These are the copies, translations and editions that scholars compare to recover the text, oldest first. Every passage in the Research Desk lists which of them contain it.</p></div>
+<section><h2 style="font-size:1.6rem;margin:0 0 10px">Manuscripts and editions</h2>
       <p class="small" style="max-width:72ch">No original manuscript of any biblical book survives. What we have are copies, and copies of copies, which scholars compare to recover the earliest text. Dates are estimates; where they are debated a range is given.</p>
       <div class="grid3">${MANUSCRIPTS.map(m => `<article class="card mscard">${IMAGES[m.img] ? `<span class="msimg">${pic(m.img, { sizes: "(max-width: 760px) 100vw, 400px" })}</span>` : ""}<span class="eyebrow">${esc(m.lang)}</span><h3 style="font-size:1.3rem;margin:4px 0">${esc(m.name)}</h3>
         <p class="small"><b>${esc(m.date)}</b> · ${esc(m.where)}</p><p>${esc(m.about)}</p><a class="small" href="${msLink(m)}">${esc(m.see[1])} ›</a></article>`).join("")}</div>
       <p class="small">Ereunia editorial summaries of widely published scholarship.</p></section>
-    <div class="card" id="credits" style="margin:22px 0 18px;scroll-margin-top:130px"><h2 style="font-size:1.5rem;margin-bottom:8px">Credits and source register</h2><div class="tablewrap"><table class="reg">
+    <section class="card libref"><h2 style="font-size:1.5rem">Reference works in Ereunia</h2>
+      <ul class="linklist">
+        ${inLink("Hebrew and Greek lexicons", "STEPBible brief lexicons (TBESH, based on BDB; TBESG, based on Abbott-Smith), CC BY 4.0", "#/languages")}
+        ${inLink("Translation histories", `How each of the ${allTranslations().length} Bibles was made, and its licence`, "#/bibles")}
+        ${inLink("Easton's Bible Dictionary (1897)", "Historic entries on people and places, labelled as historic", "#/history/people")}
+        ${inLink("Discoveries", `${DISCOVERIES.length} documented finds with sources and limits`, "#/discoveries")}
+        ${inLink("Credits and licences", "Every dataset, image and font, with its owner and licence", "#/credits")}
+      </ul></section>`;
+}
+function renderCredits(credit) {
+  setNav("credits"); setTitle("Credits and licences");
+  view.innerHTML = `<div class="pagehead"><span class="eyebrow">Library</span><h1>Credits and licences</h1><p class="small" style="max-width:72ch">Ereunia is self-contained: everything you read is hosted here. Each source below is credited as its licence requires, with what it is used for. Discovery photographs record what they show, who took them and under which licence.</p></div>
+    <div class="card" id="register" style="margin:22px 0 18px"><h2 style="font-size:1.5rem;margin-bottom:8px">Credits and source register</h2><div class="tablewrap"><table class="reg">
       <thead><tr><th>Source</th><th>Type</th><th>Owner</th><th>Licence</th><th>How it is used</th></tr></thead>
       <tbody>${SOURCES.map(s => `<tr><td>${credit(s.name, s.url)}</td><td>${s.type}</td><td>${s.owner}</td><td>${s.licence}</td><td>${s.use}</td></tr>`).join("")}
       <tr><td>${credit("54 Bibles from eBible.org", "https://ebible.org/")}</td><td>Scripture · translations</td><td>Each translation's publisher</td><td>Public domain, CC BY, CC BY-SA or CC BY-ND, shown on each Bible's page</td><td>Full text, unchanged</td></tr>
@@ -1764,9 +1812,9 @@ function renderLibrary() {
         <dt>Editorial</dt><dd>Ereunia notes on history and dating, showing each scholarly view.</dd>
         <dt>AI</dt><dd>Generated by the research assistant, with every claim tied to a cited source.</dd>
       </dl>
-      <p class="small">Translation versions in use: ${INDEX ? INDEX.translations.map(t => `${t.short} (checksum ${t.checksum})`).join(", ") : "loading"}.</p></section>`;
+      <p class="small">Translation versions in use: ${INDEX ? INDEX.translations.map(t => `${t.short} (checksum ${t.checksum})`).join(", ") : "loading"}.</p></section>
+    <section class="card" style="margin-top:18px"><h2 style="font-size:1.4rem">Corrections</h2><p>If you find an error in a text, a date, a source or an image credit, the cited source is the authority. Please tell us which page and what the source says; every correction is checked against the source before it is changed.</p><p class="small">A public corrections address has not been set up yet. Until it is, corrections can be sent to the Ereunia team through the contact details on <a href="https://owenmagocha.org/" target="_blank" rel="noopener noreferrer">owenmagocha.org</a>.</p></section>`;
 }
-
 /* ---------- one verse in every translation ---------- */
 async function renderCompare(osis) {
   await getIndex();
@@ -2264,7 +2312,7 @@ async function route() {
     else if (head === "place") await renderPlace(rest[0]);
     else if (head === "study") await renderStudy();
     else if (head === "library") { await getIndex(); renderLibrary(); }
-    else if (head === "credits") { await getIndex(); renderLibrary(); document.getElementById("credits")?.scrollIntoView(); return; }
+    else if (head === "credits") { await getIndex(); renderLibrary("credits"); }
     else if (head === "research") await renderResearch(rest);
     else if (head === "lens") await renderLens(rest[0], rest[1]);
     else if (head === "sermon") await renderSermon(rest[0]);

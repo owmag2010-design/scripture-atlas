@@ -8,6 +8,14 @@ export const KINDS = {
 };
 
 // What each evidence status means. Shown on every card so a reader never mistakes "fits" for "proves".
+// What a photograph shows. Never present a site photograph or a replica as the artefact itself.
+export const DEPICTS = {
+  object: "Photograph of the object itself",
+  site: "Photograph of the site, not of a single artefact",
+  "site-replica": "Photograph of the site; the objects shown are replicas, the originals are in a museum",
+  replica: "Photograph of a replica, not the original"
+};
+
 export const STATUS = {
   corroborates: { label: "Corroborates", note: "Names or matches a biblical person, place or event, and most specialists accept the reading and date." },
   consistent: { label: "Consistent", note: "Fits the biblical account, but the link is indirect or partial." },
@@ -86,7 +94,7 @@ export function validate(d, ctx) {
   if ((d.kind === "method") !== (d.status === "method")) e.push("methods, and only methods, have status method");
   if (!Array.isArray(d.sources) || d.sources.length < 2) e.push("needs at least two sources");
   (d.sources || []).forEach(s => { if (!/^https:\/\/[^\s]+$/.test(s.url || "")) e.push(`bad source url ${s.url}`); if (!s.title || !s.publisher) e.push("source needs title and publisher"); if (/wikipedia\.org/.test(s.url || "")) e.push("Wikipedia is not a citable source"); });
-  if (d.image?.local) { for (const k of ["licenceUrl", "source"]) if (d.image[k] && !/^https:\/\/[^\s]+$/.test(d.image[k])) e.push(`bad image ${k} ${d.image[k]}`); if (!d.image.licence || !d.image.author) e.push("image needs licence and author"); }
+  if (d.image?.local) { for (const k of ["licenceUrl", "source"]) if (d.image[k] && !/^https:\/\/[^\s]+$/.test(d.image[k])) e.push(`bad image ${k} ${d.image[k]}`); if (!d.image.licence || !d.image.author) e.push("image needs licence and author"); if (!["object", "site", "site-replica", "replica"].includes(d.image.depicts)) e.push("image.depicts must say what the photo shows"); }
   (d.passages || []).forEach(r => { if (!parseRange(r, ctx.bookIndex)) e.push(`bad passage ${r}`); });
   if (ctx.people) (d.people || []).forEach(p => { if (!ctx.people.has(p)) e.push(`unknown person ${p}`); });
   if (ctx.places && d.location?.placeSlug && !ctx.places.has(d.location.placeSlug)) e.push(`unknown place ${d.location.placeSlug}`);
