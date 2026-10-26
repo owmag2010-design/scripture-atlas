@@ -6,7 +6,7 @@
   /* brand: ink #15120E, cream #F5EFE6, marigold #F2C14E (Ereunia logo pack) */
   --bg: #F5EFE6; --page: #FFFCF7; --ink: #15120E; --muted: #675F54; --line: #E3DACB; --soft: #EEE6D8;
   --lapis-deep: #15120E; --lapis-ink: #0B0907; --lapis: #2E2820; --lapis-soft: #F1E7D2;
-  --gilt: #8A6408; --gold: #F2C14E; --rubric: #B5321C; --sel: #FBEAB8;
+  --gilt: #7A5805; --gold: #F2C14E; --rubric: #B5321C; --sel: #FBEAB8;
   --hl-gold: #F9E3A0; --hl-lapis: #DCE3EE; --hl-rose: #F5D5CE; --hl-sage: #DDE8D2;
   --sea: #E4E2DA; --land: #FAF6EE; --coast: #B9AE98; --river: #8FA3B5;
   --serif: "EB Garamond", Garamond, "Times New Roman", serif;
@@ -1133,7 +1133,7 @@ body.home header.site .gsearch { display: none; }
 .arc:hover .arc-img img { transform: scale(1.04); }
 .arc-k { font: 700 .7rem var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--gilt); }
 .arc b { font: 700 1.05rem/1.25 var(--sans); }
-.arc-d { font-size: .88rem; color: var(--muted); } .arc-c { font-size: .72rem; color: var(--muted); opacity: .85; }
+.arc-d { font-size: .88rem; color: var(--muted); } .arc-c { font-size: .72rem; color: var(--muted); }
 .standards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 40px 0 24px; }
 .standards > div { padding: 22px; border-radius: 16px; background: var(--lapis-deep); color: #F5EFE6; display: grid; gap: 8px; align-content: start; }
 .standards .eyebrow { color: var(--gold); } .standards h3 { font: 700 1.2rem/1.25 var(--sans); }

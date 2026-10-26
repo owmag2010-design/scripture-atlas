@@ -211,7 +211,9 @@ const TR = { kjv: "KJV", web: "WEB" };
 const META = { kjv: { id: "kjv", name: "King James Version", languageEn: "English", language: "English", code: "eng", dir: "ltr", licence: "Public domain (Crown patent in the UK)", source: "https://github.com/thiagobodruk/bible" }, web: { id: "web", name: "World English Bible", languageEn: "English", language: "English", code: "eng", dir: "ltr", licence: "Public domain", source: "https://ebible.org/web/" } };
 let CATALOGUE = [];
 const dirOf = t => META[t]?.dir || "ltr";
-const langOf = t => META[t]?.code || "en";
+// BCP 47 language tags for the lang attribute (eBible gives ISO 639-3 codes).
+const LANG_TAG = { arb: "ar", ben: "bn", ces: "cs", cmn: "zh", deu: "de", eng: "en", epo: "eo", fra: "fr", hat: "ht", hau: "ha", heb: "he", hin: "hi", hrv: "hr", ibo: "ig", ita: "it", jpn: "ja", kor: "ko", lat: "la", mal: "ml", mya: "my", nde: "nd", nld: "nl", nya: "ny", pes: "fa", pol: "pl", por: "pt", rus: "ru", spa: "es", srp: "sr", swh: "sw", tam: "ta", tel: "te", tgl: "tl", tha: "th", tur: "tr", ukr: "uk", urd: "ur", vie: "vi" };
+const langOf = t => { const c = META[t]?.code || "en"; return LANG_TAG[c] || c; };
 const compareWith = () => { const c = store.setting("compare", store.setting("parallel", false) ? "web" : ""); return c && TR[c] ? c : ""; };
 function translationOptions(selected, { none = "" } = {}) {
   const groups = new Map([["English", []]]);
