@@ -47,3 +47,23 @@ Preview: https://deploy-preview-1--scripture-atlas-om.netlify.app (Netlify team 
 - Netlify serves pre-rendered files at lower-cased paths (`/read/kjv/john.1`). The app accepts any case, and canonical URLs use the lower-cased form.
 - The function bundle now includes the Hebrew and Greek data (`data/orig`, `data/lex`), which is needed for lexicon retrieval. The preview build and live AI call succeeded with it.
 - Merging the pull request deploys everything to ereunia.com. Old `/#/` links keep working.
+
+## Design pass (26 October 2026)
+- **Labels:** labels read as margin notes, in small italic Garamond and gilt, instead of tracked capitals. Status chips use sentence case.
+- **Surfaces:** three kinds. Prose sits open on the page. Panels are kept for tools and facts. Image wells are kept for objects. Discovery records no longer box every paragraph.
+- **Hover:** cards no longer lift on hover. Borders and colour answer instead.
+- **Motion:** pages arrive with one short fade, and menus open from their button. Both are switched off for reduced motion.
+- **Home:**
+  - The three starting paths form one strip.
+  - The verse for today opens with a rubric initial.
+  - The evidence standards are one band with a heading.
+- **Fixes and consistency:**
+  - "Back to …" sits at the top of the page instead of floating over the content.
+  - Discoveries without a licensed photo show a quiet hatched plate instead of a black block.
+  - One search control everywhere: amber button, rounded field.
+  - The search page explains what can be searched.
+  - Header, page and footer share one width (1,320 px), so the Research Desk has more room for the text.
+- **Checked after the pass:**
+  - axe reports 0 violations on 15 page and theme combinations.
+  - A crawl of 152 routes on phone and desktop, light and dark, found no overflow, broken images or script errors.
+  - 147 tests pass.

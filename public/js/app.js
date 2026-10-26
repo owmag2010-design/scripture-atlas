@@ -386,7 +386,6 @@ async function renderHome() {
     ${pic("creation-light", { cls: "heroart", eager: true, sizes: "100vw" })}
     <div class="hero-in obs-in">
       <div class="hero-copy obs-copy">
-        <span class="eyebrow">Ereunia · Search the Scriptures</span>
         <h1>Ancient Scripture. <em>A new depth of discovery.</em></h1>
         <p class="obs-promise">Every word of the Bible, traced to its source.</p>
         <form class="bigsearch" id="bigsearch" role="search"><label class="sr" for="bq">Search passages, words, topics, people and places</label>
@@ -433,7 +432,7 @@ async function renderHome() {
   </section>
 
   <section class="standards" aria-labelledby="sth">
-    <h2 id="sth" class="sr">How Ereunia handles sources</h2>
+    <h2 id="sth">How Ereunia handles evidence</h2>
     <div><span class="eyebrow">Sources</span><h3>Every layer names where it comes from</h3><p>Bible texts are public domain or openly licensed. Hebrew and Greek come from STEPBible (Tyndale House), cross references from OpenBible.info, people and places from Theographic. Each panel shows its source.</p><a href="#/credits">Credits and licences ›</a></div>
     <div><span class="eyebrow">Editorial standards</span><h3>Scripture first, interpretation labelled</h3><p>The text comes first. Background notes give traditional and academic views side by side. Each discovery says what it establishes, what it doesn't, and where experts disagree.</p><a href="#/discoveries">How evidence is graded ›</a></div>
     <div><span class="eyebrow">AI, with limits</span><h3>Answers only from cited sources</h3><p>The research assistant answers from the passages and notes it shows you. Statements without a supporting source are removed, and every answer is labelled as AI. It can still be wrong: check it against the text.</p><a href="#/ai">Try the assistant ›</a></div>
@@ -1073,8 +1072,11 @@ async function renderSearch(q) {
   $("#gq").value = q;
   if (!q) {
     view.innerHTML = `<div class="pagehead"><span class="eyebrow">Search</span><h1>Search the Scriptures</h1><p class="small">One search covers passages, original words, people, places, discoveries, manuscripts and your own notes.</p>
-      <form class="bigsearch" id="sform" role="search" style="max-width:640px"><label class="sr" for="sq">Search</label><input id="sq" type="search" placeholder="John 1:1, logos, shepherd, Abraham, Lachish" autocomplete="off"><button>Search</button></form></div>`;
-    $("#sform").addEventListener("submit", e => { e.preventDefault(); goSearch($("#sq").value); }); return;
+      <form class="bigsearch" id="sform" role="search" style="max-width:640px"><label class="sr" for="sq">Search</label><input id="sq" type="search" placeholder="John 1:1, logos, shepherd, Abraham, Lachish" autocomplete="off"><button>Search</button></form>
+      <div class="tryline"><span>Try</span>${["John 3:16", "λόγος", "covenant", "Moses", "Jerusalem", "Dead Sea Scrolls"].map(x => `<button type="button" data-q="${esc(x)}">${esc(x)}</button>`).join("")}</div></div>
+      <dl class="skinds">${[["A reference", "John 1:1, Ps 23, Romans 8:28-39", "Opens the passage in the Research Desk."], ["A word", "light, shepherd, grace", "Finds every verse in the translation you choose."], ["Hebrew or Greek", "λόγος, אֱלֹהִים, G3056", "Opens the word study with every place it appears."], ["A person or place", "Abraham, Bethlehem", "Opens their page, with family, journeys and verses."], ["A find or manuscript", "Lachish, Codex Sinaiticus", "Opens the record with its sources."], ["Your own notes", "anything you wrote", "Searched here on this device only."]].map(([a, b, c]) => `<div><dt>${a}</dt><dd><span>${b}</span>${c}</dd></div>`).join("")}</dl>`;
+    $("#sform").addEventListener("submit", e => { e.preventDefault(); goSearch($("#sq").value); });
+    view.querySelectorAll(".tryline button").forEach(b => b.addEventListener("click", () => goSearch(b.dataset.q))); return;
   }
   const t = TR[store.setting("searchT", "kjv")] ? store.setting("searchT", "kjv") : "kjv";
   const fq = fold(q), ql = q.toLowerCase();
@@ -1844,7 +1846,7 @@ function renderLibrary(mode) {
   view.innerHTML = `${artHead("isaiah-scroll")}<span class="eyebrow">Library</span><h1>The manuscripts behind the text.</h1>
     <p class="small" style="max-width:72ch">No original manuscript of any biblical book survives. These are the copies, translations and editions that scholars compare to recover the text, oldest first. Every passage in the Research Desk lists which of them contain it.</p></div>
 <section><h2 style="font-size:1.6rem;margin:0 0 10px">Manuscripts and editions</h2>
-      <p class="small" style="max-width:72ch">No original manuscript of any biblical book survives. What we have are copies, and copies of copies, which scholars compare to recover the earliest text. Dates are estimates; where they are debated a range is given.</p>
+      <p class="small" style="max-width:72ch">Dates are estimates; where they are debated, a range is given.</p>
       <div class="grid3">${MANUSCRIPTS.map(m => `<article class="card mscard">${IMAGES[m.img] ? `<span class="msimg">${pic(m.img, { sizes: "(max-width: 760px) 100vw, 400px" })}</span>` : ""}<span class="eyebrow">${esc(m.lang)}</span><h3 style="font-size:1.3rem;margin:4px 0">${esc(m.name)}</h3>
         <p class="small"><b>${esc(m.date)}</b> · ${esc(m.where)}</p><p>${esc(m.about)}</p><a class="small" href="${msLink(m)}">${esc(m.see[1])} ›</a></article>`).join("")}</div>
       <p class="small">Ereunia editorial summaries of widely published scholarship.</p></section>
@@ -2463,6 +2465,7 @@ function renderPrivacy() {
 }
 
 /* ---------- router ---------- */
+let lastPath = null;
 async function route() {
   await Promise.all([imagesReady, artReady]);
   closeMore();
@@ -2472,6 +2475,8 @@ async function route() {
   if (/^(read|translation|share)\//i.test(h)) await getIndex().catch(() => {});
   h = h.replace(/^(read|translation|share\/v\/[^/]+)\/([^/]+)/i, (m0, a, id) => { const k = Object.keys(TR).find(x => x.toLowerCase() === id.toLowerCase()); return `${a}/${k || id}`; });
   const [head, ...rest] = h.split("/");
+  const changed = document.body.dataset.route !== (head || "home") || lastPath !== location.pathname;
+  document.body.dataset.route = head || "home"; lastPath = location.pathname;
   document.body.classList.remove("focus", "kidsmode"); window.speechSynthesis?.cancel(); document.querySelector(".exitfocus")?.remove();
   try {
     if (head === "read") await renderRead(rest[0], rest[1]);
@@ -2506,6 +2511,8 @@ async function route() {
     view.innerHTML = `<p class="empty">Something did not load. Check your connection, then <a href="${esc(location.pathname)}">try again</a>.</p>`;
   }
   if (head !== "read" && !location.hash) window.scrollTo(0, 0);
+  // One quiet arrival per page change, so the new page reads as a response to the click; skipped for reduced motion.
+  if (changed && view.animate && !matchMedia("(prefers-reduced-motion: reduce)").matches) view.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "cubic-bezier(.2,.7,.2,1)" });
   // Research trail: record the sources and studies opened anywhere on the site.
   const TRAIL_HEADS = { word: "word", discoveries: "discovery", person: "person", place: "place", lens: "passage", compare: "passage", translation: "source", research: "source" };
   if (TRAIL_HEADS[head] && rest[0]) store.trailAdd({ kind: TRAIL_HEADS[head], label: document.title.replace(/ · Ereunia$/, ""), href: location.pathname });
@@ -2513,7 +2520,8 @@ async function route() {
   document.querySelector(".deskreturn")?.remove();
   let desk = null; try { desk = JSON.parse(sessionStorage.getItem("ereunia:desk") || "null"); } catch {}
   if (desk?.href && head !== "read" && head !== "" && head !== "kids") {
-    document.body.insertAdjacentHTML("beforeend", `<a class="deskreturn" href="${esc(desk.href)}"><span aria-hidden="true">↩</span> Back to ${esc(desk.label)}</a>`);
+    const back = `<a class="deskreturn${head === "atlas" ? " float" : ""}" href="${esc(desk.href)}"><span aria-hidden="true">↩</span> Back to ${esc(desk.label)}</a>`;
+    if (head === "atlas") document.body.insertAdjacentHTML("beforeend", back); else view.insertAdjacentHTML("afterbegin", back);
   }
 }
 setRouter(route);

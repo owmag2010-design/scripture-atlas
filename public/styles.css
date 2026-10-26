@@ -1239,3 +1239,178 @@ details.ev { margin: 6px 0 4px; } details.ev summary { font-size: .82rem; color:
 .evsrc li { background: var(--soft); border-radius: 8px; padding: 8px 10px; } .evsrc li.flash { outline: 2px solid var(--gold); }
 .chip.lex { background: #E3EEF8; color: #1F4569; } .chip.arch { background: #F3E4D8; color: #6A3A12; } .chip.data { background: #E6EFE3; color: #2D5124; }
 ol.trail { max-height: 560px; overflow: auto; padding-right: 4px; }
+
+/* =====================================================================
+   Design refinement, October 2026
+   One voice across every page:
+   - Labels are marginalia: small italic Garamond in gilt, sentence case, the way a scribe annotates a margin.
+     Tracked capitals are kept only for map lettering.
+   - Three surfaces only. Open text sits straight on the vellum. A folio (a quiet bordered panel) holds tools
+     and grouped facts. A plate (an image well) holds objects. Prose is not boxed.
+   - Hover answers with colour and border, never by lifting cards. Motion is reserved for opening, closing
+     and arriving on a page.
+   - One illuminated moment: the rubric initial on the verse for today.
+   ===================================================================== */
+:root { --r: 16px; --r-md: 12px; --r-sm: 10px; --ease: cubic-bezier(.2, .7, .2, 1); --rule: color-mix(in srgb, var(--gilt) 28%, var(--line)); }
+@supports not (color: color-mix(in srgb, red, blue)) { :root { --rule: var(--line); } }
+
+/* marginalia labels */
+.path .pn, .arc-k, .tk, .railtrail .tk, .eyebrow.note {
+  font: italic 500 1rem/1.2 var(--serif); letter-spacing: 0; text-transform: none; color: var(--gilt);
+}
+.railtrail .tk { font-size: .9rem; }
+ol.trail .tk { font-size: .95rem; }
+.dfacts dt, .sheetgroup h3, .atl-tlabel { font: italic 500 .95rem/1.2 var(--serif); letter-spacing: 0; text-transform: none; color: var(--gilt); }
+.atl-tlabel { color: var(--gold); }
+.dfacts { gap: 14px; } .dfacts dd { margin-top: 1px; font-weight: 500; }
+/* status and match chips: sentence case */
+.dstat, .sgroup .mtype, .infchip { text-transform: none; letter-spacing: 0; font-weight: 600; }
+.dstat { font-size: .76rem; padding: 5px 9px; }
+.sgroup .mtype, .infchip { font-size: .76rem; }
+
+/* buttons and controls: one set of states */
+.btn, .sfilters button, .more-row a, .tryline button, .dkinds .btn { transition: background-color .18s var(--ease), border-color .18s var(--ease), color .18s var(--ease); }
+.btn { padding: 8px 16px; border-radius: 999px; font-weight: 600; }
+.btn:hover { border-color: var(--gilt); }
+.btn.pri:hover { background: #000; border-color: #000; }
+.btn.gold:hover { background: #F7CF67; border-color: #F7CF67; }
+.btn:active, .sfilters button:active { transform: translateY(1px); }
+:focus-visible { outline: 2px solid var(--gilt); outline-offset: 2px; }
+input[type="search"], input[type="text"], textarea, select { accent-color: var(--gilt); }
+
+/* folios: quiet panels for tools and grouped facts */
+.card { border-radius: var(--r); border-color: var(--line); }
+.card, .sgroup, .savedtrails > li { box-shadow: none; }
+
+/* hover: no lifting */
+.dcard, .dcard:hover, .path, .path:hover, .path:focus-visible { transform: none; }
+.dcard { box-shadow: none; transition: border-color .2s var(--ease); }
+.dcard:hover, .dcard:focus-visible { border-color: var(--gilt); box-shadow: none; outline: none; }
+.dcard:hover b, .arc:hover b, .sitem:hover b { color: var(--gilt); }
+.arc { transition: border-color .2s var(--ease); } .arc:hover { border-color: var(--gilt); }
+.arc:hover .arc-img img { transform: none; }
+
+/* plates: an honest blank where no licensed photograph exists yet */
+.dfall, .dfall.k-manuscript, .dfall.k-method, .dfall.k-site {
+  background: repeating-linear-gradient(135deg, transparent 0 11px, var(--rule) 11px 12px), var(--soft);
+  color: var(--gilt); font: italic 500 1.15rem/1.2 var(--serif); letter-spacing: 0; text-transform: none;
+}
+.dfall::before { content: ""; position: absolute; inset: 10px; border: 1px solid var(--rule); border-radius: 6px; pointer-events: none; }
+.dcard .dimg, .dmini .dthumb { background: var(--soft); }
+
+/* page heads */
+.pagehead h1 { letter-spacing: -.03em; }
+.pagehead:not(.art) { padding-bottom: 18px; border-bottom: 1px solid var(--rule); margin-bottom: 24px; }
+.pagehead:not(.art) h1 { font-size: clamp(2rem, 4.6vw, 3rem); }
+.pagehead.art { border-radius: 20px; }
+
+/* "Back to …" sits at the top of the page it applies to, not over the content */
+.deskreturn { position: static; display: inline-flex; align-items: center; gap: 6px; margin: 0 0 14px; padding: 6px 14px 6px 10px; background: var(--page); color: var(--ink); border: 1px solid var(--rule); box-shadow: none; font: 600 .88rem var(--sans); border-radius: 99px; }
+.deskreturn span { color: var(--gilt); }
+.deskreturn:hover, .deskreturn:focus-visible { background: var(--soft); border-color: var(--gilt); }
+.deskreturn.float { position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); top: 120px; bottom: auto; z-index: 26; box-shadow: var(--shadow); }
+@media (max-width: 960px) { .deskreturn { bottom: auto; } .deskreturn.float { top: auto; bottom: calc(140px + env(safe-area-inset-bottom, 0px)); } }
+
+/* nav menus open from where they were asked for */
+@media (prefers-reduced-motion: no-preference) {
+  nav.main .navmenu:not([hidden]) { animation: menuin .16s var(--ease); transform-origin: top left; }
+  @keyframes menuin { from { opacity: 0; transform: translateY(-4px) scale(.98); } }
+}
+nav.main .navmenu { border-radius: var(--r); padding: 6px; box-shadow: 0 1px 0 var(--line), 0 24px 60px -24px rgba(0,0,0,.5); }
+nav.main .navmenu a { border-radius: var(--r-sm); }
+
+/* ---------- home ---------- */
+.paths { gap: 0; border: 1px solid var(--line); border-radius: var(--r); background: var(--page); overflow: hidden; margin-top: 28px; }
+.path { border: 0; border-radius: 0; background: transparent; padding: 24px 52px 24px 26px; transition: background-color .2s var(--ease); }
+.path + .path { border-left: 1px solid var(--line); }
+.path:hover, .path:focus-visible { background: var(--soft); }
+.path::after { top: 50%; margin-top: -.9rem; transition: transform .2s var(--ease); }
+.path:hover::after { transform: translateX(3px); }
+@media (max-width: 760px) { .path + .path { border-left: 0; border-top: 1px solid var(--line); } }
+
+.dd-copy .eyebrow, .today .eyebrow, .archive .eyebrow { font: italic 500 1.05rem var(--serif); color: var(--gilt); }
+.dd-frame { border-radius: 20px; }
+
+.today { margin: 12px 0 44px; }
+.votd2 { box-shadow: none; border: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); border-radius: 0; background: transparent; padding: 30px 0 28px; display: grid; grid-template-columns: minmax(150px, 1fr) minmax(0, 3fr); column-gap: clamp(20px, 4vw, 56px); align-items: start; }
+.votd2 > .eyebrow { grid-row: 1 / span 2; padding-top: 10px; font: italic 500 1.15rem var(--serif); color: var(--gilt); }
+.votd2 blockquote { margin: 0 0 18px; font-size: clamp(1.45rem, 2.6vw, 2rem); line-height: 1.42; max-width: 40ch; }
+.votd2 blockquote::first-letter { float: left; font: 500 3.6em/.82 var(--serif); color: var(--rubric); margin: .06em .1em 0 0; }
+.votd2 .actions { grid-column: 2; }
+@media (max-width: 720px) { .votd2 { grid-template-columns: minmax(0, 1fr); } .votd2 > .eyebrow { grid-row: auto; padding: 0 0 8px; } .votd2 .actions { grid-column: 1; } }
+
+.arc { border-radius: var(--r-md); }
+.arc-k { font-size: .95rem; margin-top: 2px; }
+.arc b { font-size: 1.12rem; }
+
+.standards { gap: 0; padding: clamp(26px, 4vw, 44px); border-radius: 22px; background: var(--lapis-deep); color: #F5EFE6; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 48px 0 28px; }
+.standards > h2 { grid-column: 1 / -1; font: 700 clamp(1.5rem, 2.6vw, 2rem)/1.15 var(--sans); letter-spacing: -.025em; color: #F5EFE6; margin: 0 0 26px; }
+.standards > div { background: none; border-radius: 0; padding: 0 clamp(16px, 2.4vw, 32px); border-left: 1px solid rgba(242, 193, 78, .28); }
+.standards > div:nth-of-type(1) { padding-left: 0; border-left: 0; }
+.standards .eyebrow { font: italic 500 1.05rem var(--serif); color: var(--gold); }
+.standards a:hover { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 760px) { .standards { grid-template-columns: minmax(0, 1fr); } .standards > div { padding: 18px 0 0; margin-top: 18px; border-left: 0; border-top: 1px solid rgba(242, 193, 78, .28); } .standards > div:nth-of-type(1) { margin-top: 0; padding-top: 0; border-top: 0; } }
+
+.more-row a:hover { background: var(--soft); }
+
+/* ---------- discovery record: open prose, one folio of facts ---------- */
+.dmain { gap: 0; }
+.dmain > .card { background: none; border: 0; border-radius: 0; padding: 26px 0; border-top: 1px solid var(--rule); }
+.dmain > .card:first-child { border-top: 0; padding-top: 6px; }
+.dmain h2 { font-size: 1.4rem; margin-bottom: 10px; }
+.dmain p { font-size: 1.05rem; line-height: 1.65; max-width: 70ch; }
+.dweigh { border-top: 1px solid var(--rule); padding: 26px 0; }
+.dweigh > .card { background: none; border: 0; border-radius: 0; padding: 0 0 0 18px; border-left: 3px solid; }
+.dweigh .est { border-top: 0; border-left-color: #4C8A35; } .dweigh .lim { border-top: 0; border-left-color: #C77A1E; }
+.dverse { background: var(--page); border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+.dside > .card { background: var(--page); }
+.dlayout { gap: clamp(20px, 3vw, 44px); }
+
+/* discovery list legend: quieter */
+.dlg { border-radius: var(--r-md); }
+
+/* ---------- research desk: room to read on wide screens ---------- */
+/* one measure for header, page and footer */
+header.site .bar, nav.main, main, footer.site, body.kidsmode main { max-width: 1320px; }
+.reader .page { box-shadow: 0 1px 0 var(--line), 0 30px 60px -48px rgba(21, 18, 14, .35); }
+.margin { border-radius: var(--r); }
+.margin .tabs button { transition: color .15s var(--ease), border-color .15s var(--ease); }
+.margin .tabs button:hover { color: var(--ink); }
+
+/* ---------- search ---------- */
+.sgroup { border-radius: var(--r); }
+.sitem { border-radius: var(--r-sm); transition: border-color .18s var(--ease); }
+
+/* ---------- my study ---------- */
+.trailgrid > .card, .backup.card { border-radius: var(--r); }
+.dcard .dfall b { font: inherit; color: inherit; }
+.dmini .dfall::before { inset: 4px; border-radius: 4px; }
+.dside h2 { margin-bottom: 12px; }
+.pagehead.art > p, .pagehead.art > .small { max-width: 60ch; }
+.dlg .dstat { justify-self: start; }
+.dlegend { gap: 10px; }
+
+/* the verse being studied: a wash of gold, no box */
+.v.sel { box-shadow: none; background: var(--sel); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.text .ew { text-decoration-color: color-mix(in srgb, var(--gilt) 26%, transparent); }
+.text .ew.og { text-decoration-color: color-mix(in srgb, var(--ink) 18%, transparent); }
+/* desk tabs scroll sideways: fade the edge so it reads as more */
+.margin .tabs { -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); scrollbar-width: none; }
+.margin .tabs:hover { -webkit-mask-image: none; mask-image: none; }
+.margin .tabs:focus-within { -webkit-mask-image: none; mask-image: none; }
+/* search: one search control everywhere */
+.bigsearch button { background: var(--gold); color: var(--lapis-ink); }
+.bigsearch input { border-radius: 999px 0 0 999px; padding-left: 20px; }
+.bigsearch button { border-radius: 0 999px 999px 0; padding: 0 24px; }
+.bigsearch input:focus { outline: none; border-color: var(--gilt); }
+.bigsearch:focus-within { border-radius: 999px; box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 45%, transparent); }
+.pagehead .tryline { margin-top: 4px; color: var(--muted); }
+.skinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 8px 0 0; border-top: 1px solid var(--rule); }
+.skinds > div { padding: 18px 22px 20px 0; border-bottom: 1px solid var(--rule); }
+.skinds dt { font: italic 500 1.05rem var(--serif); color: var(--gilt); }
+.skinds dd { margin: 4px 0 0; color: var(--muted); font-size: .92rem; }
+.skinds dd span { display: block; color: var(--ink); font-weight: 600; font-size: 1rem; margin-bottom: 2px; }
+@media (max-width: 860px) { .skinds { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .skinds { grid-template-columns: minmax(0, 1fr); } }
+.skinds { border-top: 0; margin-top: -6px; }
+.trailgrid { align-items: stretch; } .trailgrid > .card { display: flex; flex-direction: column; } .trailgrid > .card > ol.trail { flex: 1; }
