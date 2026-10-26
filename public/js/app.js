@@ -1085,19 +1085,21 @@ async function renderSearch(q) {
 }
 
 /* ---------- my study ---------- */
-async function renderStudy(tab = "notes") {
+async function renderStudy(tab = "trails") {
+  if (!["trails", "notes", "bookmarks", "highlights", "collections", "history"].includes(tab)) tab = "trails";
   setNav("study"); setTitle("My study");
+  if (tab === "trails") return renderTrails();
   await getIndex();
-  const lists = { notes: store.notes(), bookmarks: store.bookmarks(), highlights: store.highlights(), history: store.history(), collections: collLoad() };
+  const lists = { trails: store.trails(), notes: store.notes(), bookmarks: store.bookmarks(), highlights: store.highlights(), history: store.history(), collections: collLoad() };
   const sorted = tab === "history" || tab === "collections" ? lists[tab] : lists[tab].slice().sort((a, b) => orderOf(a.osis) - orderOf(b.osis));
   view.innerHTML = `${artHead("aleppo")}<span class="eyebrow">My study</span><h1>Your notes and saved verses</h1>
-    <p class="small">Kept in this browser on this device. Export them to keep a copy; accounts that sync across devices arrive in Phase 3.</p>
+    ${STORAGE_NOTE}
     <div class="actions"><span class="chip">Study streak: ${store.streak()} day${store.streak() === 1 ? "" : "s"}</span><span class="chip ext">${store.studyDays()} days studied</span><a class="small" href="#/learn">Courses</a></div></div>
-    <div class="tabsrow">${[["notes", "Notes"], ["bookmarks", "Bookmarks"], ["highlights", "Highlights"], ["collections", "Collections"], ["history", "Reading history"]].map(([k, l]) => `<button type="button" class="btn ${k === tab ? "on" : ""}" data-st="${k}">${l} (${lists[k].length})</button>`).join("")}
+    <div class="tabsrow">${[["trails", "Research trails"], ["notes", "Notes"], ["bookmarks", "Bookmarks"], ["highlights", "Highlights"], ["collections", "Collections"], ["history", "Reading history"]].map(([k, l]) => `<button type="button" class="btn ${k === tab ? "on" : ""}" data-st="${k}">${l} (${lists[k].length})</button>`).join("")}
       <span style="flex:1"></span><button class="btn" type="button" id="exp">Download as Markdown</button><button class="btn" type="button" id="cpyall">Copy all</button></div>
     <div class="card"><div class="results" id="slist"><p class="loading">Loading…</p></div></div>
     <p style="margin-top:20px"><button class="btn" type="button" id="clear">Delete all study data on this device</button></p><div id="confirm"></div>`;
-  view.querySelectorAll("[data-st]").forEach(b => b.addEventListener("click", () => renderStudy(b.dataset.st)));
+  view.querySelectorAll("[data-st]").forEach(b => b.addEventListener("click", () => go(`#/study/${b.dataset.st}`)));
   const rows = await Promise.all(sorted.map(async (it, ci) => {
     if (tab === "collections") return `<div class="hit coll"><span class="meta"><b>${esc(it.name)}</b><span class="small">${it.items.length} verse${it.items.length === 1 ? "" : "s"}</span><button class="linkbtn small" type="button" data-delc="${ci}">Delete</button></span>${(await Promise.all(it.items.map(async o => `<a class="cref" href="#/lens/${o}"><b>${labelOf(o)}</b> <span class="small">${esc(await anyText(o))}</span></a>`))).join("")}</div>`;
     if (tab === "history") { const r = fromOsis(it.osis); return `<a class="hit" href="${readUrl(it.translation || "kjv", r.book, r.chapter)}"><span class="meta"><span class="ref">${formatRef(r.book, r.chapter)}</span><span class="small">${TR[it.translation] || ""} · ${new Date(it.at).toLocaleString()}</span></span></a>`; }
@@ -1114,7 +1116,7 @@ async function renderStudy(tab = "notes") {
   $("#exp").addEventListener("click", async () => {
     const blob = new Blob([await md()], { type: "text/markdown" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-    a.download = `scripture-atlas-notes-${new Date().toISOString().slice(0, 10)}.md`;
+    a.download = `ereunia-notes-${new Date().toISOString().slice(0, 10)}.md`;
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   });
   $("#cpyall").addEventListener("click", async () => copyText(await md()));
@@ -2288,6 +2290,111 @@ async function renderShare(kind, a, b) {
   draw();
 }
 
+
+/* ---------- My study: research trails, teaching packs, backup and restore ---------- */
+const STORAGE_NOTE = `<p class="small storenote"><b>Stored in this browser on this device only.</b> Nothing is uploaded. Clearing this browser's site data deletes it, and it does not follow you to other devices, so download a backup now and then. Optional accounts with sync across devices are not available yet.</p>`;
+const SITE = "https://ereunia.com";
+const absUrl = href => SITE + (href.startsWith("/") ? href : "/" + href.replace(/^#?\/?/, ""));
+async function trailMarkdown(t) {
+  const lines = [`# ${t.title}`, "", `Research trail from Ereunia. Started ${new Date(t.started || t.steps[0]?.at || Date.now()).toLocaleString()}. ${t.steps.length} steps.`, ""];
+  const kinds = new Set();
+  for (const [i, st] of t.steps.entries()) {
+    kinds.add(st.kind);
+    lines.push(`${i + 1}. **${TRAIL_KIND[st.kind] || "Page"}:** ${st.label}  `, `   ${absUrl(st.href)}`);
+    if (st.kind === "verse" || st.kind === "passage") { const m = st.href.match(/\/read\/([^/]+)\/([^?#]+)/); if (m && fromOsis(m[2])?.verse) { const txt = await verseText(m[1], m[2]).catch(() => ""); if (txt) lines.push(`   > ${txt.replace(/\n/g, " ")} (${META[m[1]]?.name || m[1]})`); } }
+    if (st.kind === "note" && st.detail) lines.push(`   Note: ${st.detail.replace(/\n/g, " ")}`);
+  }
+  lines.push("", "## Sources", "");
+  lines.push("- Bible text: the translation named with each verse (public domain or openly licensed; see https://ereunia.com/bibles).");
+  if (kinds.has("word")) lines.push("- Hebrew and Greek words and lexicons: STEPBible.org, Tyndale House Cambridge, CC BY 4.0.");
+  if (kinds.has("passage")) lines.push("- Cross references: OpenBible.info, CC BY. A link means readers saw a connection, not a claim about the author's intent.");
+  if (kinds.has("person") || kinds.has("place")) lines.push("- People and places: Theographic Bible Metadata, CC BY-SA 4.0.");
+  if (kinds.has("discovery")) lines.push("- Discoveries: Ereunia summaries; each discovery page lists the museum, excavation or peer-reviewed sources it relies on.");
+  if (kinds.has("ai")) lines.push("- Research assistant answers are AI-generated from cited sources and are not included here; reopen them from the links.");
+  lines.push("", `Exported ${new Date().toISOString().slice(0, 10)} from ${SITE}`);
+  return lines.join("\n");
+}
+async function teachingPack(t) {
+  const verses = t.steps.filter(s => s.kind === "verse" || s.kind === "passage");
+  const words = t.steps.filter(s => s.kind === "word"), notes = t.steps.filter(s => s.kind === "note"), sources = t.steps.filter(s => ["discovery", "person", "place", "source"].includes(s.kind));
+  const L = [`# Teaching outline: ${t.title}`, "", "_Assembled automatically from a research trail on Ereunia. No AI was used; review and adapt it before teaching._", ""];
+  L.push("## Passages to read together", "");
+  for (const v of verses) { const m = v.href.match(/\/read\/([^/]+)\/([^?#]+)/); const txt = m ? await verseText(m[1], m[2]).catch(() => "") : ""; L.push(`- **${v.label}**${txt ? `: ${txt.replace(/\n/g, " ")}` : ""} (${absUrl(v.href)})`); }
+  if (words.length) { L.push("", "## Words to explain", ""); words.forEach(w => L.push(`- ${w.label} (${absUrl(w.href)})`)); }
+  if (sources.length) { L.push("", "## Background to share", ""); sources.forEach(s => L.push(`- ${TRAIL_KIND[s.kind]}: ${s.label} (${absUrl(s.href)})`)); }
+  if (notes.length) { L.push("", "## Your notes", ""); notes.forEach(n => L.push(`- ${n.label}: ${n.detail || ""}`)); }
+  L.push("", "## Questions for the group", ""); QUESTIONS.forEach((q, i) => L.push(`${i + 1}. ${q}`));
+  L.push("", "## Sources", "", "- Bible text in the translation named; Hebrew and Greek from STEPBible (CC BY 4.0); cross references from OpenBible.info (CC BY); people and places from Theographic (CC BY-SA 4.0).", `- Every link above opens the source on ${SITE}.`);
+  return L.join("\n");
+}
+function downloadText(name, text, type = "text/markdown") {
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+}
+function trailList(steps) {
+  return steps.length ? `<ol class="trail">${steps.map(st => `<li><span class="tk tk-${esc(st.kind)}">${esc(TRAIL_KIND[st.kind] || "Page")}</span><a href="${esc(st.href)}">${esc(st.label)}</a><span class="small">${new Date(st.at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</span>${st.kind === "note" && st.detail ? `<p class="small">${esc(st.detail)}</p>` : ""}</li>`).join("")}</ol>` : `<p class="empty">No steps yet. Open a passage in the reader and follow its words, connections and sources: each step is recorded here.</p>`;
+}
+async function renderTrails(openId) {
+  const cur = store.trailSteps(), saved = store.trails();
+  view.innerHTML = `${artHead("aleppo")}<span class="eyebrow">My study</span><h1>Research trails</h1>
+    <p class="small" style="max-width:68ch">Every passage, word, connection, source and note you open is recorded as a trail, so you can retrace your path, save it, and export it with citations.</p>${STORAGE_NOTE}</div>
+    <div class="tabsrow">${[["trails", "Research trails"], ["notes", "Notes"], ["bookmarks", "Bookmarks"], ["highlights", "Highlights"], ["collections", "Collections"], ["history", "Reading history"]].map(([k, l]) => `<a class="btn ${k === "trails" ? "on" : ""}" href="#/study/${k}">${l}</a>`).join("")}</div>
+    <div class="trailgrid">
+      <section class="card"><h2 style="font-size:1.35rem">Current trail <span class="small">${cur.length} step${cur.length === 1 ? "" : "s"}</span></h2>
+        ${trailList(cur.slice().reverse())}
+        ${cur.length ? `<form id="tsave" class="actions" style="margin-top:12px"><label class="sr" for="tname">Trail name</label><input id="tname" placeholder="Name this trail, e.g. The Word in John 1" maxlength="120"><button class="btn pri">Save trail</button><button class="btn" type="button" id="tclear">Start a new trail</button></form>` : ""}</section>
+      <section class="card"><h2 style="font-size:1.35rem">Saved trails</h2>
+        ${saved.length ? `<ul class="savedtrails">${saved.map(t => `<li${t.id === openId ? ' class="open"' : ""}><div class="st-h"><b>${esc(t.title)}</b><span class="small">${t.steps.length} steps · saved ${new Date(t.saved).toLocaleDateString()}</span></div>
+          <div class="actions"><button class="btn" type="button" data-topen="${t.id}">${t.id === openId ? "Hide" : "Show"} steps</button><button class="btn" type="button" data-tmd="${t.id}">Export with citations</button><button class="btn" type="button" data-tteach="${t.id}">Teaching outline</button><button class="linkbtn small" type="button" data-tdel="${t.id}">Delete</button></div>
+          ${t.id === openId ? trailList(t.steps) : ""}</li>`).join("")}</ul>` : `<p class="empty">Saved trails appear here.</p>`}</section>
+    </div>
+    <section class="card backup"><h2 style="font-size:1.35rem">Backup and restore</h2>
+      <p>Download everything kept on this device (notes, highlights, bookmarks, collections, trails, saved answers and settings) as one file, and restore it here or in another browser.</p>
+      <div class="actions"><button class="btn pri" type="button" id="bk-dl">Download backup</button><label class="btn" for="bk-file">Restore from a backup…</label><input type="file" id="bk-file" accept="application/json,.json" hidden>
+        <label class="small"><input type="checkbox" id="bk-replace"> Replace what is here instead of merging</label></div><p class="small" id="bk-msg" role="status"></p></section>`;
+  const form = $("#tsave");
+  form?.addEventListener("submit", e => { e.preventDefault(); const t = store.saveTrail($("#tname").value.trim() || `Trail from ${new Date().toLocaleDateString()}`); if (t) { toast("Trail saved on this device"); renderTrails(t.id); } });
+  $("#tclear")?.addEventListener("click", () => { store.trailClear(); toast("New trail started"); renderTrails(); });
+  view.querySelectorAll("[data-topen]").forEach(b => b.addEventListener("click", () => renderTrails(b.dataset.topen === openId ? null : b.dataset.topen)));
+  view.querySelectorAll("[data-tmd]").forEach(b => b.addEventListener("click", async () => { const t = store.trail(b.dataset.tmd); downloadText(`ereunia-trail-${t.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40)}.md`, await trailMarkdown(t)); }));
+  view.querySelectorAll("[data-tteach]").forEach(b => b.addEventListener("click", async () => { const t = store.trail(b.dataset.tteach); downloadText(`ereunia-teaching-${t.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40)}.md`, await teachingPack(t)); }));
+  view.querySelectorAll("[data-tdel]").forEach(b => b.addEventListener("click", () => { store.removeTrail(b.dataset.tdel); renderTrails(); }));
+  $("#bk-dl").addEventListener("click", () => downloadText(`ereunia-backup-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ ...store.backup(), collections: collLoad() }, null, 1), "application/json"));
+  $("#bk-file").addEventListener("change", async e => {
+    const f = e.target.files[0]; if (!f) return;
+    if (f.size > 5e6) { $("#bk-msg").textContent = "That file is too large to be an Ereunia backup."; return; }
+    try {
+      const obj = JSON.parse(await f.text());
+      const r = store.restore(obj, { merge: !$("#bk-replace").checked });
+      if (Array.isArray(obj.collections)) { const clean = obj.collections.filter(c => c && typeof c.name === "string" && Array.isArray(c.items)).map(c => ({ name: c.name.slice(0, 80), items: c.items.filter(x => typeof x === "string" && fromOsis(x)).slice(0, 500) })); collSave($("#bk-replace").checked ? clean : [...collLoad(), ...clean.filter(c => !collLoad().some(x => x.name === c.name))]); }
+      $("#bk-msg").textContent = `Restored: ${r.notes} notes, ${r.bookmarks} bookmarks, ${r.highlights} highlights and ${r.trails} saved trails are now on this device.`;
+    } catch (err) { $("#bk-msg").textContent = err.message || "That file could not be read as an Ereunia backup."; }
+    e.target.value = "";
+  });
+}
+
+
+function renderPrivacy() {
+  setNav(""); setTitle("Privacy and your data");
+  view.innerHTML = `<div class="pagehead"><span class="eyebrow">Ereunia</span><h1>Privacy and your data</h1><p class="small" style="max-width:68ch">Last reviewed ${new Date(2026, 9, 26).toLocaleDateString(undefined, { dateStyle: "long" })}.</p></div>
+  <div class="prose card">
+    <h2>What stays on your device</h2>
+    <p>Notes, highlights, bookmarks, collections, research trails, saved assistant answers, reading position and settings are stored in your browser on your device (local storage). They are not sent to Ereunia. They do not follow you to other devices, and clearing this browser's site data deletes them. You can download a backup and restore it from <a href="#/study/trails">My study</a>, and delete everything there at any time.</p>
+    <h2>What is sent when you use a feature</h2>
+    <ul>
+      <li><b>Research assistant and sermon notes.</b> When you ask a question or make sermon notes, your question or transcript, the passage reference and the chosen level are sent to Ereunia's server, which sends them with the cited sources to an AI model (Anthropic Claude, through Netlify's AI Gateway) to write the answer. Do not include personal information you would not want processed this way.</li>
+      <li><b>Sermon recording.</b> Speech is turned into text by your browser's own speech service. Some browsers do this on the device; others send audio to the browser maker. Audio is not sent to Ereunia.</li>
+      <li><b>Everything else.</b> Bible texts, maps, images and fonts are served from ereunia.com. There are no advertising or analytics scripts and no third-party trackers.</li>
+    </ul>
+    <h2>Server records</h2>
+    <p>Ereunia is hosted on Netlify. Like any web server, it processes your IP address to deliver pages and to limit how often the assistant can be used, and the hosting provider may keep standard request logs. A daily count of assistant requests is kept without personal details.</p>
+    <h2>Accounts</h2>
+    <p>Ereunia has no accounts at present. If optional accounts with sync are added, this page will say what is stored and where before any data leaves your device.</p>
+    <h2>Questions and corrections</h2>
+    <p>See <a href="#/credits">Credits and licences</a> for how to report an error.</p>
+  </div>`;
+}
+
 /* ---------- router ---------- */
 async function route() {
   await Promise.all([imagesReady, artReady]);
@@ -2310,7 +2417,7 @@ async function route() {
     else if (head === "learn") { if (rest[1]) await renderLesson(rest[0], rest[1]); else if (rest[0]) renderCourse(rest[0]); else renderLearn(); }
     else if (head === "person") await renderPerson(rest[0]);
     else if (head === "place") await renderPlace(rest[0]);
-    else if (head === "study") await renderStudy();
+    else if (head === "study") await renderStudy(rest[0]);
     else if (head === "library") { await getIndex(); renderLibrary(); }
     else if (head === "credits") { await getIndex(); renderLibrary("credits"); }
     else if (head === "research") await renderResearch(rest);
@@ -2319,6 +2426,7 @@ async function route() {
     else if (head === "kids") await (rest[0] ? renderStory(rest[0]) : renderKids());
     else if (head === "soon") renderSoon(rest[0]);
     else if (head === "books") { await getIndex(); renderBooks(); }
+    else if (head === "privacy") renderPrivacy();
     else if (head === "share") await renderShare(rest[0], rest[1], rest[2]);
     else if (head === "atlas") { await getIndex(); setNav("atlas"); setTitle("Atlas"); await renderAtlas({ view, H, esc, go, DISCOVERIES, JOURNEYS, NAMES, BOOKS, ERAS, unpackRef, readUrl, formatRef, PRECISION, toOsis, fromOsis, labelOf, discImg, discCredit, discMini, yearText, verseText, rangeHref, rangeLabel, project, MAP_SIZE, SECTIONS, parseRef: q => parseReference(q, chapterCount) }, rest); }
     else if (head === "discoveries") { await getIndex(); await renderDiscoveries(rest[0]); }
