@@ -1238,3 +1238,4 @@ details.ev { margin: 6px 0 4px; } details.ev summary { font-size: .82rem; color:
 .evsrc { list-style: none; margin: 6px 0; padding: 0; display: grid; gap: 6px; }
 .evsrc li { background: var(--soft); border-radius: 8px; padding: 8px 10px; } .evsrc li.flash { outline: 2px solid var(--gold); }
 .chip.lex { background: #E3EEF8; color: #1F4569; } .chip.arch { background: #F3E4D8; color: #6A3A12; } .chip.data { background: #E6EFE3; color: #2D5124; }
+ol.trail { max-height: 560px; overflow: auto; padding-right: 4px; }

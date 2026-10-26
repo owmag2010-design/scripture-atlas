@@ -1082,7 +1082,7 @@ async function renderSearch(q) {
     <p class="small">Exact matches come first. <b>Suggestions</b> are partial matches only: check they are what you mean. Nothing here is ranked by guesswork about meaning.</p></div>
     <div id="sres" class="sres"><p class="loading">Searching…</p></div>`;
   const sec = (k, title, kindLabel, items) => items.length ? `<section class="sgroup" data-k="${k}"><h2>${title} <span class="small">${items.length}</span></h2><span class="mtype ${kindLabel === "Suggestion" ? "sugg" : ""}">${kindLabel}</span><div class="sitems">${items.join("")}</div></section>` : "";
-  const [pp, pl] = await Promise.all([H.people().catch(() => []), H.places().catch(() => [])]);
+  const [pp, plc] = await Promise.all([H.people().catch(() => []), H.places().catch(() => [])]);
   WORDS ??= await loadJson("data/research/words.json").catch(() => []);
   const stems = [...new Set(glossStems(q).length ? glossStems(q) : [stem(q)])].filter(Boolean);
   const shards = await Promise.all([...new Set(stems.map(x => x[0]))].map(l => loadJson(`data/research/en/${l}.json`).catch(() => ({}))));
@@ -1092,7 +1092,7 @@ async function renderSearch(q) {
   const wEn = [...enRows.values()].sort((a, b) => b[1] - a[1]).slice(0, 10);
   const nameExact = n => fold(n) === fq, nameWord = n => fold(n).split(/\s+/).includes(fq), namePart = n => fq.length > 2 && fold(n).includes(fq);
   const P1 = pp.filter(r => nameExact(r[1]) || nameWord(r[1])).sort((a, b) => b[5] - a[5]).slice(0, 12), P2 = pp.filter(r => !P1.includes(r) && namePart(r[1])).sort((a, b) => b[5] - a[5]).slice(0, 8);
-  const L1 = pl.filter(r => nameExact(r[1]) || nameWord(r[1])).slice(0, 12), L2 = pl.filter(r => !L1.includes(r) && namePart(r[1])).slice(0, 8);
+  const L1 = plc.filter(r => nameExact(r[1]) || nameWord(r[1])).slice(0, 12), L2 = plc.filter(r => !L1.includes(r) && namePart(r[1])).slice(0, 8);
   const D1 = DISCOVERIES.filter(d => fold(d.name).includes(fq)), D2 = DISCOVERIES.filter(d => !D1.includes(d) && fq.length > 3 && fold(`${d.summary} ${d.description}`).includes(fq)).slice(0, 8);
   const M1 = MANUSCRIPTS.filter(m => fold(`${m.name} ${m.about}`).includes(fq));
   const mine = store.notes().filter(n => fold(n.text).includes(fq) || fold(labelOf(n.osis)).includes(fq));
