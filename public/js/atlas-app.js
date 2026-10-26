@@ -3,6 +3,7 @@
 // Routes: #/atlas, #/atlas/place/<slug>, #/atlas/journey/<id>, #/atlas/period/<id>, #/atlas/book/<OSIS>,
 //         #/atlas/person/<slug>, #/atlas/q/<question>
 import { mountMap } from "./atlas-map.js";
+const pl = (n, one, many) => `${typeof n === "number" ? n.toLocaleString() : n} ${Number(String(n).replace(/[^0-9.-]/g, "")) === 1 ? one : many}`;
 import { resolveQuery, PERSON_JOURNEYS } from "./atlas-query.js";
 
 let A = null; // the mounted atlas (kept across sub-routes so the map does not reload)
@@ -92,7 +93,7 @@ async function mount(ctx) {
       ${p.born.length || p.died.length ? `<h3>People</h3><p>${p.born.length ? `Born here: ${p.born.map(s => `<a href="#/person/${s}">${esc(pm.get(s)?.[1] || s)}</a>`).join(", ")}. ` : ""}${p.died.length ? `Died here: ${p.died.map(s => `<a href="#/person/${s}">${esc(pm.get(s)?.[1] || s)}</a>`).join(", ")}.` : ""}</p>` : ""}
       <h3>In the Bible</h3><p class="small">Named in ${p.verses.length} verse${p.verses.length === 1 ? "" : "s"} across ${books.length} book${books.length === 1 ? "" : "s"}: ${books.slice(0, 12).map(b => esc(NAMES[b])).join(", ")}${books.length > 12 ? "…" : ""}.</p>
       <div class="averses">${p.verses.slice(0, 8).map(n => `<p>${refLink(n)} <span class="tx" data-n="${n}">…</span></p>`).join("")}</div>
-      ${p.verses.length > 8 ? `<a class="small" href="#/place/${slug}">All ${p.verses.length} verses ›</a>` : ""}
+      ${p.verses.length > 8 ? `<a class="small" href="#/place/${slug}">All ${pl(p.verses.length, "verse", "verses")} ›</a>` : ""}
       ${p.dict ? `<details class="adict"><summary>Bible dictionary entry</summary><p>${esc(p.dict.slice(0, 1400))}${p.dict.length > 1400 ? "…" : ""}</p><p class="small">Easton's Bible Dictionary (1897), public domain, via Theographic. A 19th-century source: identifications may have changed since.</p></details>` : ""}`);
     body.querySelectorAll(".averses .tx").forEach(async el => { const r = ctx.unpackRef(+el.dataset.n); el.textContent = await ctx.verseText("kjv", ctx.toOsis(r.book, r.chapter, r.verse)).catch(() => ""); });
   }
@@ -161,7 +162,7 @@ async function mount(ctx) {
     Object.values(vx).forEach(v => (v[1] || []).forEach(s => count.set(s, (count.get(s) || 0) + 1)));
     const slugs = [...count].sort((a, b) => b[1] - a[1]).map(([s]) => s), on = slugs.filter(mapped);
     map.highlight(new Set(on)); map.flyFit(on.slice(0, 60), 900);
-    open(`<span class="eyebrow">Book</span><h1>Places in ${esc(NAMES[b])}</h1><p>${slugs.length} places are named in ${esc(NAMES[b])}; ${on.length} can be mapped. Most-mentioned first.</p>
+    open(`<span class="eyebrow">Book</span><h1>Places in ${esc(NAMES[b])}</h1><p>${pl(slugs.length, "place", "places")} are named in ${esc(NAMES[b])}; ${on.length} can be mapped. Most-mentioned first.</p>
       ${placeList(slugs.filter(mapped), 60)}<div class="actions"><a class="btn" href="#/read/kjv/${osis}.1">Read ${esc(NAMES[b])}</a><a class="btn" href="#/atlas">Clear</a></div>`);
   }
   async function showPerson(slug) {
@@ -214,7 +215,7 @@ async function mount(ctx) {
       map.setPeriod(null); map.route([]); map.highlight(new Set(slugs)); if (slugs.length) map.flyFit(slugs, 900);
       const secs = ctx.SECTIONS.filter(([k]) => data.sections?.[k]?.length);
       open(`<span class="eyebrow">Ask the atlas · AI answer from cited sources</span><h1>${esc(q)}</h1>
-        ${secs.map(([k, l]) => `<h3>${l}</h3><ul class="aai">${data.sections[k].map(x => `<li>${esc(x.text)} ${x.cites.map(c => `<sup title="${esc((data.sources.find(s => s.id === c) || {}).label || "")}">${esc(c)}</sup>`).join("")}</li>`).join("")}</ul>`).join("") || `<p>No answer survived the source check. Try naming a place, person or passage.</p>`}
+        ${secs.map(([k, l]) => `<h3>${l}</h3><ul class="aai">${data.sections[k].map(x => `<li>${x.kind === "inference" ? `<span class="infchip">Editorial inference</span> ` : ""}${esc(x.text)} ${x.cites.map(c => `<sup title="${esc((data.sources.find(s => s.id === c) || {}).label || "")}">${esc(c)}</sup>`).join("")}</li>`).join("")}</ul>`).join("") || `<p>No answer survived the source check. Try naming a place, person or passage.</p>`}
         ${slugs.length ? `<h3>On the map</h3>${placeList(slugs, 20)}` : ""}
         <details><summary>Sources (${(data.sources || []).length})</summary><ol class="small">${(data.sources || []).map(s => `<li><b>${esc(s.id)}</b> ${esc(s.label)}</li>`).join("")}</ol></details>
         <p class="small">Written by AI from the numbered sources only; statements that failed the citation check were removed. Check the passages yourself.</p>`);

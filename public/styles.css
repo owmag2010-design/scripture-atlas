@@ -1230,3 +1230,11 @@ ol.trail a { color: var(--ink); font-weight: 600; text-decoration: none; overflo
 .sitem:hover { border-color: var(--gilt); } .sitem b { font-size: 1.02rem; overflow-wrap: anywhere; } .sitem.big b { font-size: 1.3rem; }
 .sgroup[hidden] { display: none; }
 @media (max-width: 560px) { .sgroup h2 { padding-right: 0; } .sgroup .mtype { position: static; display: inline-block; margin-bottom: 8px; } }
+
+/* ---------- AI evidence inspection ---------- */
+.infchip { display: inline-block; font: 700 .68rem var(--sans); letter-spacing: .04em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; background: #EDE3F7; color: #4B2A7A; vertical-align: 1px; }
+.answer li.inference { border-left: 3px solid #B79BDB; padding-left: 10px; }
+details.ev { margin: 6px 0 4px; } details.ev summary { font-size: .82rem; color: var(--gilt); cursor: pointer; }
+.evsrc { list-style: none; margin: 6px 0; padding: 0; display: grid; gap: 6px; }
+.evsrc li { background: var(--soft); border-radius: 8px; padding: 8px 10px; } .evsrc li.flash { outline: 2px solid var(--gold); }
+.chip.lex { background: #E3EEF8; color: #1F4569; } .chip.arch { background: #F3E4D8; color: #6A3A12; } .chip.data { background: #E6EFE3; color: #2D5124; }

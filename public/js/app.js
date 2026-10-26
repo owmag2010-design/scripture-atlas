@@ -15,10 +15,9 @@ import { CONTEXT } from "./context.js";
 import { DAILY, QUESTIONS, TEXT_NOTES, SOURCES, MANUSCRIPTS, SOON } from "./content.js";
 import { yearText, dateCertainty, PRECISION, inMapBox, project, MAP_SIZE } from "./history.js";
 import { mountMap } from "./atlas-map.js";
-import { renderAtlas } from "./atlas-app.js";
-import { COURSES, PLANNED, STATUS } from "./courses.js";
+let COURSES = [], PLANNED = [], STATUS = {};
+const loadCourses = () => import("./courses.js").then(m => { COURSES = m.COURSES; PLANNED = m.PLANNED; STATUS = m.STATUS; });
 import { SECTIONS } from "./ai-core.js";
-import { drawCard, canvasBlob, SIZES, STYLES } from "./share.js";
 import { go, setPath, currentRoute, setRouter, startNavigation } from "./nav.js";
 import { HISTORY, NOT_HOSTED } from "./translations-info.js";
 import { KID_STORIES } from "./kids.js";
@@ -39,6 +38,7 @@ function pic(slot, { cls = "", sizes = "100vw", eager = false } = {}) {
   return `<img class="${cls}" src="img/${slot}-sm.webp" srcset="img/${slot}-sm.webp 640w, img/${slot}.webp 1600w" sizes="${sizes}" alt="${esc(m.alt || m.title)}" width="${m.w}" height="${m.h}" style="object-position:${m.focus || "50% 50%"}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
 }
 const artHead = slot => (IMAGES[slot] ? `<div class="pagehead art">${pic(slot, { cls: "headart", sizes: "(max-width: 720px) 100vw, 62vw", eager: true })}` : `<div class="pagehead">`);
+const pl = (n, one, many) => `${typeof n === "number" ? n.toLocaleString() : n} ${Number(String(n).replace(/[^0-9.-]/g, "")) === 1 ? one : many}`;
 const credit = slot => { const m = IMAGES[slot]; return m ? `${esc(m.artist)}, ${esc(m.title)}${m.date ? ` (${esc(m.date)})` : ""}` : ""; };
 
 // Gustave Doré's Bible engravings (1866, public domain), one per book and for major people, from art.js when present.
@@ -630,7 +630,7 @@ async function originCard(v, k, words) {
       <dl class="facts">
         ${f ? `<dt>In this verse</dt><dd><b dir="${rtl ? "rtl" : "ltr"}" lang="${lang}">${esc(f[0])}</b> <span class="small">${esc(f[1])}</span>, “${esc(f[2])}”<br><span class="small">${esc(describeMorph(f[5], morph).map(p => p.summary).join(" + "))}</span></dd>` : ""}
         <dt>Dictionary form</dt><dd><span class="lemma" dir="${rtl ? "rtl" : "ltr"}" lang="${lang}">${esc(e.lemma)}</span> <span class="small">${esc(e.translit.replace(/\./g, ""))}</span><br>${esc(e.gloss)}</dd>
-        <dt>Strong's</dt><dd><a href="#/word/${e.key}">${displayStrong(e.key)}</a> · ${rtl ? "Hebrew or Aramaic" : "Greek"} · used ${e.n.toLocaleString()} times</dd>
+        <dt>Strong's</dt><dd><a href="#/word/${e.key}">${displayStrong(e.key)}</a> · ${rtl ? "Hebrew or Aramaic" : "Greek"} · used ${pl(e.n.toLocaleString(), "time", "times")}</dd>
       </dl>
       ${top.length ? `<div class="rend"><h3>How the KJV translates it</h3><p class="small">${rend.n.toLocaleString()} tagged uses, ${top.length < 12 ? top.length : "12 most common"} English renderings:</p>
         <ul>${top.map(([w, n]) => `<li><span class="w">${esc(w)}</span><span class="bar"><i style="width:${Math.max(3, Math.round(n / max * 100))}%"></i></span><span class="n">${n.toLocaleString()}</span></li>`).join("")}</ul></div>` : ""}
@@ -1097,10 +1097,10 @@ async function renderSearch(q) {
   const M1 = MANUSCRIPTS.filter(m => fold(`${m.name} ${m.about}`).includes(fq));
   const mine = store.notes().filter(n => fold(n.text).includes(fq) || fold(labelOf(n.osis)).includes(fq));
   const bookHits = NAMES.map((n, i) => i).filter(i => q.length > 2 && fold(NAMES[i]).includes(fq));
-  const person = r => `<a class="sitem" href="#/person/${r[0]}"><b>${esc(r[1])}</b><span class="small">${esc(r[3] || "Person")}${r[5] ? ` · ${r[5]} verses` : ""}</span></a>`;
+  const person = r => `<a class="sitem" href="#/person/${r[0]}"><b>${esc(r[1])}</b><span class="small">${esc(r[3] || "Person")}${r[5] ? ` · ${pl(r[5], "verse", "verses")}` : ""}</span></a>`;
   const place = r => `<a class="sitem" href="#/place/${r[0]}"><b>${esc(r[1])}</b><span class="small">${esc(r[4] || "Place")} · ${PRECISION[r[5]]?.label || ""}</span></a>`;
-  const word = w => `<a class="sitem" href="#/word/${w[0]}"><b lang="${w[0][0] === "H" ? "hbo" : "grc"}">${esc(w[1])}</b><span class="small">${esc(w[2])} · “${esc(w[3])}” · ${displayStrong(w[0])} · ${Number(w[4]).toLocaleString()} uses</span></a>`;
-  const enw = r => `<a class="sitem" href="#/word/${r[0]}"><b lang="${r[0][0] === "H" ? "hbo" : "grc"}">${esc(r[2])}</b><span class="small">${esc(r[3])} · “${esc(r[4])}” · rendered “${esc(q)}” ${r[1]} times in the KJV</span></a>`;
+  const word = w => `<a class="sitem" href="#/word/${w[0]}"><b lang="${w[0][0] === "H" ? "hbo" : "grc"}">${esc(w[1])}</b><span class="small">${esc(w[2])} · “${esc(w[3])}” · ${displayStrong(w[0])} · ${pl(Number(w[4]).toLocaleString(), "use", "uses")}</span></a>`;
+  const enw = r => `<a class="sitem" href="#/word/${r[0]}"><b lang="${r[0][0] === "H" ? "hbo" : "grc"}">${esc(r[2])}</b><span class="small">${esc(r[3])} · “${esc(r[4])}” · rendered “${esc(q)}” ${pl(r[1], "time", "times")} in the KJV</span></a>`;
   const disc = d => `<a class="sitem" href="#/discoveries/${d.id}"><b>${esc(d.name)}</b><span class="small">${esc(KINDS[d.kind] || "")} · ${esc(DSTATUS[d.status]?.label || "")} · ${esc(d.objectDate?.text || "")}</span></a>`;
   const msx = m => `<a class="sitem" href="#/library"><b>${esc(m.name)}</b><span class="small">${esc(m.date)}</span></a>`;
   const note = n => `<a class="sitem" href="${readUrl("kjv", fromOsis(n.osis).book, fromOsis(n.osis).chapter, fromOsis(n.osis).verse)}"><b>${labelOf(n.osis)}</b><span class="small">Your note: ${esc(n.text.slice(0, 120))}</span></a>`;
@@ -1260,7 +1260,7 @@ async function renderHistory(tab = "map", sub = "") {
     <label class="small"><input type="checkbox" id="appx" checked> Show approximate locations</label>
     <div class="legend"><span><i class="pm located"></i>Identified site</span><span><i class="pm approximate"></i>Approximate</span><span><i class="pm related"></i>Placed by a related site</span></div>
     <div id="pinfo"><p class="small">${places.filter(p => p[2] != null).length.toLocaleString()} places are plotted. Tap one to see what happened there. Drag to move; pinch, scroll or use + and − to zoom.</p></div>
-    <p class="small">${places.filter(p => p[5] === "unknown").length} places have no known location and are not shown. Off this map: ${esc(off.slice(0, 6).join(", "))}${off.length > 6 ? " and others" : ""}.</p></aside></div>`;
+    <p class="small">${pl(places.filter(p => p[5] === "unknown").length, "place", "places")} have no known location and are not shown. Off this map: ${esc(off.slice(0, 6).join(", "))}${off.length > 6 ? " and others" : ""}.</p></aside></div>`;
   const map = mountMap($("#map"), { base, places, onPick: slug => showPlace(slug) });
   async function showPlace(slug) {
     const p = await H.place(slug); if (!p) return;
@@ -1414,7 +1414,7 @@ function renderLearn() {
   <div class="streak card"><div><span class="big">${streak}</span><span class="small">day study streak</span></div><div><span class="big">${days}</span><span class="small">day${days === 1 ? "" : "s"} studied</span></div><div><span class="big">${COURSES.reduce((n, c) => n + store.courseProgress(c.id, c.lessons.map(l => l.id)), 0)}</span><span class="small">lessons completed</span></div></div>
   <div class="coursegrid">${COURSES.map(c => { const done = store.courseProgress(c.id, c.lessons.map(l => l.id)), n = c.lessons.length; const next = c.lessons.find(l => !store.lessonResult(c.id, l.id)) || c.lessons[0];
     return `<article class="card course">${IMAGES[COURSE_ART[c.id]] ? `<span class="cart">${pic(COURSE_ART[c.id], { sizes: "(max-width: 760px) 100vw, 420px" })}</span>` : ""}<div class="actions"><span class="chip ext">${c.level}</span>${statusChip(c)}</div><h2>${c.title}</h2><p class="small">${c.summary}</p>
-      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${done}" aria-label="${done} of ${n} lessons done"><i style="width:${done / n * 100}%"></i></div><span class="small">${done} of ${n} lessons</span>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${done}" aria-label="${done} of ${pl(n, "lesson", "lessons")} done"><i style="width:${done / n * 100}%"></i></div><span class="small">${done} of ${pl(n, "lesson", "lessons")}</span>
       <div class="actions"><a class="btn pri" href="#/learn/${c.id}/${next.id}">${done ? (done === n ? "Review" : "Continue") : "Start"}</a><a class="btn" href="#/learn/${c.id}">All lessons</a></div></article>`; }).join("")}</div>
   <section class="card" style="margin-top:18px"><h2 style="font-size:1.4rem">Planned courses</h2><ul class="planned">${PLANNED.map(([t, d]) => `<li><b>${t}</b> <span class="small">${d}</span></li>`).join("")}</ul></section>`;
   wireFamily(renderLearn);
@@ -1532,7 +1532,7 @@ async function renderGuide(spec) {
     ${repeated.length ? `<p><b>Repeated words</b> (in the KJV): ${repeated.map(([w, n]) => `<span class="chip">${esc(w)} × ${n}</span>`).join(" ")}</p>` : ""}
     ${OBSERVE.map((q, i) => box("o" + i, q)).join("")}</section>
   <section class="gsec"><h2><span class="gn">4</span> Key words in the ${g.book < 39 ? "Hebrew" : "Greek"}</h2>
-    ${keys.length ? `<div class="kwgrid">${keys.map(k => `<a class="kw" href="#/word/${k.strong}"><span class="big" lang="${g.book < 39 ? "hbo" : "grc"}" dir="${g.book < 39 ? "rtl" : "ltr"}">${esc(k.form)}</span><span class="small">${esc(k.translit)}</span><b>“${esc(k.gloss)}”</b><span class="small">${k.inPassage > 1 ? `${k.inPassage} times here · ` : ""}${k.total.toLocaleString()} times in the Bible · ${displayStrong(k.strong)}</span></a>`).join("")}</div><p class="small">Chosen because they repeat in this passage or are rare in the Bible. Tap one for its full entry. Data: STEPBible, CC BY 4.0.</p>` : `<p class="small">No original-language data for this passage.</p>`}</section>
+    ${keys.length ? `<div class="kwgrid">${keys.map(k => `<a class="kw" href="#/word/${k.strong}"><span class="big" lang="${g.book < 39 ? "hbo" : "grc"}" dir="${g.book < 39 ? "rtl" : "ltr"}">${esc(k.form)}</span><span class="small">${esc(k.translit)}</span><b>“${esc(k.gloss)}”</b><span class="small">${k.inPassage > 1 ? `${pl(k.inPassage, "time", "times")} here · ` : ""}${pl(k.total.toLocaleString(), "time", "times")} in the Bible · ${displayStrong(k.strong)}</span></a>`).join("")}</div><p class="small">Chosen because they repeat in this passage or are rare in the Bible. Tap one for its full entry. Data: STEPBible, CC BY 4.0.</p>` : `<p class="small">No original-language data for this passage.</p>`}</section>
   <section class="gsec"><h2><span class="gn">5</span> Connect</h2><p class="small">Passages readers most often link to this one (OpenBible.info).</p>
     ${xrows.length ? `<div class="results">${xrows.map(([ref, txt, r]) => `<a class="hit" href="${readUrl("kjv", r.book, r.chapter, r.verse)}"><span class="meta"><span class="ref">${ref}</span></span><span class="tx">${esc(txt)}</span></a>`).join("")}</div>` : `<p class="small">No cross references recorded.</p>`}
     ${box("c0", "How do these passages shed light on this one?")}</section>
@@ -1603,18 +1603,24 @@ async function renderTranslation(id) {
 
 /* ---------- AI Studio ---------- */
 const AI_EXAMPLES = [["John 3:16", "What does this verse mean, and how do the KJV and WEB differ?"], ["Genesis 15:6", "How do Paul and James use this verse?"], ["", "What does the Bible say about forgiveness?"], ["Ruth 1:16", "Explain this to a beginner, with its background."]];
+const SRC_TYPE = { scripture: ["Scripture", "scripture"], translation: ["Translation", "scripture"], dataset: ["Dataset", "data"], editorial: ["Editorial note", "ext"], archaeology: ["Archaeology", "arch"], lexicon: ["Lexicon", "lex"], reference: ["Reference work", "ext"] };
 function renderAnswer(res) {
   const src = new Map(res.sources.map(s => [s.id, s]));
+  const typeChip = s => { const [l, c] = SRC_TYPE[s?.type] || ["Source", "ext"]; return `<span class="chip ${c}">${l}</span>`; };
   const chip = id => `<button type="button" class="srcchip" data-src="${esc(id)}" title="${esc(src.get(id)?.label || "")}">${esc(id)}</button>`;
-  const secs = SECTIONS.filter(([k]) => res.sections[k]?.length).map(([k, title, desc]) => `<section class="ans ${k}"><h3>${title} <span class="small">${desc}</span></h3><ul>${res.sections[k].map(st => `<li>${esc(st.text)} ${st.cites.map(chip).join(" ")}</li>`).join("")}</ul></section>`).join("");
-  return `<div class="card answer"><div class="actions"><span class="chip draftchip">AI-generated</span><span class="small">Every statement links to the sources it used. ${res.dropped?.length ? `${res.dropped.length} statement${res.dropped.length === 1 ? " was" : "s were"} removed because ${res.dropped.length === 1 ? "it" : "they"} failed the citation check.` : "All statements passed the citation check."}</span></div>
+  const excerpt = id => { const s = src.get(id); if (!s) return ""; const t = s.text.length > 420 ? s.text.slice(0, 420) + "…" : s.text; return `<li>${typeChip(s)} <b>${esc(s.id)}</b> ${esc(s.label)}<p class="small">${esc(t)}</p></li>`; };
+  const stmt = (st, k) => `<li class="${st.kind === "inference" ? "inference" : ""}">${st.kind === "inference" ? `<span class="infchip" title="The assistant's own reading of the cited passages. No source states it.">Editorial inference</span> ` : ""}${esc(st.text)} ${st.cites.map(chip).join(" ")}
+    ${st.cites.length ? `<details class="ev"><summary>Inspect the evidence</summary><ul class="evsrc">${st.cites.map(excerpt).join("")}</ul><p class="small">A citation shows where a statement comes from. It does not by itself prove the statement is right.</p></details>` : ""}</li>`;
+  const secs = SECTIONS.filter(([k]) => res.sections[k]?.length).map(([k, title, desc]) => `<section class="ans ${k}"><h3>${title} <span class="small">${desc}</span></h3><ul>${res.sections[k].map(st => stmt(st, k)).join("")}</ul></section>`).join("");
+  const nInf = Object.values(res.sections).flat().filter(st => st.kind === "inference").length;
+  return `<div class="card answer"><div class="actions"><span class="chip draftchip">AI-generated</span><span class="small">Every statement links to the sources it used. ${res.dropped?.length ? `${res.dropped.length} statement${res.dropped.length === 1 ? " was" : "s were"} removed because ${res.dropped.length === 1 ? "it" : "they"} failed a check (see below).` : "All statements passed the checks."}${nInf ? ` ${nInf} statement${nInf === 1 ? " is" : "s are"} marked as editorial inference: the assistant's reading, not a cited view.` : ""}</span></div>
     ${secs}
-    <details class="srcs" open><summary>Sources (${res.sources.length})</summary><ol>${res.sources.map(s => `<li id="src-${esc(s.id)}"><b>${esc(s.id)}</b> <span class="chip ${s.type === "scripture" || s.type === "translation" ? "scripture" : "ext"}">${s.type === "scripture" ? "Scripture" : s.type === "translation" ? "Translation" : s.type === "dataset" ? "Dataset" : "Editorial"}</span> ${esc(s.label)}<p class="small">${esc(s.text)}</p></li>`).join("")}</ol></details>
+    <details class="srcs"><summary>All sources given to the assistant (${res.sources.length})</summary><ol>${res.sources.map(s => `<li id="src-${esc(s.id)}"><b>${esc(s.id)}</b> ${typeChip(s)} ${esc(s.label)}<p class="small">${esc(s.text)}</p></li>`).join("")}</ol></details>
     ${res.dropped?.length ? `<details><summary>Removed statements (${res.dropped.length})</summary><ul>${res.dropped.map(d => `<li><span class="small">${esc(d.reason)}:</span> ${esc(d.text)}</li>`).join("")}</ul></details>` : ""}
-    <p class="small">An AI summary of the sources above, not an authority. Read the passages yourself; for pastoral questions, talk with someone who knows you.</p></div>`;
+    <p class="small">An AI summary of the sources above, not an authority. The checks catch missing citations, misquotations and unsupported claims about what scholars or traditions hold; they cannot confirm every claim is true. Read the passages yourself; for pastoral questions, talk with someone who knows you.</p></div>`;
 }
 function wireAnswer(el) {
-  el.querySelectorAll(".srcchip").forEach(b => b.addEventListener("click", () => { const t = el.querySelector(`#src-${b.dataset.src}`); t?.scrollIntoView({ block: "center", behavior: "smooth" }); t?.classList.add("flash"); setTimeout(() => t?.classList.remove("flash"), 1200); }));
+  el.querySelectorAll(".srcchip").forEach(b => b.addEventListener("click", () => { const d = b.closest("li")?.querySelector("details.ev"); if (d) { d.open = true; d.querySelectorAll("li").forEach(li => li.classList.toggle("flash", li.textContent.includes(b.dataset.src + " "))); setTimeout(() => d.querySelectorAll(".flash").forEach(x => x.classList.remove("flash")), 1400); } }));
 }
 function renderAI(refArg) {
   setNav("ai"); setTitle("AI Studio");
@@ -1751,7 +1757,7 @@ async function renderVerseGraph(osis) {
     <div class="two">
       <section class="card"><h2 style="font-size:1.4rem">Connected verses</h2><p class="small">The passages readers most often link to ${label}, and the Hebrew or Greek words each one shares with it.</p><div class="results">${xrows.join("") || `<p class="small">No cross references are recorded.</p>`}</div>
         <p class="small">Cross references: OpenBible.info, CC BY. A shared word is a fact about the text; whether the authors meant the link is a matter of interpretation.</p></section>
-      <section class="card"><h2 style="font-size:1.4rem">Key words</h2>${keys.length ? `<div class="plist">${keys.map(k => `<a href="#/word/${k.strong}"><b lang="${greek ? "grc" : "hbo"}">${esc(k.form)}</b><span class="small">${esc(k.translit)} · “${esc(k.gloss)}” · ${k.total.toLocaleString()} uses in the Bible</span></a>`).join("")}</div>` : `<p class="small">No key words found.</p>`}
+      <section class="card"><h2 style="font-size:1.4rem">Key words</h2>${keys.length ? `<div class="plist">${keys.map(k => `<a href="#/word/${k.strong}"><b lang="${greek ? "grc" : "hbo"}">${esc(k.form)}</b><span class="small">${esc(k.translit)} · “${esc(k.gloss)}” · ${pl(k.total.toLocaleString(), "use", "uses")} in the Bible</span></a>`).join("")}</div>` : `<p class="small">No key words found.</p>`}
         ${P.length || L.length ? `<h3>People and places</h3><div class="plist">${P.map(p => `<a href="#/research/person/${p[0]}"><b>${esc(p[1])}</b><span class="small">${esc(p[3] || "Person")}</span></a>`).join("")}${L.map(p => `<a href="#/research/place/${p[0]}"><b>${esc(p[1])}</b><span class="small">${esc(p[4] || "Place")}</span></a>`).join("")}</div>` : ""}
         ${E.length ? `<h3>Events</h3><ul class="evlist">${E.map(e => `<li><span class="yr">${yearText(e.year)}</span> ${certChip(e.year)}<br><a href="#/history/timeline#e${e.id}">${esc(e.title)}</a></li>`).join("")}</ul>` : ""}
         <p class="small">Word tagging: STEPBible TAHOT and TAGNT, CC BY 4.0. People, places and events: Theographic, CC BY-SA 4.0. Key words are nouns, verbs and adjectives, ranked by how rare they are.</p></section>
@@ -1813,7 +1819,7 @@ async function renderTopic(raw) {
     const top = d.map((n, i) => [n, i]).filter(([n]) => n).sort((a, b) => b[0] - a[0]).slice(0, 3);
     return `<article class="card tcard"><div class="wchead"><a class="big" href="#/word/${r[0]}" dir="${heb ? "rtl" : "ltr"}" lang="${heb ? "hbo" : "grc"}">${esc(r[2])}</a><span class="small">${esc(r[3])} · ${displayStrong(r[0])} · ${heb ? "Hebrew or Aramaic" : "Greek"}</span></div>
       <p class="wgloss">“${esc(r[4])}”</p>
-      <p class="small">Glossed with “${esc(q)}” ${r[1].toLocaleString()} time${r[1] === 1 ? "" : "s"} out of ${e.n.toLocaleString()} uses.</p>
+      <p class="small">Glossed with “${esc(q)}” ${r[1].toLocaleString()} time${r[1] === 1 ? "" : "s"} out of ${pl(e.n.toLocaleString(), "use", "uses")}.</p>
       ${distSvg(d)}<div class="distlab small"><span>Genesis</span><span>Matthew</span><span>Revelation</span></div>
       <p class="small">Most used in ${top.map(([n, i]) => `<a href="${readUrl("kjv", i, 1)}">${NAMES[i]}</a> (${n})`).join(", ")}.</p>
       <p class="small"><a href="#/word/${r[0]}">Lexicon entry and every verse ›</a></p></article>`;
@@ -1937,7 +1943,7 @@ async function renderLens(osis, modeArg) {
   const ctx = CONTEXT[r.book];
   const chips = `${P.map(p => `<a class="chip" href="#/person/${p[0]}">${esc(p[1])}</a>`).join(" ")} ${L.map(p => `<a class="chip ext" href="#/place/${p[0]}">${esc(p[1])}</a>`).join(" ")}`;
   const renderingsOf = async k => { const rd = await loadRenderings(baseStrong(k)); return rd ? rd.top.slice(0, 5).map(([w, n]) => `${esc(w)} <span class="n">${n}</span>`).join(", ") : ""; };
-  const keyRows = await Promise.all(keys.map(async k => `<li><a href="#/word/${k.strong}"><b lang="${heb ? "hbo" : "grc"}" dir="${heb ? "rtl" : "ltr"}">${esc(k.form)}</b></a> <span class="small">${esc(k.translit)}</span>, “${esc(k.gloss)}”<span class="small"> · ${k.total.toLocaleString()} uses</span>${mode !== "discover" ? `<div class="small rendline">KJV: ${await renderingsOf(k.strong)}</div>` : ""}</li>`));
+  const keyRows = await Promise.all(keys.map(async k => `<li><a href="#/word/${k.strong}"><b lang="${heb ? "hbo" : "grc"}" dir="${heb ? "rtl" : "ltr"}">${esc(k.form)}</b></a> <span class="small">${esc(k.translit)}</span>, “${esc(k.gloss)}”<span class="small"> · ${pl(k.total.toLocaleString(), "use", "uses")}</span>${mode !== "discover" ? `<div class="small rendline">KJV: ${await renderingsOf(k.strong)}</div>` : ""}</li>`));
   const xrows = await Promise.all(X.map(async ([to, votes]) => { const u = unpackRef(to); return `<li><a href="#/lens/${toOsis(u.book, u.chapter, u.verse)}/${mode}"><b>${formatRef(u.book, u.chapter, u.verse)}</b></a> <span class="small">${esc(await verseText("kjv", toOsis(u.book, u.chapter, u.verse)).catch(() => ""))}</span></li>`; }));
 
   let main = "";
@@ -2284,6 +2290,7 @@ function renderStory(id) {
 
 /* ---------- share cards: branded images of a verse or a discovery ---------- */
 async function renderShare(kind, a, b) {
+  const { drawCard, canvasBlob, SIZES, STYLES } = await import("./share.js");
   setNav(""); setTitle("Share a card");
   await getIndex();
   const day = Math.floor(Date.now() / 864e5);
@@ -2354,7 +2361,7 @@ const STORAGE_NOTE = `<p class="small storenote"><b>Stored in this browser on th
 const SITE = "https://ereunia.com";
 const absUrl = href => SITE + (href.startsWith("/") ? href : "/" + href.replace(/^#?\/?/, ""));
 async function trailMarkdown(t) {
-  const lines = [`# ${t.title}`, "", `Research trail from Ereunia. Started ${new Date(t.started || t.steps[0]?.at || Date.now()).toLocaleString()}. ${t.steps.length} steps.`, ""];
+  const lines = [`# ${t.title}`, "", `Research trail from Ereunia. Started ${new Date(t.started || t.steps[0]?.at || Date.now()).toLocaleString()}. ${pl(t.steps.length, "step", "steps")}.`, ""];
   const kinds = new Set();
   for (const [i, st] of t.steps.entries()) {
     kinds.add(st.kind);
@@ -2402,7 +2409,7 @@ async function renderTrails(openId) {
         ${trailList(cur.slice().reverse())}
         ${cur.length ? `<form id="tsave" class="actions" style="margin-top:12px"><label class="sr" for="tname">Trail name</label><input id="tname" placeholder="Name this trail, e.g. The Word in John 1" maxlength="120"><button class="btn pri">Save trail</button><button class="btn" type="button" id="tclear">Start a new trail</button></form>` : ""}</section>
       <section class="card"><h2 style="font-size:1.35rem">Saved trails</h2>
-        ${saved.length ? `<ul class="savedtrails">${saved.map(t => `<li${t.id === openId ? ' class="open"' : ""}><div class="st-h"><b>${esc(t.title)}</b><span class="small">${t.steps.length} steps · saved ${new Date(t.saved).toLocaleDateString()}</span></div>
+        ${saved.length ? `<ul class="savedtrails">${saved.map(t => `<li${t.id === openId ? ' class="open"' : ""}><div class="st-h"><b>${esc(t.title)}</b><span class="small">${pl(t.steps.length, "step", "steps")} · saved ${new Date(t.saved).toLocaleDateString()}</span></div>
           <div class="actions"><button class="btn" type="button" data-topen="${t.id}">${t.id === openId ? "Hide" : "Show"} steps</button><button class="btn" type="button" data-tmd="${t.id}">Export with citations</button><button class="btn" type="button" data-tteach="${t.id}">Teaching outline</button><button class="linkbtn small" type="button" data-tdel="${t.id}">Delete</button></div>
           ${t.id === openId ? trailList(t.steps) : ""}</li>`).join("")}</ul>` : `<p class="empty">Saved trails appear here.</p>`}</section>
     </div>
@@ -2472,7 +2479,7 @@ async function route() {
     else if (head === "translation") await renderTranslation(rest[0]);
     else if (head === "compare") await renderCompare(rest[0]);
     else if (head === "history") await renderHistory(rest[0] || "map", rest[1]);
-    else if (head === "learn") { if (rest[1]) await renderLesson(rest[0], rest[1]); else if (rest[0]) renderCourse(rest[0]); else renderLearn(); }
+    else if (head === "learn") { await loadCourses(); if (rest[1]) await renderLesson(rest[0], rest[1]); else if (rest[0]) renderCourse(rest[0]); else renderLearn(); }
     else if (head === "person") await renderPerson(rest[0]);
     else if (head === "place") await renderPlace(rest[0]);
     else if (head === "study") await renderStudy(rest[0]);
@@ -2486,7 +2493,7 @@ async function route() {
     else if (head === "books") { await getIndex(); renderBooks(); }
     else if (head === "privacy") renderPrivacy();
     else if (head === "share") await renderShare(rest[0], rest[1], rest[2]);
-    else if (head === "atlas") { await getIndex(); setNav("atlas"); setTitle("Atlas"); await renderAtlas({ view, H, esc, go, DISCOVERIES, JOURNEYS, NAMES, BOOKS, ERAS, unpackRef, readUrl, formatRef, PRECISION, toOsis, fromOsis, labelOf, discImg, discCredit, discMini, yearText, verseText, rangeHref, rangeLabel, project, MAP_SIZE, SECTIONS, parseRef: q => parseReference(q, chapterCount) }, rest); }
+    else if (head === "atlas") { await getIndex(); setNav("atlas"); setTitle("Atlas"); const { renderAtlas } = await import("./atlas-app.js"); await renderAtlas({ view, H, esc, go, DISCOVERIES, JOURNEYS, NAMES, BOOKS, ERAS, unpackRef, readUrl, formatRef, PRECISION, toOsis, fromOsis, labelOf, discImg, discCredit, discMini, yearText, verseText, rangeHref, rangeLabel, project, MAP_SIZE, SECTIONS, parseRef: q => parseReference(q, chapterCount) }, rest); }
     else if (head === "discoveries") { await getIndex(); await renderDiscoveries(rest[0]); }
     else await renderHome();
   } catch (e) {
