@@ -8,6 +8,7 @@ Key facts
 - Tagline: Search the Scriptures
 - Promise: Every word of the Bible, traced to its source.
 - Website: ereunia.com (ereunia.org forwards to it)
+- Contact: info@ereunia.com
 - Bibles: 54 complete Bibles in 38 languages, each public domain or openly licensed
 - Original languages: Hebrew and Greek interlinear, lexicon and grammar for every verse (STEPBible data)
 - Atlas: 1,267 places, 11 journeys, 10 historical periods, 59 archaeological sites
@@ -39,4 +40,5 @@ Files in this kit
 - social/: profile pictures, covers for Facebook, X, LinkedIn and YouTube, and Instagram highlight covers
 
 Website: https://ereunia.com
+Contact: info@ereunia.com
 Press kit: https://ereunia.com/press/ereunia-press-kit.zip
