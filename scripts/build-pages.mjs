@@ -52,7 +52,7 @@ const SECTIONS = [
   ["/credits", "Credits and licences", "Every dataset, image and font used by Ereunia, with its owner and licence."],
   ["/learn", "Courses", "Structured Bible study courses with readings, questions and quizzes."],
   ["/sermon", "Sermon studio", "Record a sermon, catch every Bible reference and turn it into study notes."],
-  ["/kids", "Bible stories for children", "Eight illustrated Bible stories to read and hear, each showing where to find it in the Bible."],
+  ["/kids", "Bible stories for children", "Thirty-six illustrated Bible stories to read and hear, each showing where to find it in the Bible."],
   ["/ai", "Research assistant", "Ask a question and see exactly which sources the answer rests on."],
   ["/search", "Search", "Search passages, original words, people, places, discoveries and manuscripts."],
   ["/share", "Share cards", "Make a branded card of any Bible verse or documented discovery to share."],

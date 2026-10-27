@@ -2318,18 +2318,29 @@ async function renderSermon(openId) {
 // Extra illustrated pages per story (Magnific, AI illustrations): page index -> img/kids/<id>-<page>.webp
 const KID_SCENES = { creation: [2, 3], noah: [2, 4], joseph: [3, 4], moses: [1, 3], david: [1, 2], daniel: [2, 3], jonah: [1, 2], storm: [2, 3] };
 const sceneArt = (id, page) => { const k = (KID_SCENES[id] || []).filter(n => n <= page).pop(); return k == null ? id : `${id}-${k}`; };
-const kidImg = (id, cls = "") => `<img class="${cls}" src="img/kids/${id}-sm.webp" srcset="img/kids/${id}-sm.webp 720w, img/kids/${id}.webp 1600w" sizes="(max-width: 760px) 100vw, 60vw" alt="" decoding="async">`;
+const kidImg = (id, cls = "") => `<img class="${cls}" ${cls ? "" : `loading="lazy"`} src="img/kids/${id}-sm.webp" srcset="img/kids/${id}-sm.webp 720w, img/kids/${id}.webp 1600w" sizes="(max-width: 760px) 100vw, 60vw" alt="" decoding="async">`;
 function renderKids() {
   setNav("kids"); setTitle("Kids");
   document.body.classList.add("kidsmode");
   view.innerHTML = `<section class="kidshero">${kidImg("hero", "kh-art")}
       <div class="kh-copy"><h1>Bible stories, told and drawn for you.</h1><p>Pick a story. Tap the arrows to turn the page, or press <b>Read to me</b> and listen.</p></div></section>
-    <div class="kshelf">${KID_STORIES.map((s, i) => `<a class="book" href="#/kids/${s.id}" style="--c:${s.colour};--tilt:${[-2, 1.5, -1, 2, -1.5, 1, -2, 1.5][i % 8]}deg">
-      <span class="cover">${kidImg(s.id)}</span><span class="spine"><b>${esc(s.title)}</b><span>${esc(s.range)} · ${s.scenes.length} pages</span></span></a>`).join("")}</div>
+    ${[["Stories from the Old Testament", x => x < 39], ["Stories about Jesus and the first Christians", x => x >= 39]].map(([h, f]) => { const list = KID_STORIES.map(st => [st, fromOsis(st.ref)]).filter(([, r]) => r && f(r.book)).sort((a, b) => a[1].book - b[1].book || a[1].chapter - b[1].chapter).map(([st]) => st); return `<h2 class="kshelfh">${h} <span class="small">${list.length} stories</span></h2><div class="kshelf">${list.map((s, i) => `<a class="book" href="#/kids/${s.id}" style="--c:${s.colour};--tilt:${[-2, 1.5, -1, 2, -1.5, 1, -2, 1.5][i % 8]}deg">
+      <span class="cover">${kidImg(s.id)}</span><span class="spine"><b>${esc(s.title)}</b><span>${esc(s.range)} · ${s.scenes.length} pages${KID_NARRATED.has(s.id) ? " · narrated" : ""}</span></span></a>`).join("")}</div>`; }).join("")}
     <p class="small kidsnote">Stories retold for children by Ereunia, keeping close to the Bible text; each page shows where to read it. Pictures made for Ereunia with an AI image tool. <a href="#/learn">Family mode</a> in Courses has more for parents and children together.</p>`;
 }
 
-let storyTimer = null;
+let storyTimer = null, kidAudio = null;
+// Stories with recorded narration in /audio/kids/<id>-<page>.mp3 and word timings in /audio/kids/<id>.json.
+const KID_NARRATED = new Set(["creation"]);
+// The most natural English voice the device offers: neural/online voices first, then known good system voices.
+function bestVoice() {
+  const vs = (window.speechSynthesis?.getVoices() || []).filter(v => /^en(-|_|$)/i.test(v.lang));
+  if (!vs.length) return null;
+  const pick = store.setting("kidsVoice", ""); const chosen = pick && vs.find(v => v.name === pick); if (chosen) return chosen;
+  const score = v => (/natural|neural|online|premium|enhanced/i.test(v.name) ? 40 : 0) + (/Sonia|Libby|Aria|Jenny|Ava|Emma|Natasha|Clara|Serena|Kate|Samantha|Karen|Moira|Martha|Google UK English Female|Google US English/i.test(v.name) ? 20 : 0) + (/en-(GB|AU|IE|NZ)/i.test(v.lang) ? 4 : 0) + (v.localService ? 0 : 3) - (/compact|eSpeak|Fred|Albert|Zarvox|Bad News|Bells|Boing|Bubbles|Cellos|Jester|Organ|Trinoids|Whisper|Wobble/i.test(v.name) ? 60 : 0);
+  return [...vs].sort((a, b) => score(b) - score(a))[0];
+}
+window.speechSynthesis?.addEventListener?.("voiceschanged", () => {});
 function renderStory(id) {
   const s = KID_STORIES.find(x => x.id === id); if (!s) return renderKids();
   setNav("kids"); setTitle(s.title);
@@ -2343,20 +2354,38 @@ function renderStory(id) {
       <button class="turn prev" id="sprev" type="button" aria-label="Previous page">‹</button><button class="turn next" id="snext" type="button" aria-label="Next page">›</button></div>
     <div class="pagecard" id="pagecard" aria-live="polite"></div>
     <div class="storyctl"><div class="dots" id="dots">${s.scenes.map((_, k) => `<button type="button" data-k="${k}" aria-label="Page ${k + 1}"></button>`).join("")}<button type="button" data-k="${N}" aria-label="Quiz" class="qdot">?</button></div>
-      <button class="btn gold" type="button" id="readme">Read to me</button></div>
-    <p class="small kidsnote">${s.note ? `<b>For grown-ups:</b> ${esc(s.note)} ` : ""}Pictures are illustrations made for Ereunia with an AI image tool, not historical images.</p>
+      <button class="btn gold" type="button" id="readme">Read to me</button>${KID_NARRATED.has(s.id) ? "" : `<label class="kvoice"><span class="sr">Reading voice</span><select id="kvoice"><option value="">Best voice on this device</option></select></label>`}</div>
+    <p class="small kidsnote">${s.note ? `<b>For grown-ups:</b> ${esc(s.note)} ` : ""}Pictures are illustrations made for Ereunia with an AI image tool, not historical images. ${KID_NARRATED.has(s.id) ? "The narration is a computer-generated voice, recorded for Ereunia." : "“Read to me” uses a voice built into your device."}</p>
   </div>`;
   const art = $(".st-art"), card = $("#pagecard");
   const synth = window.speechSynthesis;
-  const stop = () => { if (synth) synth.cancel(); speaking = false; const b = $("#readme"); if (b) b.textContent = "Read to me"; };
+  // Recorded narration where it exists (a human-quality voice with word timings); otherwise the best voice this device offers.
+  const narrated = KID_NARRATED.has(s.id); let timings = null, raf = 0;
+  if (narrated) fetch(`/audio/kids/${s.id}.json`).then(r => r.ok ? r.json() : null).then(t => { timings = t; }).catch(() => {});
+  const clearNow = () => card.querySelectorAll(".sw.now").forEach(w => w.classList.remove("now"));
+  const stop = () => { if (synth) synth.cancel(); if (kidAudio) { kidAudio.pause(); kidAudio = null; } cancelAnimationFrame(raf); clearNow(); speaking = false; const b = $("#readme"); if (b) b.textContent = "Read to me"; };
+  const ended = () => { clearNow(); speaking = false; $("#readme").textContent = "Read to me"; if (store.setting("kidsauto", false) && i < N) { clearTimeout(storyTimer); storyTimer = setTimeout(() => go(i + 1, true), 900); } };
   const say = text => {
-    if (!synth) { toast("Reading aloud is not available in this browser"); return; }
-    stop(); const u = new SpeechSynthesisUtterance(text); u.rate = .92; u.pitch = 1.05;
-    const words = [...card.querySelectorAll(".sw")];
-    u.onboundary = e => { if (e.name !== "word") return; let n = 0; words.forEach(w => { const a = +w.dataset.o; w.classList.toggle("now", a <= e.charIndex && e.charIndex < a + w.textContent.length); }); };
-    u.onend = () => { words.forEach(w => w.classList.remove("now")); speaking = false; $("#readme").textContent = "Read to me"; if (store.setting("kidsauto", false) && i < N) { clearTimeout(storyTimer); storyTimer = setTimeout(() => go(i + 1, true), 900); } };
-    speaking = true; $("#readme").textContent = "Stop reading"; synth.speak(u);
+    if (narrated && i < N) {
+      stop(); const a = new Audio(`/audio/kids/${s.id}-${i}.mp3`); kidAudio = a;
+      const words = [...card.querySelectorAll(".sw")], t = timings?.[i];
+      const tick = () => { if (kidAudio !== a) return; if (t) { const now = a.currentTime; let k = -1; for (let n = 0; n < t.length; n++) if (t[n] <= now + .05) k = n; words.forEach((w, n) => w.classList.toggle("now", n === k)); } raf = requestAnimationFrame(tick); };
+      a.onended = () => { cancelAnimationFrame(raf); if (kidAudio === a) kidAudio = null; ended(); };
+      a.onerror = () => { if (kidAudio === a) kidAudio = null; speakSynth(text); };
+      speaking = true; $("#readme").textContent = "Stop reading";
+      a.play().then(() => { raf = requestAnimationFrame(tick); }).catch(() => { if (kidAudio === a) kidAudio = null; speakSynth(text); });
+      return;
+    }
+    speakSynth(text);
   };
+  function speakSynth(text) {
+    if (!synth) { toast("Reading aloud is not available in this browser"); return; }
+    if (synth) synth.cancel(); const u = new SpeechSynthesisUtterance(text); const v = bestVoice(); if (v) { u.voice = v; u.lang = v.lang; } u.rate = .9; u.pitch = 1;
+    const words = [...card.querySelectorAll(".sw")];
+    u.onboundary = e => { if (e.name !== "word") return; words.forEach(w => { const a = +w.dataset.o; w.classList.toggle("now", a <= e.charIndex && e.charIndex < a + w.textContent.length); }); };
+    u.onend = ended;
+    speaking = true; $("#readme").textContent = "Stop reading"; synth.speak(u);
+  }
   const wrapWords = t => { let o = 0; return t.split(/(\s+)/).map(p => { const html = /\s/.test(p) ? p : `<span class="sw" data-o="${o}">${esc(p)}</span>`; o += p.length; return html; }).join(""); };
   function go(k, auto = false) {
     i = Math.max(0, Math.min(N, k)); clearTimeout(storyTimer);
@@ -2394,6 +2423,12 @@ function renderStory(id) {
   $("#sprev").addEventListener("click", () => go(i - 1)); $("#snext").addEventListener("click", () => go(i + 1));
   $("#dots").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) go(+b.dataset.k); });
   $("#readme").addEventListener("click", () => { if (speaking) return stop(); if (i < N) say(s.scenes[i][0]); });
+  const vsel = $("#kvoice");
+  if (vsel) {
+    const fill = () => { const vs = (synth?.getVoices() || []).filter(v => /^en(-|_|$)/i.test(v.lang)); const cur = store.setting("kidsVoice", ""); vsel.innerHTML = `<option value="">Best voice on this device${bestVoice() ? ` (${esc(bestVoice().name.replace(/^Microsoft |^Google /, "").replace(/ Online \(Natural\).*/, ""))})` : ""}</option>` + vs.map(v => `<option value="${esc(v.name)}" ${v.name === cur ? "selected" : ""}>${esc(v.name)}</option>`).join(""); vsel.parentElement.hidden = !vs.length; };
+    fill(); synth?.addEventListener?.("voiceschanged", fill);
+    vsel.addEventListener("change", () => { store.setSetting("kidsVoice", vsel.value); if (i < N) say(s.scenes[i][0]); });
+  }
   const keys = e => { if (!document.contains($("#stage"))) return removeEventListener("keydown", keys); if (e.key === "ArrowRight") go(i + 1); if (e.key === "ArrowLeft") go(i - 1); };
   addEventListener("keydown", keys);
   let sx = null; $("#stage").addEventListener("touchstart", e => (sx = e.touches[0].clientX), { passive: true });
@@ -2608,7 +2643,7 @@ async function route() {
   const [head, ...rest] = h.split("/");
   const changed = document.body.dataset.route !== (head || "home") || lastPath !== location.pathname;
   document.body.dataset.route = head || "home"; lastPath = location.pathname;
-  document.body.classList.remove("focus", "kidsmode"); window.speechSynthesis?.cancel(); document.querySelector(".exitfocus")?.remove();
+  document.body.classList.remove("focus", "kidsmode"); window.speechSynthesis?.cancel(); if (kidAudio) { kidAudio.pause(); kidAudio = null; } document.querySelector(".exitfocus")?.remove();
   try {
     if (head === "read") await renderRead(rest[0], rest[1]);
     else if (head === "search") await renderSearch(rest.join("/"));

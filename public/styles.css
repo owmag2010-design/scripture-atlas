@@ -658,7 +658,7 @@ body.kidsmode main { max-width: 1240px; }
 .pagecard .pt { font: 500 clamp(1.25rem, 2.6vw, 1.7rem)/1.5 "Fredoka", var(--sans); color: #24164a; margin: 0; }
 .pagecard .sw.now { background: #FFD166; border-radius: 6px; box-shadow: 0 0 0 3px #FFD166; }
 .pagecard .pmeta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: 14px; font: 500 .92rem "Fredoka", var(--sans); color: #6b5f8f; }
-.pagecard .pmeta a { color: var(--c); color: color-mix(in srgb, var(--c) 70%, #24164a); font-weight: 600; }
+.pagecard .pmeta a { color: var(--c); color: color-mix(in srgb, var(--c) 45%, #24164a); font-weight: 600; }
 @media (prefers-reduced-motion: no-preference) { .pagecard.flip { animation: flipin .45s cubic-bezier(.2, .9, .3, 1.2); transform-origin: left center; } }
 @keyframes flipin { from { opacity: 0; transform: perspective(900px) rotateY(-22deg) translateX(-12px); } to { opacity: 1; transform: none; } }
 .storyctl { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
@@ -1625,3 +1625,8 @@ button.linkbtn[data-q] { min-height: 24px; padding-block: 2px; }
   .sheetgrid { grid-template-columns: 1.6fr 1fr; } .smargin { display: block; }
   .drawbox, .fstory, .structure { break-inside: avoid; }
 }
+.kshelfh { margin: 28px 0 10px; font-size: 1.35rem; } .kshelfh .small { font-weight: 400; margin-left: 6px; }
+.kvoice select { border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; background: var(--page); max-width: 260px; }
+.storyctl .kvoice { margin-left: auto; }
+/* Kids pages keep their bright light look in dark mode too, so text uses light-mode colours there. */
+body.kidsmode main, body.kidsmode footer.site { --lapis: #2E2820; --lapis-soft: #F1E7D2; --rubric: #B5321C; --gilt: #7A5805; --ink: #24164a; --muted: #5b5175; --page: #FFFFFF; --line: #E3DACB; --soft: #F3EEF9; color: var(--ink); }
