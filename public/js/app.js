@@ -2624,7 +2624,7 @@ function renderPrivacy() {
     </ul>
     <h2>Server records</h2>
     <p>Ereunia is hosted on Netlify. Like any web server, it processes your IP address to deliver pages and to limit how often the assistant can be used, and the hosting provider may keep standard request logs. A daily count of assistant requests is kept without personal details.</p>
-    <h2>Pastor workspace</h2><p>Sermon manuscripts, research snapshots, transcripts and recovery versions are saved in this browser. Audio recordings and imported audio use this browser’s IndexedDB storage. Microphone access requires your permission; these recordings are not uploaded for transcription. Downloaded library backups contain your manuscripts and audio, including private notes, and should be kept safely. Browser storage may be removed by you or the browser; keep external backups. PDF and Word generation runs on your device.</p>
+    <h2>Research companion</h2><p>When you submit a question to the research companion, Ereunia sends that question and the selected passage sources through Netlify AI Gateway to Anthropic. The draft-review action sends manuscript text only when you select it and explicitly choose to include it; private delivery cues are excluded. Suggestions are not inserted until you choose to keep them. Review AI output and its cited sources before use.</p><h2>Pastor workspace</h2><p>Sermon manuscripts, research snapshots, transcripts and recovery versions are saved in this browser. Audio recordings and imported audio use this browser’s IndexedDB storage. Microphone access requires your permission; these recordings are not uploaded for transcription. Downloaded library backups contain your manuscripts and audio, including private notes, and should be kept safely. Browser storage may be removed by you or the browser; keep external backups. PDF and Word generation runs on your device.</p>
     <h2>Accounts</h2>
     <p>Ereunia has no accounts at present. If optional accounts with sync are added, this page will say what is stored and where before any data leaves your device.</p>
     <h2>Questions and corrections</h2>
@@ -2677,9 +2677,10 @@ async function route() {
     }
     else if (head === "soon") renderSoon(rest[0]);
     else if (head === "books") { await getIndex(); renderBooks(); }
+    else if (head === "membership") { const m=await import("./membership.js"); m.renderMembership(prepCtx()); }
     else if (head === "privacy") renderPrivacy();
     else if (head === "about") renderAbout();
-    else if (head === "pastors" || head === "prepare") { await getIndex(); const m = await import("./prepare.js?v=desk2"); const ctx = prepCtx(); if (head === "pastors") await m.renderPastors(ctx, rest[0], rest[1]); else await m.renderPrepare(ctx, rest[0], rest[1]); }
+    else if (head === "pastors" || head === "prepare") { await getIndex(); const m = await import("./prepare.js?v=editions3"); const ctx = prepCtx(); if (head === "pastors") await m.renderPastors(ctx, rest[0], rest[1]); else await m.renderPrepare(ctx, rest[0], rest[1]); }
     else if (head === "share") await renderShare(rest[0], rest[1], rest[2]);
     else if (head === "atlas") { await getIndex(); setNav("atlas"); setTitle("Atlas"); const { renderAtlas } = await import("./atlas-app.js"); await renderAtlas({ view, H, esc, go, DISCOVERIES, JOURNEYS, NAMES, BOOKS, ERAS, unpackRef, readUrl, formatRef, PRECISION, toOsis, fromOsis, labelOf, discImg, discCredit, discMini, yearText, verseText, rangeHref, rangeLabel, project, MAP_SIZE, SECTIONS, parseRef: q => parseReference(q, chapterCount) }, rest); }
     else if (head === "discoveries") { await getIndex(); await renderDiscoveries(rest[0]); }

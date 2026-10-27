@@ -60,7 +60,7 @@ function prepList() {
 }
 
 export async function renderPastors(ctx, section, id) {
-  const { renderStudio } = await import('./pastor-studio.js?v=desk2');
+  const { renderStudio } = await import('./pastor-studio.js?v=editions3');
   return renderStudio(ctx, section, id);
 }
 
@@ -99,7 +99,7 @@ async function workspace(g) {
       <a class="btn" href="${C.readUrl(t, g.book, g.chapter, g.from)}">Open in the Research Desk</a>
       <a class="btn pri" href="/prepare/${g.key}/present">Present</a>
       <details class="pmenu"><summary class="btn">Print</summary><div role="list"><a role="listitem" href="/prepare/${g.key}/handout">Handout with the outline</a><a role="listitem" href="/prepare/${g.key}/group">Small-group guide</a><a role="listitem" href="/prepare/${g.key}/sheet">Passage study sheet</a><a role="listitem" href="/prepare/${g.key}/family">Family take-home sheet</a></div></details>
-      <button class="btn" type="button" id="pdocx">Word document</button><button class="btn pri" type="button" id="sermonfromprep">${linked?'Save research & return to sermon':'Create sermon from outline'}</button></div>
+      <button class="btn" type="button" id="pdocx">Branded Word</button><button class="btn" type="button" id="ppdf">Personal study PDF</button><button class="btn pri" type="button" id="sermonfromprep">${linked?'Save research & return to sermon':'Create sermon from outline'}</button></div>
     <div class="preached" id="preached">${preachedHtml(p)}</div></div>
   <div class="prep">
     <nav class="prepsteps" aria-label="Preparation steps"><ol>${STEPS.map(([k, l, d], i) => `<li><a href="/prepare/${g.key}?step=${k}" data-step="${k}" ${k === step ? 'aria-current="step"' : ""} class="${p.steps[k]?.done ? "done" : ""}"><span class="pn" aria-hidden="true">${p.steps[k]?.done ? "✓" : i + 1}</span><span><b>${l}</b><span class="small">${d}</span></span></a></li>`).join("")}</ol></nav>
@@ -119,6 +119,7 @@ async function workspace(g) {
       C.go(`/pastors/sermon/${p.id}`);
     } catch (e) { C.toast(`Sermon was not saved: ${e.message}`); }
   };
+  document.getElementById('ppdf').onclick=async()=>{const button=document.getElementById('ppdf');button.disabled=true;try{flush();const [{newSermon,fromStudy,uid},{createSermonPdf}]=await Promise.all([import('./pastor-core.js'),import('./pastor-pdf.js')]);const p=fromStudy(newSermon(g.key,g.title),loadPrep(g)),{verses}=await passageVerses(g,translation());p.blocks.unshift({id:uid(),type:'scripture',text:verses.map(v=>v[0]+'. '+v[1]).join('\n'),cite:g.title+' / '+C.META[translation()].name});download(g.key+'-study-dossier.pdf',await createSermonPdf(p,'dossier',{privateNotes:true}),'application/pdf');}catch(e){C.toast(e.message||'The study PDF could not be made.');}finally{button.disabled=false;}};
   wirePreached(g);
   await renderStep(g, step);
 }
