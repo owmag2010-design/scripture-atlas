@@ -67,7 +67,7 @@ for (const [p, t, d] of SECTIONS) page(p, { title: t, description: d, body: `<h1
 
 // Kids learning pages have their own shareable paths and readable fallback content.
 for (const [path, title, description] of [
-  ['stories','The story cove','Eight illustrated Bible retellings with passage links, narration and quizzes.'],
+  ['stories','The story cove','Thirty-six illustrated Bible retellings with passage links, narration and quizzes.'],
   ['words','The word garden',`Explore ${KIDS_WORDS.length} Bible words, people and places, with simple explanations and Scripture references.`],
   ['read','My Bible','Read the World English Bible or King James Version and discover Bible words in context.'],
   ['find','Find a verse','A children’s concordance: follow exact words and phrases through the Bible.'],
