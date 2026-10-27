@@ -28,6 +28,7 @@ import { stem, glossStems, distribution, sharedStrongs, radialLayout, NODE_TYPES
 import { repeatedWords, keyLemmas, mergeCrossRefs, interpretQuestions, guideMarkdown, OBSERVE, APPLY } from "./guide.js";
 import { KINDS, DEPICTS, STATUS as DSTATUS, DATING, parseRange, forVerse as discForVerse, forChapter as discForChapter, forPerson as discForPerson, forPlace as discForPlace, inEra as discInEra, related as discRelated, filterList as discFilter } from "./discoveries.js";
 import { DISCOVERIES } from "./discoveries-data.js";
+import { newPrep, cleanPrep, blockId } from "./prep-core.js";
 import { describeMorph, languageOf, normaliseStrong, shardOf, displayStrong, isGrammaticalStrong, editionNote } from "./lang.js";
 
 // Images load from images.js when present (public domain, credited in the Library).
@@ -297,7 +298,7 @@ function toast(msg) {
 const NAV_GROUP = { home: "", read: "read", books: "read", bibles: "read", compare: "read", translation: "read", guide: "read",
   lens: "research", languages: "research", word: "research", research: "research", ai: "research", search: "research",
   atlas: "explore", history: "explore", timeline: "explore", journeys: "explore", people: "explore", person: "explore", place: "explore", discoveries: "explore",
-  library: "library", credits: "library", study: "study", learn: "learn", sermon: "sermon", kids: "kids", share: "" };
+  library: "library", credits: "library", study: "study", learn: "learn", sermon: "sermon", kids: "kids", share: "", pastors: "pastors" };
 function setNav(key) {
   const g = NAV_GROUP[key] ?? "";
   document.querySelectorAll("nav.main .navgroup").forEach(el => el.querySelector(".navtop").classList.toggle("on", el.dataset.group === g));
@@ -338,7 +339,7 @@ function closeMore() { const s = document.querySelector("#moresheet"); if (s && 
 (function wireTabbar() {
   const btn = document.querySelector("#morebtn"), sheet = document.querySelector("#moresheet"); if (!btn || !sheet) return;
   const groups = [...document.querySelectorAll("nav.main .navgroup")].map(g => `<div class="sheetgroup"><h3>${g.querySelector(".navtop").textContent}</h3>${[...g.querySelectorAll(".navmenu a")].map(a => `<a href="${a.getAttribute("href")}" data-nav="${a.dataset.nav}">${a.querySelector("b").textContent}</a>`).join("")}</div>`).join("");
-  sheet.querySelector(".sheetlinks").innerHTML = `<a class="sheethome" href="/" data-nav="home">Home</a>` + groups + `<div class="sheetgroup"><h3>Learn and teach</h3><a href="/learn" data-nav="learn">Courses</a><a href="/sermon" data-nav="sermon">Sermon studio</a><a href="/kids" data-nav="kids">Kids</a><a href="/share" data-nav="share">Share cards</a></div><div class="sheetgroup"><h3>My study</h3><a href="/study" data-nav="study">Notes, highlights and trails</a></div>`;
+  sheet.querySelector(".sheetlinks").innerHTML = `<a class="sheethome" href="/" data-nav="home">Home</a>` + groups + `<div class="sheetgroup"><h3>Learn and teach</h3><a href="/pastors" data-nav="pastors">Prepare a sermon or lesson</a><a href="/learn" data-nav="learn">Courses</a><a href="/sermon" data-nav="sermon">Sermon studio</a><a href="/kids" data-nav="kids">Kids</a><a href="/share" data-nav="share">Share cards</a></div><div class="sheetgroup"><h3>My study</h3><a href="/study" data-nav="study">Notes, highlights and trails</a></div>`;
   btn.addEventListener("click", () => { const open = sheet.hidden; sheet.hidden = !open; btn.setAttribute("aria-expanded", String(open)); if (open) sheet.querySelector("a")?.focus(); });
   sheet.addEventListener("click", e => { if (e.target === sheet || e.target.closest("a, .sheetclose")) closeMore(); });
   addEventListener("keydown", e => { if (e.key === "Escape") closeMore(); });
@@ -435,7 +436,7 @@ async function renderHome() {
     <h2 id="sth">How Ereunia handles evidence</h2>
     <div><span class="eyebrow">Sources</span><h3>Every layer names where it comes from</h3><p>Bible texts are public domain or openly licensed. Hebrew and Greek come from STEPBible (Tyndale House), cross references from OpenBible.info, people and places from Theographic. Each panel shows its source.</p><a href="#/credits">Credits and licences ›</a></div>
     <div><span class="eyebrow">Editorial standards</span><h3>Scripture first, interpretation labelled</h3><p>The text comes first. Background notes give traditional and academic views side by side. Each discovery says what it establishes, what it doesn't, and where experts disagree.</p><a href="#/discoveries">How evidence is graded ›</a></div>
-    <div><span class="eyebrow">AI, with limits</span><h3>Answers only from cited sources</h3><p>The research assistant answers from the passages and notes it shows you. Statements without a supporting source are removed, and every answer is labelled as AI. It can still be wrong: check it against the text.</p><a href="#/ai">Try the assistant ›</a></div>
+    <div><span class="eyebrow">For pastors and teachers</span><h3>Prepare to teach from the text</h3><p>Eight guided steps take a passage from first reading to an outline, with the Hebrew and Greek, background, classic commentaries and connected Scripture, then a handout, slides and a view to preach from.</p><a href="/pastors">Prepare a sermon or lesson ›</a></div>
   </section>
 
   <nav class="more-row" aria-label="More from Ereunia"><a href="#/books">Books of the Bible</a><a href="#/history/people">People</a><a href="#/learn">Courses</a><a href="#/sermon">Sermon studio</a><a href="#/kids">Kids</a><a href="#/share">Share cards</a></nav>`;
@@ -572,6 +573,7 @@ async function versePane() {
     <div class="actions" aria-label="Verse actions">
       <button class="btn ${bm ? "on" : ""}" id="bmk" type="button" aria-pressed="${bm}">${bm ? "Bookmarked" : "Bookmark"}</button>
       <button class="btn" id="cpy" type="button">Copy</button>
+      <button class="btn" id="toprep" type="button">Add to preparation</button>
       <a class="btn" href="#/share/v/${osis}/${R.t}">Share card</a>
       <span class="small" style="margin-left:4px">Highlight</span>
       ${HL.map(h => `<button type="button" class="swatch sw-${h}" data-hl="${h}" aria-label="Highlight ${h}" aria-pressed="${hl === h}"></button>`).join("")}
@@ -589,7 +591,7 @@ async function versePane() {
       ${inLink("People and places", "Who and where this verse mentions", "people", true)}
     </ul>
     <p class="small">Strong's numbers are an index to words, not full definitions. Use the Hebrew-Greek tab for the words of this verse.</p></div>
-    <div class="actions"><a class="btn pri" href="#/lens/${osis}">Open in Scripture Lens</a><a class="btn" href="#/research/${osis}">Explore connections</a><a class="btn" href="#/ai/${osis}">Ask the research assistant</a><a class="btn" href="#/guide/${BOOKS[R.book].osis}.${c}">Study guide for this chapter</a></div>
+    <div class="actions"><a class="btn pri" href="#/lens/${osis}">Open in Scripture Lens</a><a class="btn" href="#/research/${osis}">Explore connections</a><a class="btn" href="#/ai/${osis}">Ask a question</a><a class="btn" href="#/guide/${BOOKS[R.book].osis}.${c}">Study guide for this chapter</a></div>
     <details><summary>Study questions</summary><ol>${QUESTIONS.map(q => `<li>${q}</li>`).join("")}</ol></details>
   </div>`;
 }
@@ -780,7 +782,7 @@ async function renderChapterText() {
 }
 
 /* ---------- Research Desk: shared passage context, depth modes, manuscripts and inline research assistant ---------- */
-const DESK_TABS = [["verse", "Passage"], ["words", null], ["xref", "Connections"], ["people", "People & places"], ["bg", "History"], ["ms", "Manuscripts"], ["ask", "Ask"]];
+const DESK_TABS = [["verse", "Passage"], ["words", null], ["xref", "Connections"], ["cm", "Commentaries"], ["il", "Illustrations"], ["people", "People & places"], ["bg", "History"], ["ms", "Manuscripts"], ["ask", "Ask"]];
 const DEPTHS = [["discover", "Discover", "Plain meaning and the essentials"], ["study", "Study", "Words, connections and background"], ["scholar", "Scholar", "Grammar, lexicons and textual evidence"], ["teach", "Teach", "Questions and outlines for a group"]];
 const depth = () => { const d = store.setting("depth", "study"); return DEPTHS.some(x => x[0] === d) ? d : "study"; };
 const deskUrl = () => `${readUrl(R.t, R.book, R.chapter, R.verse)}${R.tab && R.tab !== "verse" ? `?panel=${R.tab}${R.word != null ? `&w=${R.word}` : ""}${R.origin != null ? `&o=${R.origin}` : ""}` : ""}`;
@@ -817,6 +819,107 @@ async function msPane() {
     <ul class="mslist">${rows.map(([m, [k, txt]]) => `<li class="ms-${k}"><span class="mschip">${label[k]}</span><div><b>${esc(m.name)}</b> <span class="small">${esc(m.date)}</span><p class="small">${esc(txt)}</p></div></li>`).join("")}</ul>
     <p class="small">Coverage is summarised at book level from published descriptions of each manuscript; "partly preserved" does not mean this verse survives. <a href="#/library">About each manuscript</a></p></div>`;
 }
+/* ---------- commentaries (public-domain classics) ---------- */
+const CM_SHORT = { mhcc: "Henry (concise)", mhc: "Henry (complete)", jfb: "Jamieson–Fausset–Brown", barnes: "Barnes", clarke: "Clarke", kd: "Keil–Delitzsch", tdavid: "Spurgeon" };
+const loadCommIndex = () => loadJson("data/comm/index.json");
+const loadComm = (id, b, c) => loadJson(`data/comm/${id}/${fileId(b)}/${String(c).padStart(3, "0")}.json`);
+async function commentaryChoice(b) {
+  const idx = await loadCommIndex();
+  const avail = idx.commentaries.filter(c => idx.books[c.id]?.includes(b));
+  let id = store.setting("commentary", "mhcc");
+  if (!avail.some(c => c.id === id)) id = avail[0]?.id || null;
+  return { avail, cm: avail.find(c => c.id === id) || null };
+}
+/** The entry covering verse v, or the nearest one before it. */
+function commentFor(data, v) {
+  const e = data?.e || [];
+  const exact = e.find(([a, z]) => a <= v && v <= z);
+  if (exact) return { entry: exact, exact: true };
+  const before = e.filter(([a]) => a <= v).at(-1);
+  return before ? { entry: before, exact: false } : e[0] ? { entry: e[0], exact: false } : null;
+}
+const cmOn = (b, c, [a, z]) => a === z ? formatRef(b, c, a) : formatRef(b, c, a, z);
+const plainText = html => { const d = document.createElement("div"); d.innerHTML = html; d.querySelectorAll("h4").forEach(h => h.append(". ")); return d.textContent.replace(/\s+/g, " ").trim(); };
+async function commentaryPane() {
+  const { avail, cm } = await commentaryChoice(R.book);
+  if (!cm) return `<div class="pane"><p class="small">No commentary covers ${NAMES[R.book]} yet.</p></div>`;
+  const v = R.verse || 1, idx = await loadCommIndex();
+  const [data, bookIntro] = await Promise.all([loadComm(cm.id, R.book, R.chapter).catch(() => null), R.chapter === 1 && idx.intros?.[cm.id]?.includes(R.book) ? loadComm(cm.id, R.book, 0).catch(() => null) : null]);
+  const hit = commentFor(data, v);
+  const long = hit && hit.entry[2].length > 2400;
+  return `<div class="pane cmpane"><div><span class="chip interp">Commentary · interpretation</span><div class="vref" style="margin-top:6px">${formatRef(R.book, R.chapter, R.verse)}</div></div>
+    <div class="cmpick" role="group" aria-label="Choose a commentary">${avail.map(c => `<button type="button" data-cm="${c.id}" aria-pressed="${c.id === cm.id}">${esc(CM_SHORT[c.id] || c.author)}</button>`).join("")}</div>
+    <p class="cmmeta"><b>${esc(cm.name)}</b><br><span class="small">${esc(cm.author)}, ${esc(cm.date)}. ${esc(cm.tradition)}.</span></p>
+    ${bookIntro?.intro ? `<details class="cmintro"><summary>Introduction to ${NAMES[R.book]}</summary><div class="cmtext">${bookIntro.intro}</div></details>` : ""}
+    ${data?.intro ? `<details class="cmintro"><summary>Introduction to ${formatRef(R.book, R.chapter)}</summary><div class="cmtext">${data.intro}</div></details>` : ""}
+    ${hit ? `<section class="cmentry"><h3 class="cmon">${hit.exact ? "On" : "Nearest comment: on"} ${cmOn(R.book, R.chapter, hit.entry)}</h3>
+      <div class="cmtext ${long ? "clamp" : ""}" id="cmtext">${hit.entry[2]}</div>
+      <div class="actions">${long ? `<button class="btn" type="button" id="cmmore" aria-expanded="false" aria-controls="cmtext">Show all</button>` : ""}<button class="btn" type="button" id="cmadd" title="Adds the words you select, or the opening of this comment">Add to preparation</button></div></section>`
+      : `<p class="small">${esc(cm.author)} has no comment on ${formatRef(R.book, R.chapter)}.</p>`}
+    <p class="small">A ${esc(cm.date)} reading from the ${esc(cm.tradition)} tradition: interpretation, not Scripture. The text above is the authority. Public domain; text from the CrossWire Bible Society. <a href="#/credits">Credits</a></p></div>`;
+}
+function wireCommentaryPane() {
+  const pane = $("#pane");
+  pane.querySelectorAll("[data-cm]").forEach(b => b.addEventListener("click", () => { store.setSetting("commentary", b.dataset.cm); renderMargin(); }));
+  $("#cmmore")?.addEventListener("click", e => { const t = $("#cmtext"), open = t.classList.toggle("clamp") === false; e.currentTarget.textContent = open ? "Show less" : "Show all"; e.currentTarget.setAttribute("aria-expanded", open); });
+  $("#cmadd")?.addEventListener("click", async () => {
+    const { cm } = await commentaryChoice(R.book); const data = await loadComm(cm.id, R.book, R.chapter).catch(() => null); const hit = commentFor(data, R.verse || 1); if (!hit) return;
+    const sel = String(getSelection?.() || "").trim(), inPane = sel && $("#cmtext")?.contains(getSelection().anchorNode);
+    let text = inPane ? sel : plainText(hit.entry[2]); if (!inPane && text.length > 700) text = text.slice(0, 700).replace(/\s\S*$/, "") + " …";
+    addToPrep({ kind: "commentary", text, cite: `${cm.author}, ${cm.name} (${cm.date}), on ${cmOn(R.book, R.chapter, hit.entry)}`, href: deskUrl().replace(/^#/, "") });
+  });
+}
+
+/* ---------- sourced illustrations: true, checkable material from Ereunia's own records ---------- */
+async function illustrationsFor(b, c, from, to) {
+  const items = [];
+  const seen = new Set();
+  const vs = from ? Array.from({ length: (to || from) - from + 1 }, (_, i) => from + i) : null;
+  const disc = vs ? [...new Set(vs.flatMap(v => discForVerse(DISCOVERIES, b, c, v, bIdx)))] : discForChapter(DISCOVERIES, b, c, bIdx);
+  const chapterDisc = vs ? discForChapter(DISCOVERIES, b, c, bIdx).filter(d => !disc.includes(d)) : [];
+  for (const d of [...disc, ...chapterDisc]) {
+    if (seen.has(d.id)) continue; seen.add(d.id);
+    items.push({ kind: "discovery", title: d.name, badge: DSTATUS[d.status]?.label || "", status: d.status, text: `${d.summary} What it shows: ${d.establishes}`, limits: d.limits, cite: `Ereunia, Discoveries: ${d.name} (${DSTATUS[d.status]?.label || ""}), with its museum and study sources`, href: `/discoveries/${d.id}` });
+  }
+  const [vx, em, lm] = await Promise.all([H.vx(b), H.eventMap(), H.placeMap()]).catch(() => [{}, new Map(), new Map()]);
+  const evs = new Set(), pls = new Set();
+  for (const [k, r] of Object.entries(vx || {})) { const ch = Math.floor(k / 1e3) % 1e3, v = k % 1e3; if (ch === c && (!vs || vs.includes(v))) { r[2].forEach(x => evs.add(x)); r[1].forEach(x => pls.add(x)); } }
+  for (const e of [...evs].map(i => em.get(i)).filter(Boolean).sort((x, y) => x.year - y.year).slice(0, 4))
+    items.push({ kind: "context", title: e.title, badge: `${yearText(e.year)}, ${dateCertainty(e.year).label.toLowerCase()}`, text: `${e.title}: ${yearText(e.year)} (${dateCertainty(e.year).label.toLowerCase()}).`, cite: "Theographic Bible Metadata (CC BY-SA 4.0); dates follow a traditional chronology", href: `/history/timeline#e${e.id}` });
+  for (const r of [...pls].map(x => lm.get(x)).filter(Boolean).filter(r => discForPlace(DISCOVERIES, r[0]).length).slice(0, 3))
+    items.push({ kind: "context", title: r[1], badge: "Place with archaeology", text: `${r[1]}: a place in the passage with documented archaeology. See the place page for its finds and how sure its location is.`, cite: "Ereunia atlas; places from Theographic and OpenBible.info", href: `/place/${r[0]}` });
+  for (const [m, x] of MANUSCRIPTS.map(m => [m, MS_COVER[m.name]?.(b, c, from)]).filter(([m, x]) => x && x[0] !== "no" && /P52|P46|Dead Sea|Leningrad|Sinaiticus/.test(m.name)).slice(0, 2))
+    items.push({ kind: "context", title: m.name, badge: "Manuscript", text: `${m.name} (${m.date}): ${x[1]}`, cite: "Ereunia Library: published descriptions of the manuscript", href: "/library" });
+  return items;
+}
+const ilList = (items, add) => items.map((it, i) => `<li class="ilitem"><div><b>${it.href ? `<a href="${esc(it.href)}">${esc(it.title)}</a>` : esc(it.title)}</b> ${it.status ? `<span class="dstat s-${esc(it.status)}">${esc(it.badge)}</span>` : `<span class="small">${esc(it.badge)}</span>`}</div><p>${esc(it.text)}</p>${it.limits ? `<p class="small"><b>What it does not show:</b> ${esc(it.limits)}</p>` : ""}${add(it, i)}</li>`).join("");
+async function illustrationsPane() {
+  const items = await illustrationsFor(R.book, R.chapter, R.verse, R.verse);
+  const scope = R.verse ? formatRef(R.book, R.chapter, R.verse) : formatRef(R.book, R.chapter);
+  return `<div class="pane"><div><span class="chip">Sourced illustrations</span><div class="vref" style="margin-top:6px">${scope}</div></div>
+    <p class="small">True, checkable material from Ereunia's records that could illustrate this passage. Each says where it comes from; open its page before you use it.</p>
+    ${items.length ? `<ul class="illist">${ilList(items, (it, i) => `<div class="actions"><button type="button" class="btn" data-il="${i}">Add to preparation</button></div>`)}</ul>` : `<p class="empty">No discoveries, dated events or manuscripts are linked to ${scope}. Try the whole chapter: choose another verse or the History tab.</p>`}</div>`;
+}
+function wireIllustrationsPane() {
+  $("#pane").querySelectorAll("[data-il]").forEach(b => b.addEventListener("click", async () => {
+    const it = (await illustrationsFor(R.book, R.chapter, R.verse, R.verse))[+b.dataset.il]; if (!it) return;
+    addToPrep({ kind: it.kind, text: it.text, cite: it.cite, href: it.href }); b.textContent = "Added"; b.disabled = true;
+  }));
+}
+
+/* ---------- adding material to the active preparation ---------- */
+function prepTitle(key) { const g = parseGuideSpec(key); return g ? formatRef(g.book, g.chapter, g.from, g.to) : key; }
+function addToPrep(block) {
+  let key = store.setting("activePrep", null);
+  const g = key && parseGuideSpec(key);
+  if (!g || g.book !== R.book) key = guideSpec(R.book, R.chapter);
+  const p = cleanPrep(store.prep(key), key, prepTitle(key));
+  p.inbox.push({ ...block, id: blockId() });
+  store.savePrep(p); store.setSetting("activePrep", key);
+  toast(`Added to your preparation of ${prepTitle(key)}`);
+  store.trailAdd({ kind: "note", label: `Added to preparation: ${prepTitle(key)}`, href: `/prepare/${key}?step=outline` });
+}
+
 function askPane() {
   const ref = R.verse ? formatRef(R.book, R.chapter, R.verse) : formatRef(R.book, R.chapter);
   const lvl = { discover: "beginner", study: "intermediate", scholar: "academic", teach: "intermediate" }[depth()];
@@ -876,7 +979,7 @@ async function renderMargin() {
   const pane = $("#pane");
   pane.innerHTML = '<p class="small" style="padding:16px 18px">Loading…</p>';
   try {
-    pane.innerHTML = R.tab === "bg" ? await historyPane() : R.tab === "words" ? await wordsPane() : R.tab === "xref" ? await xrefPane() : R.tab === "people" ? await peoplePane() : R.tab === "ms" ? await msPane() : R.tab === "ask" ? askPane() : await versePane();
+    pane.innerHTML = R.tab === "bg" ? await historyPane() : R.tab === "words" ? await wordsPane() : R.tab === "xref" ? await xrefPane() : R.tab === "people" ? await peoplePane() : R.tab === "ms" ? await msPane() : R.tab === "cm" ? await commentaryPane() : R.tab === "il" ? await illustrationsPane() : R.tab === "ask" ? askPane() : await versePane();
     // Discoveries linked to the selected verse (Verse tab) or to this chapter (Book tab).
     const dl = R.tab === "verse" && R.verse ? discForVerse(DISCOVERIES, R.book, R.chapter, R.verse, bIdx) : R.tab === "bg" ? discForChapter(DISCOVERIES, R.book, R.chapter, bIdx) : [];
     if (dl.length) pane.querySelector(".pane")?.insertAdjacentHTML("beforeend", discMini(dl, R.tab === "bg" ? `Discoveries linked to ${formatRef(R.book, R.chapter)}` : "Archaeology and discoveries"));
@@ -884,6 +987,8 @@ async function renderMargin() {
   pane.querySelectorAll("[data-gotab]").forEach(a => a.addEventListener("click", e => { e.preventDefault(); R.tab = a.dataset.gotab; renderMargin(); }));
   if (R.tab === "verse" && R.verse) wireVersePane();
   if (R.tab === "ask") wireAskPane();
+  if (R.tab === "cm") wireCommentaryPane();
+  if (R.tab === "il") wireIllustrationsPane();
   m.dataset.depth = depth();
   if (store.setting("depth", "study") === "scholar") pane.querySelectorAll("details").forEach(d => (d.open = true));
   if (location.pathname.startsWith("/read/")) { setPath(deskUrl()); rememberDesk(); }
@@ -906,6 +1011,7 @@ function wireVersePane() {
     refresh(); toast(on ? "Bookmarked" : "Bookmark removed");
   });
   $("#cpy").addEventListener("click", async () => copyText(`${await verseText(R.t, osis)} (${labelOf(osis)}, ${TR[R.t]})`));
+  $("#toprep").addEventListener("click", async () => addToPrep({ kind: "verse", text: await verseText(R.t, osis), cite: `${labelOf(osis)} (${TR[R.t]})`, href: readUrl(R.t, R.book, R.chapter, R.verse).replace(/^#/, "") }));
   document.querySelectorAll("[data-hl]").forEach(b => b.addEventListener("click", () => {
     store.setHighlight(osis, b.dataset.hl || null);
     document.querySelectorAll("[data-hl]").forEach(x => x.setAttribute("aria-pressed", x.dataset.hl === (b.dataset.hl || "-")));
@@ -1152,16 +1258,17 @@ async function renderSearch(q) {
 
 /* ---------- my study ---------- */
 async function renderStudy(tab = "trails") {
-  if (!["trails", "notes", "bookmarks", "highlights", "collections", "history"].includes(tab)) tab = "trails";
+  if (!["trails", "preps", "notes", "bookmarks", "highlights", "collections", "history"].includes(tab)) tab = "trails";
   setNav("study"); setTitle("My study");
   if (tab === "trails") return renderTrails();
+  if (tab === "preps") { go("/prepare", { replace: true }); return; }
   await getIndex();
   const lists = { trails: store.trails(), notes: store.notes(), bookmarks: store.bookmarks(), highlights: store.highlights(), history: store.history(), collections: collLoad() };
   const sorted = tab === "history" || tab === "collections" ? lists[tab] : lists[tab].slice().sort((a, b) => orderOf(a.osis) - orderOf(b.osis));
   view.innerHTML = `${artHead("aleppo")}<span class="eyebrow">My study</span><h1>Your notes and saved verses</h1>
     ${STORAGE_NOTE}
     <div class="actions"><span class="chip">Study streak: ${store.streak()} day${store.streak() === 1 ? "" : "s"}</span><span class="chip ext">${store.studyDays()} days studied</span><a class="small" href="#/learn">Courses</a></div></div>
-    <div class="tabsrow">${[["trails", "Research trails"], ["notes", "Notes"], ["bookmarks", "Bookmarks"], ["highlights", "Highlights"], ["collections", "Collections"], ["history", "Reading history"]].map(([k, l]) => `<button type="button" class="btn ${k === tab ? "on" : ""}" data-st="${k}">${l} (${lists[k].length})</button>`).join("")}
+    <div class="tabsrow">${[["trails", "Research trails"], ["notes", "Notes"], ["bookmarks", "Bookmarks"], ["highlights", "Highlights"], ["collections", "Collections"], ["history", "Reading history"]].map(([k, l]) => `<button type="button" class="btn ${k === tab ? "on" : ""}" data-st="${k}">${l} (${lists[k].length})</button>`).join("")}<a class="btn" href="/prepare">Sermon preparations (${store.preps().length})</a>
       <span style="flex:1"></span><button class="btn" type="button" id="exp">Download as Markdown</button><button class="btn" type="button" id="cpyall">Copy all</button></div>
     <div class="card"><div class="results" id="slist"><p class="loading">Loading…</p></div></div>
     <p style="margin-top:20px"><button class="btn" type="button" id="clear">Delete all study data on this device</button></p><div id="confirm"></div>`;
@@ -1528,7 +1635,7 @@ async function renderGuide(spec) {
   <div class="pagehead"><span class="eyebrow"><a href="#/learn">Learn</a> · Study guide</span><h1>${title}</h1>
     <div class="actions noprint"><label class="sr" for="gtr">Translation</label><select id="gtr" class="trsel">${translationOptions(t)}</select>
       <form id="gp" class="minisearch"><label class="sr" for="gpq">Another passage</label><input id="gpq" placeholder="Another passage, e.g. Romans 8:28-39"><button class="btn">Build</button></form></div>
-    <div class="actions noprint"><button class="btn pri" type="button" id="gdl">Download as Markdown</button><button class="btn" type="button" id="gpr">Print</button><a class="btn" href="#/ai/${toOsis(g.book, g.chapter, from)}">Ask the research assistant</a><a class="btn" href="${readUrl(t, g.book, g.chapter, g.from)}">Open in the reader</a><span class="small" id="gsv">Your answers save on this device as you type.</span></div></div>
+    <div class="actions noprint"><button class="btn pri" type="button" id="gdl">Download as Markdown</button><button class="btn" type="button" id="gpr">Print</button><a class="btn" href="/prepare/${key}">Prepare a sermon on it</a><a class="btn" href="#/ai/${toOsis(g.book, g.chapter, from)}">Ask a question</a><a class="btn" href="${readUrl(t, g.book, g.chapter, g.from)}">Open in the reader</a><span class="small" id="gsv">Your answers save on this device as you type.</span></div></div>
   <section class="gsec"><h2><span class="gn">1</span> Read</h2><p class="small">Read the passage slowly, twice if you can. ${esc(META[t].name)}.</p>
     <div class="text lines gtext" dir="${rtl ? "rtl" : "ltr"}" lang="${langOf(t)}">${verses.map(([n, v]) => `<span class="v"><sup class="vn">${n}</sup>${esc(v).replace(/\n/g, "<br>")}</span>`).join("")}</div></section>
   <section class="gsec"><h2><span class="gn">2</span> Background</h2>
@@ -1631,10 +1738,10 @@ function wireAnswer(el) {
   el.querySelectorAll(".srcchip").forEach(b => b.addEventListener("click", () => { const d = b.closest("li")?.querySelector("details.ev"); if (d) { d.open = true; d.querySelectorAll("li").forEach(li => li.classList.toggle("flash", li.textContent.includes(b.dataset.src + " "))); setTimeout(() => d.querySelectorAll(".flash").forEach(x => x.classList.remove("flash")), 1400); } }));
 }
 function renderAI(refArg) {
-  setNav("ai"); setTitle("AI Studio");
+  setNav("ai"); setTitle("Ask a question");
   const ref = refArg ? (fromOsis(refArg) ? labelOf(refArg) : refArg) : "";
   const past = store.answers();
-  view.innerHTML = `${artHead("era-exile")}<span class="eyebrow">AI Studio · research assistant</span><h1>Ask a question. See exactly what the answer rests on.</h1>
+  view.innerHTML = `${artHead("era-exile")}<span class="eyebrow">Research · Ask a question</span><h1>Ask a question. See exactly what the answer rests on.</h1>
     <p class="small" style="max-width:72ch">The assistant answers only from the Bible text, the second translation, cross references, tagged people and events, and the book background, all numbered as sources. Answers come in five parts: Scripture, Translation, Historical evidence, Interpretation and Uncertainty. Statements that cite nothing, or quote words not found in their sources, are removed before you see them.</p></div>
   <div class="two">
     <form class="card askform" id="ask"><label for="aq"><b>Your question</b></label>
@@ -1836,7 +1943,7 @@ async function renderTopic(raw) {
       <div class="grid3">${rows.map(card).join("")}</div>` : `<p class="empty">No Hebrew or Greek word is glossed with “${esc(q)}”. Try a single word, or a related word (for example “mercy” for “merciful”).</p>`}
     <div class="two" style="margin-top:16px">
       <section class="card"><h2 style="font-size:1.4rem">Verses</h2><p class="small">Search the text of any translation for “${esc(q)}”.</p><a class="btn pri" href="#/search/${encodeURIComponent(q)}">Search the Bible for “${esc(q)}”</a>
-        <p class="small">Ask the AI assistant to trace the theme, with every claim cited: <a href="#/ai">AI Studio</a>.</p></section>
+        <p class="small">You can also <a href="#/ai">ask a question</a> about the theme; answers cite their sources.</p></section>
       <section class="card"><h2 style="font-size:1.4rem">People, places and events</h2>${P.length || L.length || E.length ? `<div class="plist">${P.map(p => `<a href="#/research/person/${p[0]}"><b>${esc(p[1])}</b><span class="small">${esc(p[3] || "Person")}</span></a>`).join("")}${L.map(p => `<a href="#/research/place/${p[0]}"><b>${esc(p[1])}</b><span class="small">${esc(p[4] || "Place")}</span></a>`).join("")}</div>${E.length ? `<ul class="evlist">${E.map(e => `<li><span class="yr">${yearText(e.year)}</span> <a href="#/history/timeline#e${e.id}">${esc(e.title)}</a></li>`).join("")}</ul>` : ""}` : `<p class="small">No person, place or event is named “${esc(q)}”.</p>`}</section>
     </div>
     <p class="small" style="margin-top:12px">Sources: STEPBible TAHOT, TAGNT, TBESH and TBESG (CC BY 4.0); Theographic Bible Metadata (CC BY-SA 4.0).</p>`;
@@ -2211,18 +2318,29 @@ async function renderSermon(openId) {
 // Extra illustrated pages per story (Magnific, AI illustrations): page index -> img/kids/<id>-<page>.webp
 const KID_SCENES = { creation: [2, 3], noah: [2, 4], joseph: [3, 4], moses: [1, 3], david: [1, 2], daniel: [2, 3], jonah: [1, 2], storm: [2, 3] };
 const sceneArt = (id, page) => { const k = (KID_SCENES[id] || []).filter(n => n <= page).pop(); return k == null ? id : `${id}-${k}`; };
-const kidImg = (id, cls = "") => `<img class="${cls}" src="img/kids/${id}-sm.webp" srcset="img/kids/${id}-sm.webp 720w, img/kids/${id}.webp 1600w" sizes="(max-width: 760px) 100vw, 60vw" alt="" decoding="async">`;
+const kidImg = (id, cls = "") => `<img class="${cls}" ${cls ? "" : `loading="lazy"`} src="img/kids/${id}-sm.webp" srcset="img/kids/${id}-sm.webp 720w, img/kids/${id}.webp 1600w" sizes="(max-width: 760px) 100vw, 60vw" alt="" decoding="async">`;
 function renderKids() {
   setNav("kids"); setTitle("Kids");
   document.body.classList.add("kidsmode");
   view.innerHTML = `<section class="kidshero">${kidImg("hero", "kh-art")}
       <div class="kh-copy"><h1>Bible stories, told and drawn for you.</h1><p>Pick a story. Tap the arrows to turn the page, or press <b>Read to me</b> and listen.</p></div></section>
-    <div class="kshelf">${KID_STORIES.map((s, i) => `<a class="book" href="#/kids/${s.id}" style="--c:${s.colour};--tilt:${[-2, 1.5, -1, 2, -1.5, 1, -2, 1.5][i % 8]}deg">
-      <span class="cover">${kidImg(s.id)}</span><span class="spine"><b>${esc(s.title)}</b><span>${esc(s.range)} · ${s.scenes.length} pages</span></span></a>`).join("")}</div>
+    ${[["Stories from the Old Testament", x => x < 39], ["Stories about Jesus and the first Christians", x => x >= 39]].map(([h, f]) => { const list = KID_STORIES.map(st => [st, fromOsis(st.ref)]).filter(([, r]) => r && f(r.book)).sort((a, b) => a[1].book - b[1].book || a[1].chapter - b[1].chapter).map(([st]) => st); return `<h2 class="kshelfh">${h} <span class="small">${list.length} stories</span></h2><div class="kshelf">${list.map((s, i) => `<a class="book" href="#/kids/${s.id}" style="--c:${s.colour};--tilt:${[-2, 1.5, -1, 2, -1.5, 1, -2, 1.5][i % 8]}deg">
+      <span class="cover">${kidImg(s.id)}</span><span class="spine"><b>${esc(s.title)}</b><span>${esc(s.range)} · ${s.scenes.length} pages${KID_NARRATED.has(s.id) ? " · narrated" : ""}</span></span></a>`).join("")}</div>`; }).join("")}
     <p class="small kidsnote">Stories retold for children by Ereunia, keeping close to the Bible text; each page shows where to read it. Pictures made for Ereunia with an AI image tool. <a href="#/learn">Family mode</a> in Courses has more for parents and children together.</p>`;
 }
 
-let storyTimer = null;
+let storyTimer = null, kidAudio = null;
+// Stories with recorded narration in /audio/kids/<id>-<page>.mp3 and word timings in /audio/kids/<id>.json.
+const KID_NARRATED = new Set(["creation"]);
+// The most natural English voice the device offers: neural/online voices first, then known good system voices.
+function bestVoice() {
+  const vs = (window.speechSynthesis?.getVoices() || []).filter(v => /^en(-|_|$)/i.test(v.lang));
+  if (!vs.length) return null;
+  const pick = store.setting("kidsVoice", ""); const chosen = pick && vs.find(v => v.name === pick); if (chosen) return chosen;
+  const score = v => (/natural|neural|online|premium|enhanced/i.test(v.name) ? 40 : 0) + (/Sonia|Libby|Aria|Jenny|Ava|Emma|Natasha|Clara|Serena|Kate|Samantha|Karen|Moira|Martha|Google UK English Female|Google US English/i.test(v.name) ? 20 : 0) + (/en-(GB|AU|IE|NZ)/i.test(v.lang) ? 4 : 0) + (v.localService ? 0 : 3) - (/compact|eSpeak|Fred|Albert|Zarvox|Bad News|Bells|Boing|Bubbles|Cellos|Jester|Organ|Trinoids|Whisper|Wobble/i.test(v.name) ? 60 : 0);
+  return [...vs].sort((a, b) => score(b) - score(a))[0];
+}
+window.speechSynthesis?.addEventListener?.("voiceschanged", () => {});
 function renderStory(id) {
   const s = KID_STORIES.find(x => x.id === id); if (!s) return renderKids();
   setNav("kids"); setTitle(s.title);
@@ -2236,21 +2354,39 @@ function renderStory(id) {
       <button class="turn prev" id="sprev" type="button" aria-label="Previous page">‹</button><button class="turn next" id="snext" type="button" aria-label="Next page">›</button></div>
     <div class="pagecard" id="pagecard" aria-live="polite"></div>
     <div class="storyctl"><div class="dots" id="dots">${s.scenes.map((_, k) => `<button type="button" data-k="${k}" aria-label="Page ${k + 1}"></button>`).join("")}<button type="button" data-k="${N}" aria-label="Quiz" class="qdot">?</button></div>
-      <button class="btn gold" type="button" id="readme">Read to me</button></div>
+      <button class="btn gold" type="button" id="readme">Read to me</button>${KID_NARRATED.has(s.id) ? "" : `<label class="kvoice"><span class="sr">Reading voice</span><select id="kvoice"><option value="">Best voice on this device</option></select></label>`}</div>
     <div class="kd-story-discover"><a href="/kids/words">Discover Bible words →</a><a href="/kids/read/${s.ref}">Open the Kids Bible →</a><a href="/kids/quests">Follow a wonder trail →</a></div>
-    <p class="small kidsnote">${s.note ? `<b>For grown-ups:</b> ${esc(s.note)} ` : ""}This is an Ereunia story retelling, not a Bible translation. Pictures are illustrations made for Ereunia with an AI image tool, not historical images.</p>
+    <p class="small kidsnote">${s.note ? `<b>For grown-ups:</b> ${esc(s.note)} ` : ""}This is an Ereunia story retelling, not a Bible translation. Pictures are illustrations made for Ereunia with an AI image tool, not historical images. ${KID_NARRATED.has(s.id) ? "The narration is a computer-generated voice, recorded for Ereunia." : "“Read to me” uses a voice built into your device."}</p>
   </div>`;
   const art = $(".st-art"), card = $("#pagecard");
   const synth = window.speechSynthesis;
-  const stop = () => { if (synth) synth.cancel(); speaking = false; const b = $("#readme"); if (b) b.textContent = "Read to me"; };
+  // Recorded narration where it exists (a human-quality voice with word timings); otherwise the best voice this device offers.
+  const narrated = KID_NARRATED.has(s.id); let timings = null, raf = 0;
+  if (narrated) fetch(`/audio/kids/${s.id}.json`).then(r => r.ok ? r.json() : null).then(t => { timings = t; }).catch(() => {});
+  const clearNow = () => card.querySelectorAll(".sw.now").forEach(w => w.classList.remove("now"));
+  const stop = () => { if (synth) synth.cancel(); if (kidAudio) { kidAudio.pause(); kidAudio = null; } cancelAnimationFrame(raf); clearNow(); speaking = false; const b = $("#readme"); if (b) b.textContent = "Read to me"; };
+  const ended = () => { clearNow(); speaking = false; $("#readme").textContent = "Read to me"; if (store.setting("kidsauto", false) && i < N) { clearTimeout(storyTimer); storyTimer = setTimeout(() => go(i + 1, true), 900); } };
   const say = text => {
-    if (!synth) { toast("Reading aloud is not available in this browser"); return; }
-    stop(); const u = new SpeechSynthesisUtterance(text); u.rate = .92; u.pitch = 1.05;
-    const words = [...card.querySelectorAll(".sw")];
-    u.onboundary = e => { if (e.name !== "word") return; let n = 0; words.forEach(w => { const a = +w.dataset.o; w.classList.toggle("now", a <= e.charIndex && e.charIndex < a + w.textContent.length); }); };
-    u.onend = () => { words.forEach(w => w.classList.remove("now")); speaking = false; $("#readme").textContent = "Read to me"; if (store.setting("kidsauto", false) && i < N) { clearTimeout(storyTimer); storyTimer = setTimeout(() => go(i + 1, true), 900); } };
-    speaking = true; $("#readme").textContent = "Stop reading"; synth.speak(u);
+    if (narrated && i < N) {
+      stop(); const a = new Audio(`/audio/kids/${s.id}-${i}.mp3`); kidAudio = a;
+      const words = [...card.querySelectorAll(".sw")], t = timings?.[i];
+      const tick = () => { if (kidAudio !== a) return; if (t) { const now = a.currentTime; let k = -1; for (let n = 0; n < t.length; n++) if (t[n] <= now + .05) k = n; words.forEach((w, n) => w.classList.toggle("now", n === k)); } raf = requestAnimationFrame(tick); };
+      a.onended = () => { cancelAnimationFrame(raf); if (kidAudio === a) kidAudio = null; ended(); };
+      a.onerror = () => { if (kidAudio === a) kidAudio = null; speakSynth(text); };
+      speaking = true; $("#readme").textContent = "Stop reading";
+      a.play().then(() => { raf = requestAnimationFrame(tick); }).catch(() => { if (kidAudio === a) kidAudio = null; speakSynth(text); });
+      return;
+    }
+    speakSynth(text);
   };
+  function speakSynth(text) {
+    if (!synth) { toast("Reading aloud is not available in this browser"); return; }
+    if (synth) synth.cancel(); const u = new SpeechSynthesisUtterance(text); const v = bestVoice(); if (v) { u.voice = v; u.lang = v.lang; } u.rate = .9; u.pitch = 1;
+    const words = [...card.querySelectorAll(".sw")];
+    u.onboundary = e => { if (e.name !== "word") return; words.forEach(w => { const a = +w.dataset.o; w.classList.toggle("now", a <= e.charIndex && e.charIndex < a + w.textContent.length); }); };
+    u.onend = ended;
+    speaking = true; $("#readme").textContent = "Stop reading"; synth.speak(u);
+  }
   const wrapWords = t => { let o = 0; return t.split(/(\s+)/).map(p => { const html = /\s/.test(p) ? p : `<span class="sw" data-o="${o}">${esc(p)}</span>`; o += p.length; return html; }).join(""); };
   function go(k, auto = false) {
     i = Math.max(0, Math.min(N, k)); clearTimeout(storyTimer);
@@ -2288,6 +2424,12 @@ function renderStory(id) {
   $("#sprev").addEventListener("click", () => go(i - 1)); $("#snext").addEventListener("click", () => go(i + 1));
   $("#dots").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) go(+b.dataset.k); });
   $("#readme").addEventListener("click", () => { if (speaking) return stop(); if (i < N) say(s.scenes[i][0]); });
+  const vsel = $("#kvoice");
+  if (vsel) {
+    const fill = () => { const vs = (synth?.getVoices() || []).filter(v => /^en(-|_|$)/i.test(v.lang)); const cur = store.setting("kidsVoice", ""); vsel.innerHTML = `<option value="">Best voice on this device${bestVoice() ? ` (${esc(bestVoice().name.replace(/^Microsoft |^Google /, "").replace(/ Online \(Natural\).*/, ""))})` : ""}</option>` + vs.map(v => `<option value="${esc(v.name)}" ${v.name === cur ? "selected" : ""}>${esc(v.name)}</option>`).join(""); vsel.parentElement.hidden = !vs.length; };
+    fill(); synth?.addEventListener?.("voiceschanged", fill);
+    vsel.addEventListener("change", () => { store.setSetting("kidsVoice", vsel.value); if (i < N) say(s.scenes[i][0]); });
+  }
   const keys = e => { if (!document.contains($("#stage"))) return removeEventListener("keydown", keys); if (e.key === "ArrowRight") go(i + 1); if (e.key === "ArrowLeft") go(i - 1); };
   addEventListener("keydown", keys);
   let sx = null; $("#stage").addEventListener("touchstart", e => (sx = e.touches[0].clientX), { passive: true });
@@ -2412,7 +2554,7 @@ async function renderTrails(openId) {
   const cur = store.trailSteps(), saved = store.trails();
   view.innerHTML = `${artHead("aleppo")}<span class="eyebrow">My study</span><h1>Research trails</h1>
     <p class="small" style="max-width:68ch">Every passage, word, connection, source and note you open is recorded as a trail, so you can retrace your path, save it, and export it with citations.</p>${STORAGE_NOTE}</div>
-    <div class="tabsrow">${[["trails", "Research trails"], ["notes", "Notes"], ["bookmarks", "Bookmarks"], ["highlights", "Highlights"], ["collections", "Collections"], ["history", "Reading history"]].map(([k, l]) => `<a class="btn ${k === "trails" ? "on" : ""}" href="#/study/${k}">${l}</a>`).join("")}</div>
+    <div class="tabsrow">${[["trails", "Research trails"], ["notes", "Notes"], ["bookmarks", "Bookmarks"], ["highlights", "Highlights"], ["collections", "Collections"], ["history", "Reading history"]].map(([k, l]) => `<a class="btn ${k === "trails" ? "on" : ""}" href="#/study/${k}">${l}</a>`).join("")}<a class="btn" href="/prepare">Sermon preparations (${store.preps().length})</a></div>
     <div class="trailgrid">
       <section class="card"><h2 style="font-size:1.35rem">Current trail <span class="small">${cur.length} step${cur.length === 1 ? "" : "s"}</span></h2>
         ${trailList(cur.slice().reverse())}
@@ -2448,6 +2590,9 @@ async function renderTrails(openId) {
 }
 
 
+function prepCtx() {
+  return { view, esc, go, setPath, store, toast, setTitle, setNav, getIndex, parseReference, chapterCount, formatRef, toOsis, readUrl, loadBook, loadOrig, loadXref, loadLex, H, CONTEXT, NAMES, BOOKS, groupOf, testamentOf, META, TR, translationOptions, unpackRef, verseText, keyLemmas, repeatedWords, mergeCrossRefs, OBSERVE, APPLY, interpretQuestions, discForChapter, DISCOVERIES, bIdx, displayStrong, langOf, dirOf, parseGuideSpec, guideSpec, loadComm, commentaryChoice, commentFor, cmOn, plainText, CM_SHORT, yearText, illustrationsFor, ilList, KID_STORIES, fromOsis, dateCertainty };
+}
 function renderAbout() {
   setNav(""); setTitle("About Ereunia");
   view.innerHTML = `<div class="pagehead"><span class="eyebrow">Ereunia</span><h1>About Ereunia</h1><p class="small" style="max-width:68ch">Ereunia (eh-ROO-nee-ah) takes its name from the Greek verb ereunaō, “to search diligently”, used in <a href="#/read/kjv/John.5.39">John 5:39</a>: “Search the scriptures.”</p></div>
@@ -2499,7 +2644,7 @@ async function route() {
   const [head, ...rest] = h.split("/");
   const changed = document.body.dataset.route !== (head || "home") || lastPath !== location.pathname;
   document.body.dataset.route = head || "home"; lastPath = location.pathname;
-  document.body.classList.remove("focus", "kidsmode"); window.speechSynthesis?.cancel(); document.querySelector(".exitfocus")?.remove();
+  document.body.classList.remove("focus", "kidsmode"); window.speechSynthesis?.cancel(); if (kidAudio) { kidAudio.pause(); kidAudio = null; } document.querySelector(".exitfocus")?.remove();
   try {
     if (head === "read") await renderRead(rest[0], rest[1]);
     else if (head === "search") await renderSearch(rest.join("/"));
@@ -2533,6 +2678,7 @@ async function route() {
     else if (head === "books") { await getIndex(); renderBooks(); }
     else if (head === "privacy") renderPrivacy();
     else if (head === "about") renderAbout();
+    else if (head === "pastors" || head === "prepare") { await getIndex(); const m = await import("./prepare.js"); const ctx = prepCtx(); if (head === "pastors") m.renderPastors(ctx); else await m.renderPrepare(ctx, rest[0], rest[1]); }
     else if (head === "share") await renderShare(rest[0], rest[1], rest[2]);
     else if (head === "atlas") { await getIndex(); setNav("atlas"); setTitle("Atlas"); const { renderAtlas } = await import("./atlas-app.js"); await renderAtlas({ view, H, esc, go, DISCOVERIES, JOURNEYS, NAMES, BOOKS, ERAS, unpackRef, readUrl, formatRef, PRECISION, toOsis, fromOsis, labelOf, discImg, discCredit, discMini, yearText, verseText, rangeHref, rangeLabel, project, MAP_SIZE, SECTIONS, parseRef: q => parseReference(q, chapterCount) }, rest); }
     else if (head === "discoveries") { await getIndex(); await renderDiscoveries(rest[0]); }
@@ -2545,7 +2691,7 @@ async function route() {
   // One quiet arrival per page change, so the new page reads as a response to the click; skipped for reduced motion.
   if (changed && view.animate && !matchMedia("(prefers-reduced-motion: reduce)").matches) view.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "cubic-bezier(.2,.7,.2,1)" });
   // Research trail: record the sources and studies opened anywhere on the site.
-  const TRAIL_HEADS = { word: "word", discoveries: "discovery", person: "person", place: "place", lens: "passage", compare: "passage", translation: "source", research: "source" };
+  const TRAIL_HEADS = { prepare: "passage", word: "word", discoveries: "discovery", person: "person", place: "place", lens: "passage", compare: "passage", translation: "source", research: "source" };
   if (TRAIL_HEADS[head] && rest[0]) store.trailAdd({ kind: TRAIL_HEADS[head], label: document.title.replace(/ · Ereunia$/, ""), href: location.pathname });
   // A way back to the passage being studied, from any page opened out of the Research Desk.
   document.querySelector(".deskreturn")?.remove();

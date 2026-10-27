@@ -67,3 +67,24 @@ Preview: https://deploy-preview-1--scripture-atlas-om.netlify.app (Netlify team 
   - axe reports 0 violations on 15 page and theme combinations.
   - A crawl of 152 routes on phone and desktop, light and dark, found no overflow, broken images or script errors.
   - 147 tests pass.
+
+## Pastor tools (27 October 2026, branch `pastors`)
+- **Commentaries tab** in the Research Desk, from public-domain SWORD modules (CrossWire Bible Society): Matthew Henry (concise and complete), Jamieson–Fausset–Brown, Barnes (NT), Clarke, Keil and Delitzsch (OT) and Spurgeon's Treasury of David (Psalms). Each is labelled with its author, date and tradition, and marked as interpretation. Built at deploy time by `scripts/build-commentaries.mjs` (about 6,150 chapter files, 131 MB). Its output is limited to p, h4, i, b, br and links to Bible references; the build fails on anything else.
+- **Prepare** (`/prepare/<passage>`): eight steps (Read, Observe, Words, Context, Commentaries, Connections, Outline, Apply), with notes, done ticks and collected material that keeps its citation. The outline exports to Word (.docx, written in the browser), prints as a handout or small-group guide, and opens in a Present view with slides and preaching notes, a timer and keeping the screen awake. Everything stays on the device and is included in backups.
+- **For pastors** page (`/pastors`), an "Add to preparation" action on verses and commentary in the desk, and a "Prepare a sermon on it" link in study guides.
+- **AI kept in the background:** the homepage block about AI is replaced by one about preparing to teach. "AI Studio" is renamed "Ask a question" and moved to the end of the Research menu. No AI is used in the pastor tools.
+- **Checked:**
+  - The full journey (desk commentary, Prepare steps, outline, Word, Present, handout, group guide) passes with no script errors.
+  - The Word file opens in python-docx with the expected styles.
+  - axe reports no new violations on the new pages.
+  - 152 tests pass.
+
+## Pastor tools, stage 2
+
+- **Sermon series planner** (`/prepare/series`): name, first Sunday, weekly or fortnightly; fill from the chapters of a book or type passages; each week links to its preparation and shows progress. Exports an `.ics` calendar and prints a plan. Deleting a plan keeps its preparations.
+- **Lectionary:** not included. The Revised Common Lectionary tables belong to the Consultation on Common Texts; they will be added only with its permission. Pastors can type readings into a plan.
+- **Preached record:** "Mark as preached" (date and service) on each preparation; `/prepare/preached` lists every occasion by date and shows coverage by book, with CSV download.
+- **Passage structure** in the Observe step: phrases set out with linking words marked and indented. Labelled as an English reading aid, not a grammatical analysis.
+- **Sourced illustrations:** a new Illustrations tab in the Research Desk and a section in the Context step: discoveries (with what they do not show), dated events, places with archaeology and manuscripts, each with its source and an "Add" button.
+- **Print menu:** handout, small-group guide, a passage study sheet (phrase layout with a ruled margin) and a family take-home sheet (reading in modern English, questions, the matching Ereunia Kids story, a drawing box).
+- No AI is used in any of these tools.

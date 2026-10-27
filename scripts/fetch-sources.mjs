@@ -27,7 +27,9 @@ const jobs = [
   ["https://a.openbible.info/data/cross-references.zip", "xref/cross-references.zip"],
   [`${GH}/thiagobodruk/bible/master/json/en_kjv.json`, "kjv-source.json"],
   ["https://ebible.org/Scriptures/translations.csv", "ebible/translations.csv"],
-  ["https://ebible.org/Scriptures/eng-kjv2006_usfm.zip", "kjvs/kjv.zip"]
+  ["https://ebible.org/Scriptures/eng-kjv2006_usfm.zip", "kjvs/kjv.zip"],
+  // Public-domain commentaries (SWORD modules from CrossWire Bible Society)
+  ...["MHCC", "MHC", "JFB", "Barnes", "Clarke", "KD", "TDavid"].map(m => [`https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/${m}.zip`, `comm/${m.toLowerCase()}.zip`])
 ];
 
 async function get(url, dest, tries = 3) {
@@ -52,5 +54,9 @@ if (!existsSync(new URL("kjvs/02-GENeng-kjv2006.usfm", raw))) execFileSync("unzi
 if (!existsSync(new URL("kjv.json", raw))) {
   const src = JSON.parse(readFileSync(new URL("kjv-source.json", raw), "utf8").replace(/^﻿/, ""));
   writeFileSync(new URL("kjv.json", raw), JSON.stringify(src.map(b => [b.name, b.chapters.map(ch => ch.map(v => v.replace(/\{([^}]*)\}/g, "$1")))])));
+}
+for (const m of ["mhcc", "mhc", "jfb", "barnes", "clarke", "kd", "tdavid"]) {
+  const dir = new URL(`comm/${m}/`, raw);
+  if (!existsSync(dir) && existsSync(new URL(`comm/${m}.zip`, raw))) { mkdirSync(dir, { recursive: true }); execFileSync("unzip", ["-o", "-q", new URL(`comm/${m}.zip`, raw).pathname, "-d", dir.pathname]); }
 }
 console.log(`fetched ${n} source files`);

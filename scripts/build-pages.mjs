@@ -53,10 +53,12 @@ const SECTIONS = [
   ["/credits", "Credits and licences", "Every dataset, image and font used by Ereunia, with its owner and licence."],
   ["/learn", "Courses", "Structured Bible study courses with readings, questions and quizzes."],
   ["/sermon", "Sermon studio", "Record a sermon, catch every Bible reference and turn it into study notes."],
-  ["/kids", "Kids · Read & Discover", `A Bible discovery world for children: illustrated stories, ${KIDS_WORDS.length} Bible words, a Scripture reader, concordance and guided family quests.`],
+  ["/kids", "Kids · Read & Discover", `A Bible discovery world for children: 36 illustrated stories, ${KIDS_WORDS.length} Bible words, a Scripture reader, concordance and guided family quests.`],
   ["/ai", "Research assistant", "Ask a question and see exactly which sources the answer rests on."],
   ["/search", "Search", "Search passages, original words, people, places, discoveries and manuscripts."],
   ["/share", "Share cards", "Make a branded card of any Bible verse or documented discovery to share."],
+  ["/pastors", "For pastors and teachers", "Prepare a sermon or lesson in eight steps: original words, background, classic commentaries, connected Scripture, an outline, a handout and slides."],
+  ["/prepare", "Prepare a sermon or lesson", "Choose a passage and prepare it step by step, with every source kept beside your notes."],
   ["/about", "About Ereunia", "What Ereunia is, how its pages are written and sourced, and how to send a correction."],
   ["/privacy", "Privacy and your data", "What Ereunia stores on your device and what is sent when you use a feature."]
 ];
