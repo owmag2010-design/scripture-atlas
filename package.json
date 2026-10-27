@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.133.0",
-    "@netlify/blobs": "11.1.6"
+    "@netlify/blobs": "11.1.6",
+    "jspdf": "4.2.1"
   }
 }

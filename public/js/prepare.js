@@ -59,20 +59,9 @@ function prepList() {
   return `<ul class="preplist">${list.map(raw => { const p = cleanPrep(raw, raw.key, raw.title || raw.key); const n = doneCount(p); return `<li><a href="/prepare/${esc(p.key)}"><b>${esc(p.title)}</b><span class="small">${p.idea ? esc(p.idea) + " · " : ""}${n} of ${STEPS.length} steps · ${p.points.length} ${p.points.length === 1 ? "point" : "points"}${p.updated ? " · " + new Date(p.updated).toLocaleDateString(undefined, { dateStyle: "medium" }) : ""}</span></a></li>`; }).join("")}</ul>`;
 }
 
-export function renderPastors(ctx) {
-  C = ctx; C.setNav("pastors"); C.setTitle("For pastors and teachers");
-  C.view.innerHTML = `<div class="pagehead"><span class="eyebrow">For pastors and teachers</span><h1>Prepare to preach from the text, with every source in view.</h1>
-    <p class="lead">Ereunia takes you from the passage to an outline in eight steps: the original words, the background, classic commentaries and connected Scripture, then a handout, slides and a view to preach from. Free, with no account; your work stays on your device.</p>
-    ${startForm("pf0")}</div>
-  <section class="pastorsteps" aria-labelledby="psh"><h2 id="psh">The eight steps</h2>
-    <ol class="stepgrid">${STEPS.map(([k, l, d]) => `<li><b>${esc(l)}</b><span>${esc(d)}</span></li>`).join("")}</ol></section>
-  <section class="pastorgrid">
-    <div><h3>Classic commentaries beside the verse</h3><p>Matthew Henry, Jamieson–Fausset–Brown, Barnes, Clarke, Keil and Delitzsch, and Spurgeon's <i>Treasury of David</i>, each labelled with its date and tradition. Open them from the Commentaries tab in the Research Desk.</p><a class="btn" href="/read/kjv/John.1.1?panel=cm">See them on John 1:1</a></div>
-    <div><h3>An outline that keeps its sources</h3><p>Collect verses, word studies, commentary quotes and cross references as you study; each keeps its citation when you place it in a point.</p><a class="btn" href="/prepare/John.1.1-18?step=outline">See an outline</a></div>
-    <div><h3>Ready for Sunday</h3><p>Download a Word document, print a handout or a small-group guide, or present slides and preach from a large-type view on a phone or tablet.</p><a class="btn" href="/prepare/John.1.1-18">Open the worked example</a></div>
-  </section>
-  <section class="prepstart"><h2>Your preparations</h2>${prepList()}${planLinks()}</section>`;
-  wireStart("pf0");
+export async function renderPastors(ctx, section, id) {
+  const { renderStudio } = await import('./pastor-studio.js?v=desk2');
+  return renderStudio(ctx, section, id);
 }
 
 export async function renderPrepare(ctx, spec, sub) {
@@ -96,19 +85,21 @@ export async function renderPrepare(ctx, spec, sub) {
 /* ---------- workspace ---------- */
 async function workspace(g) {
   const p = loadPrep(g);
+  const { createSermonStore } = await import('./pastor-storage.js');
+  const sermonStore=createSermonStore();let linked;try{const candidate=sermonStore.get(C.store.setting('activeSermon',''));if(candidate?.passage===g.key)linked=candidate;}catch{}
   const qp = new URLSearchParams(location.search);
   const step = STEPS.some(([k]) => k === qp.get("step")) ? qp.get("step") : (STEPS.find(([k]) => !p.steps[k]?.done) || STEPS[0])[0];
   const t = translation();
   C.setTitle(`Prepare ${g.title}`);
   C.store.setSetting("activePrep", g.key);
   const n = doneCount(p);
-  C.view.innerHTML = `<div class="pagehead prephead"><span class="eyebrow"><a href="/pastors">For pastors and teachers</a> · Preparation</span><h1>${esc(g.title)}</h1>
+  C.view.innerHTML = `${linked?`<div class="study-return"><div><span class="eyebrow">STUDYING FOR YOUR SERMON</span><b>${esc(linked.title)}</b></div><a class="btn" href="/pastors/sermon/${linked.id}?tab=write">← Back to manuscript</a></div>`:''}<div class="pagehead prephead"><span class="eyebrow"><a href="/pastors">For pastors and teachers</a> · Preparation</span><h1>${esc(g.title)}</h1>
     <div class="prepbar"><div class="progress" role="progressbar" aria-label="Steps done" aria-valuemin="0" aria-valuemax="${STEPS.length}" aria-valuenow="${n}"><i style="width:${Math.round(n / STEPS.length * 100)}%"></i></div><span class="small"><span id="prepcount">${n} of ${STEPS.length} steps done</span> · <span id="prepsaved">Saved on this device</span></span></div>
     <div class="actions prepacts"><label class="sr" for="ptr">Translation</label><select id="ptr" class="trsel">${C.translationOptions(t)}</select>
       <a class="btn" href="${C.readUrl(t, g.book, g.chapter, g.from)}">Open in the Research Desk</a>
       <a class="btn pri" href="/prepare/${g.key}/present">Present</a>
       <details class="pmenu"><summary class="btn">Print</summary><div role="list"><a role="listitem" href="/prepare/${g.key}/handout">Handout with the outline</a><a role="listitem" href="/prepare/${g.key}/group">Small-group guide</a><a role="listitem" href="/prepare/${g.key}/sheet">Passage study sheet</a><a role="listitem" href="/prepare/${g.key}/family">Family take-home sheet</a></div></details>
-      <button class="btn" type="button" id="pdocx">Word document</button></div>
+      <button class="btn" type="button" id="pdocx">Word document</button><button class="btn pri" type="button" id="sermonfromprep">${linked?'Save research & return to sermon':'Create sermon from outline'}</button></div>
     <div class="preached" id="preached">${preachedHtml(p)}</div></div>
   <div class="prep">
     <nav class="prepsteps" aria-label="Preparation steps"><ol>${STEPS.map(([k, l, d], i) => `<li><a href="/prepare/${g.key}?step=${k}" data-step="${k}" ${k === step ? 'aria-current="step"' : ""} class="${p.steps[k]?.done ? "done" : ""}"><span class="pn" aria-hidden="true">${p.steps[k]?.done ? "✓" : i + 1}</span><span><b>${l}</b><span class="small">${d}</span></span></a></li>`).join("")}</ol></nav>
@@ -119,6 +110,15 @@ async function workspace(g) {
     const pp = loadPrep(g); const { verses } = await passageVerses(g, translation());
     download(`${g.key.replace(/\./g, "-")}-sermon.docx`, buildDocx(outlineDoc(pp, { passageText: verses, translation: C.META[translation()].name }), { title: g.title }), "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
   });
+  document.getElementById('sermonfromprep').onclick = async () => {
+    try {
+      flush();
+      const { newSermon, fromStudy } = await import('./pastor-core.js');
+      const { createSermonStore } = await import('./pastor-storage.js');
+      const p = linked ? sermonStore.save({...sermonStore.get(linked.id),study:structuredClone(loadPrep(g))}) : createSermonStore().save(fromStudy(newSermon(g.key, g.title), loadPrep(g)));
+      C.go(`/pastors/sermon/${p.id}`);
+    } catch (e) { C.toast(`Sermon was not saved: ${e.message}`); }
+  };
   wirePreached(g);
   await renderStep(g, step);
 }
