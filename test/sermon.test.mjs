@@ -50,3 +50,36 @@ test("transcripts import from WebVTT, SRT and timed text", () => {
   assert.equal(parseTranscript("1\n00:00:02,000 --> 00:00:04,000\nGrace\n")[0].t, 2);
   assert.deepEqual(parseTranscript("[1:05] Turn to Romans 8\nand read on"), [{ t: 65, text: "Turn to Romans 8" }, { t: 65, text: "and read on" }]);
 });
+
+import { createStore } from "../public/js/store.js";
+import { trimVersions } from "../public/js/prep-core.js";
+const memStore = () => { const m = new Map(); return createStore({ getItem: k => m.get(k) ?? null, setItem: (k, v) => m.set(k, v), removeItem: k => m.delete(k) }); };
+test("restoring a backup never replaces a sermon already here, and cleans what it adds", () => {
+  const st = memStore();
+  st.savePrep({ id: "John.1.1-18", key: "John.1.1-18", title: "John 1:1–18", name: "Mine", manuscript: [{ type: "para", text: "my words" }] });
+  const r = st.restore({ app: "ereunia", kind: "backup", data: { version: 1, preps: {
+    "John.1.1-18": { key: "John.1.1-18", name: "Theirs" },
+    '"><img src=x onerror=alert(1)>': { key: "John.3.16", name: "Bad id" },
+    "Rom.8": { key: "not a passage" } } } });
+  assert.equal(r.saved, true);
+  const all = st.preps();
+  assert.equal(st.prep("John.1.1-18").name, "Mine", "the existing sermon is untouched");
+  assert.ok(all.some(p => p.name === "Theirs" && /^s-/.test(p.id)), "the clashing sermon is added under a new id");
+  assert.ok(all.every(p => /^(s-[a-z0-9]+|[1-3]?[A-Za-z]+\.\d+(\.\d+(-\d+)?)?)$/.test(p.id)), "no unsafe ids are stored");
+  assert.ok(!all.some(p => p.key === "not a passage"));
+});
+test("saving never deletes other sermons", () => {
+  const st = memStore();
+  for (let i = 1; i <= 320; i++) st.savePrep({ id: `Ps.${i % 150 + 1}.${i}`, key: `Ps.${i % 150 + 1}`, title: "Psalm" });
+  assert.equal(st.preps().length, 320);
+});
+test("named versions survive any number of automatic ones", () => {
+  const vs = [{ label: "First draft" }, ...Array.from({ length: 90 }, (_, i) => ({ label: `Autosaved ${i}` })), { label: "As preached on Sunday" }];
+  const out = trimVersions(vs);
+  assert.ok(out.some(v => v.label === "First draft") && out.some(v => v.label === "As preached on Sunday"));
+  assert.equal(out.filter(v => v.label.startsWith("Autosaved")).length, 40);
+});
+test("a line beginning with a Bible reference is not read as a timestamp", () => {
+  assert.deepEqual(parseTranscript("3:16 For God so loved the world"), [{ t: 0, text: "3:16 For God so loved the world" }]);
+  assert.equal(parseTranscript("WEBVTT\n\n1\n00:00:01.000 --> 00:00:02.000\n316\n")[0].text, "316");
+});

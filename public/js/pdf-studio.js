@@ -69,16 +69,22 @@ class Layout {
     const fn = o.note ? this.noteHeight(o.note) : 0;
     const need = Math.min(lines.length, 2 + (o.keep || 0)) * lead;
     if (this.y - need - fn < this.bottom()) this.newPage();
-    if (o.note) { this.pageNotes.get(this.page).push(o.note); this.fnH += fn; }
+    // The footnote goes on the page that carries the paragraph's last line (where its number is printed).
+    let noted = !o.note;
+    const tryNote = left => { if (noted) return; if (this.y - left * lead - fn >= this.bottom()) { this.pageNotes.get(this.page).push(o.note); this.fnH += fn; noted = true; } };
     let top = this.y;
-    for (const line of lines) {
-      if (this.y - lead < this.bottom()) { this.drawBar(o, top, this.y); this.newPage(); top = this.y; }
+    for (const [li, line] of lines.entries()) {
+      tryNote(lines.length - li);
+      const rest = (lines.length - li) * lead, wouldFit = this.y - rest >= this.bottom();
+      // the rest fits but its footnote would not: carry the rest to the next page with the note
+      if (this.y - lead < this.bottom() || (!noted && wouldFit && this.y < this.size[1] - this.m - 1)) { this.drawBar(o, top, this.y); this.newPage(); top = this.y; tryNote(lines.length - li); }
       let x = this.m + indent;
       if (o.align === "center") x = this.m + (this.w - line.reduce((s, t) => s + t.w, 0)) / 2;
       const base = this.y - size;
       for (const t of line) { if (t.text !== " ") this.page.drawText(t.text, { x, y: base + (t.rise || 0), size: t.size, font: t.font, color: rgb(t.color) }); x += t.w; }
       this.y -= lead;
     }
+    if (!noted) { this.pageNotes.get(this.page).push(o.note); this.fnH += fn; }
     this.drawBar(o, top, this.y);
     this.y -= o.gap ?? size * 0.6;
   }
@@ -146,9 +152,12 @@ function footerFor(t) { return `Prepared with Ereunia · ereunia.com${t ? ` · S
 /* ---------- templates ---------- */
 async function build(kind, g, o) {
   const p = A.loadPrep(g);
-  const t = kind === "family" ? (o.t === "kjv" && C.TR.web ? "web" : o.t) : o.t;
-  const { verses } = await A.passageVerses(g, t);
-  const name = sermonName(p), sub = [p.name ? g.title : "", p.date ? A.fmtDate(p.date) : "", p.venue, C.META[t].name].filter(Boolean).join(" · ");
+  let t = kind === "family" ? (o.t === "kjv" && C.TR.web ? "web" : o.t) : o.t;
+  let { verses } = await A.passageVerses(g, t);
+  // The embedded fonts cover Latin and Greek scripts. A translation in another script is shown in the KJV instead, and the page says so.
+  let swapped = null;
+  if (!/^[\p{Script=Latin}\p{Script=Greek}\p{Script=Common}\p{Script=Inherited}\s]*$/u.test(verses.map(v => v[1]).join(" "))) { swapped = C.META[t].name; t = "kjv"; verses = (await A.passageVerses(g, "kjv")).verses; }
+  const name = sermonName(p), sub = [p.name ? g.title : "", p.date ? A.fmtDate(p.date) : "", p.venue, C.META[t].name + (swapped ? ` (${swapped} uses a script these PDFs cannot print yet)` : "")].filter(Boolean).join(" · ");
   const { pdf, F } = await newDoc({ title: `${TNAME[kind] || kind}: ${name}`, subject: g.title });
   const L = new Layout(pdf, F, { paper: o.paper, footer: footerFor(t), big: kind === "pulpit", margin: kind === "pulpit" ? 50 : 56 });
   const passage = (size = 11) => { L.label("The passage"); L.para(verseRuns(F, verses, size), { size, lead: size * 1.5, gap: 10 }); };
@@ -245,7 +254,7 @@ async function build(kind, g, o) {
     const ser = p.seriesId ? C.store.seriesGet(p.seriesId) : null;
     row("SERMON", name); row("PASSAGE", g.title); row("READINGS", p.readings); row("SERIES", ser?.title || ""); row("PLANNED LENGTH", `${p.target} minutes`); row("MAIN IDEA", p.idea);
     const hs = heads(p); if (hs.length) { L.label("Points"); hs.forEach((h, i) => L.para(`${i + 1}. ${stripBlanks(h.text)}`, { size: 11, gap: 3 })); L.space(6); }
-    if (p.serviceNotes) { L.label("Notes for the service team"); L.para(p.serviceNotes, { size: 11 }); }
+    if (p.serviceNotes) { L.label("Notes for the service team"); for (const line of p.serviceNotes.split(/\n+/).filter(x => x.trim())) L.para(line, { size: 11, gap: 4 }); }
   }
 
   if (kind === "slides") {
@@ -255,6 +264,9 @@ async function build(kind, g, o) {
       const pg = pdf.addPage([W, H]); pg.drawRectangle({ x: 0, y: 0, width: W, height: H, color: rgb([0.059, 0.051, 0.039]) });
       pg.drawRectangle({ x: 60, y: H - 70, width: 60, height: 3, color: rgb([0.949, 0.757, 0.306]) });
       const Ls = new Layout(pdf, F, { paper: "A4" }); pdf.removePage(pdf.getPageCount() - 1); Ls.page = pg; Ls.size = [W, H]; Ls.m = 60; Ls.y = H - 90; Ls.pageNotes.set(pg, []); Ls.fnH = 0; Ls.bottom = () => 40;
+      Ls.newPage = () => { const np = pdf.addPage([W, H]); np.drawRectangle({ x: 0, y: 0, width: W, height: H, color: rgb([0.059, 0.051, 0.039]) }); Ls.page = np; Ls.y = H - 60; Ls.pageNotes.set(np, []); };
+      const fit = (str, n) => (str.length > n ? str.slice(0, n).replace(/\s\S*$/, "") + " …" : str);
+      s.title = fit(s.title, 90); s.lines = s.lines.slice(0, s.lines.length > 1 && s.lines.some(x => x.text.length > 160) ? 1 : 2).map(x => ({ ...x, text: fit(x.text, s.lines.length > 1 ? 160 : 300) }));
       const cream = [0.961, 0.937, 0.902];
       Ls.para([{ text: s.title, font: F.serifB, size: s.kind === "title" ? 44 : 34, color: cream }], { size: s.kind === "title" ? 44 : 34, lead: (s.kind === "title" ? 44 : 34) * 1.15, gap: 18 });
       for (const x of s.lines) Ls.para([{ text: x.text, font: x.cite ? F.serifI : F.serif, size: 24, color: cream }], { size: 24, lead: 32, gap: 4 });

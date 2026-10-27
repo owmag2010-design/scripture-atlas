@@ -1833,3 +1833,7 @@ body.kidsmode main, body.kidsmode footer.site { --lapis: #2E2820; --lapis-soft: 
 @media (max-width: 700px) { .sbrow { grid-template-columns: 2em minmax(0, 1fr); margin-left: calc(var(--in) * .8em); } .sbrow select, .sbrow .obact, .sbrow input[data-note] { grid-column: 2; } }
 .wfields .wread { grid-column: 1 / -1; }
 .preplist .schip { justify-self: start; width: fit-content; }
+.reclive { padding: 14px 16px; border-radius: var(--r-sm); background: color-mix(in srgb, var(--rubric) 10%, var(--page)); border: 1px solid var(--rubric); }
+body[data-recording]::after { content: "● Recording"; position: fixed; z-index: 90; right: 14px; bottom: 14px; padding: 6px 12px; border-radius: 999px; background: #B5321C; color: #fff; font: 700 .85rem var(--sans); box-shadow: 0 6px 18px -6px rgba(0,0,0,.5); pointer-events: none; }
+.filebtn { position: relative; } .filebtn:focus-within { outline: 3px solid var(--gold); outline-offset: 2px; }
+.ib.armed { width: auto; padding: 0 8px; color: var(--rubric); font-size: .8rem; }

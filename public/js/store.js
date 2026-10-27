@@ -2,7 +2,22 @@
 // backed up, restored, and later synchronised to an account without changing its shape.
 // Keys are OSIS references, e.g. "John.3.16".
 
+import { cleanPrep, cleanSeries, SERMON_ID, newSermonId } from "./prep-core.js";
+
 const KEY = "scripture-atlas:v1";
+const PASSAGE = /^[1-3]?[A-Za-z]+\.\d+(?:\.\d+(?:-\d+)?)?$/;
+/** Cleans one sermon or series from a backup; returns null for anything that is not a valid record. */
+function defaultClean(kind, id, rec) {
+  if (!rec || typeof rec !== "object") return null;
+  if (kind === "preps") {
+    const key = typeof rec.key === "string" && PASSAGE.test(rec.key) ? rec.key : (PASSAGE.test(id) ? id : null); if (!key) return null;
+    // Recording ids are kept so audio already on this device stays linked; audio is deleted only when no sermon refers to it.
+    const p = cleanPrep({ ...rec, id }, key, typeof rec.title === "string" ? rec.title.slice(0, 80) : key);
+    return { id: SERMON_ID.test(id) ? id : newSermonId(), rec: { ...p, updated: rec.updated || null, created: rec.created || null }, newId: newSermonId };
+  }
+  const x = cleanSeries({ ...rec, id: /^[a-z0-9]{4,24}$/.test(id) ? id : (rec.id || "") });
+  return x ? { id: x.id, rec: x, newId: () => Math.random().toString(36).slice(2, 10) } : null;
+}
 const blank = () => ({ version: 1, notes: {}, bookmarks: {}, highlights: {}, history: [], position: null, settings: {}, progress: {}, days: [], ai: [], guides: {}, trail: { started: null, steps: [] }, trails: [], preps: {}, series: {}, illus: {} });
 
 export const today = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -121,13 +136,15 @@ export function createStore(storage) {
     prep: id => (data.preps[id] ? structuredClone(data.preps[id]) : null),
     savePrep(p) {
       const id = p?.id || p?.key; if (!id) return;
-      const keep = Object.entries(data.preps).filter(([k]) => k !== id).sort((a, b) => (b[1].updated || "").localeCompare(a[1].updated || "")).slice(0, 299);
-      data.preps = Object.fromEntries([...keep, [id, { ...structuredClone(p), id, updated: now(), created: p.created || now() }]]);
+      // Never drops other sermons: when storage is full the save fails and the page says so.
+      data.preps[id] = { ...structuredClone(p), id, updated: now(), created: p.created || now() };
       markDay(today()); save();
     },
-    preps: () => Object.entries(data.preps).map(([k, x]) => ({ ...structuredClone(x), id: x.id || k })).sort((a, b) => (b.updated || "").localeCompare(a.updated || "")),
-    sermonsFor: key => Object.entries(data.preps).filter(([, x]) => x.key === key).map(([k, x]) => ({ ...structuredClone(x), id: x.id || k })).sort((a, b) => (b.updated || "").localeCompare(a.updated || "")),
+    preps: () => Object.entries(data.preps).map(([k, x]) => ({ ...structuredClone(x), id: k })).sort((a, b) => (b.updated || "").localeCompare(a.updated || "")),
+    sermonsFor: key => Object.entries(data.preps).filter(([, x]) => x.key === key).map(([k, x]) => ({ ...structuredClone(x), id: k })).sort((a, b) => (b.updated || "").localeCompare(a.updated || "")),
     removePrep(id) { delete data.preps[id]; save(); },
+    /** True when any sermon still lists this recording (so its audio must be kept). */
+    recordingInUse: rid => Object.values(data.preps).some(x => (x.recordings || []).some(r => r.id === rid)),
 
     /** Reusable illustrations, with their source, how far they have been checked, themes and where they were used. */
     illustrations: () => Object.values(data.illus || {}).map(x => structuredClone(x)).sort((a, b) => (b.updated || "").localeCompare(a.updated || "")),
@@ -140,23 +157,34 @@ export function createStore(storage) {
     /** Sermon series plans: a title, a first Sunday and a passage per week. */
     seriesList: () => Object.values(data.series).map(x => structuredClone(x)).sort((a, b) => (b.updated || "").localeCompare(a.updated || "")),
     seriesGet: id => (data.series[id] ? structuredClone(data.series[id]) : null),
-    saveSeries(x) { if (!x?.id) return; data.series[x.id] = { ...structuredClone(x), updated: now() }; const ids = Object.values(data.series).sort((a, b) => (b.updated || "").localeCompare(a.updated || "")).slice(30).map(y => y.id); ids.forEach(i => delete data.series[i]); save(); },
+    saveSeries(x) { if (!x?.id) return; data.series[x.id] = { ...structuredClone(x), updated: now() }; save(); },
     removeSeries(id) { delete data.series[id]; save(); },
 
     /** Full backup of everything kept on this device, and restore from such a backup. */
     backup: () => ({ app: "ereunia", kind: "backup", exported: now(), data: structuredClone(data) }),
-    restore(obj, { merge = true } = {}) {
+    restore(obj, { merge = true, cleanRecord = null } = {}) {
       const src = obj?.app === "ereunia" && obj?.data ? obj.data : null;
       if (!src || typeof src !== "object" || src.version !== 1) throw new Error("This file is not an Ereunia backup.");
       const clean = v => JSON.parse(JSON.stringify(v ?? null));            // drops functions and prototypes
       const plain = o => (o && typeof o === "object" && !Array.isArray(o) ? Object.fromEntries(Object.entries(o).filter(([k]) => !["__proto__", "constructor", "prototype"].includes(k))) : {});
       const next = merge ? data : blank();
-      for (const k of ["notes", "bookmarks", "highlights", "settings", "progress", "guides", "preps", "series", "illus"]) next[k] = { ...(merge ? next[k] : {}), ...plain(clean(src[k])) };
+      for (const k of ["notes", "bookmarks", "highlights", "settings", "progress", "guides", "illus"]) next[k] = { ...(merge ? next[k] : {}), ...plain(clean(src[k])) };
+      // Sermons and series: never replace a record already here; clean each one and give clashing ids a new id.
+      for (const k of ["preps", "series"]) {
+        const incoming = plain(clean(src[k]));
+        next[k] = merge ? { ...next[k] } : {};
+        for (const [id, rec] of Object.entries(incoming)) {
+          const ok = (cleanRecord || defaultClean)(k, id, rec); if (!ok) continue;
+          let nid = ok.id;
+          if (next[k][nid]) { if (JSON.stringify(next[k][nid]) === JSON.stringify(ok.rec)) continue; nid = ok.newId(); }
+          next[k][nid] = { ...ok.rec, id: nid };
+        }
+      }
       for (const k of ["history", "days", "ai", "trails"]) if (Array.isArray(src[k])) next[k] = merge ? [...clean(src[k]), ...next[k]].filter((x, i, a) => a.findIndex(y => JSON.stringify(y) === JSON.stringify(x)) === i) : clean(src[k]);
       if (!merge && src.position) next.position = clean(src.position);
       if (src.trail?.steps && Array.isArray(src.trail.steps) && !next.trail.steps.length) next.trail = clean(src.trail);
-      data = { ...blank(), ...next }; save();
-      return { notes: Object.keys(data.notes).length, bookmarks: Object.keys(data.bookmarks).length, highlights: Object.keys(data.highlights).length, trails: data.trails.length };
+      data = { ...blank(), ...next }; const saved = save();
+      return { saved: saved !== false, notes: Object.keys(data.notes).length, bookmarks: Object.keys(data.bookmarks).length, highlights: Object.keys(data.highlights).length, trails: data.trails.length };
     },
     savedOk: () => save(),
 

@@ -55,8 +55,8 @@ export function cleanPrep(p, key, title) {
   if (!p || typeof p !== "object") return out;
   for (const [k] of STEPS) { const st = p.steps?.[k]; if (st && typeof st === "object") out.steps[k] = { done: !!st.done, notes: s(st.notes).slice(0, 20000) }; }
   out.idea = s(p.idea).slice(0, 500);
-  out.points = (Array.isArray(p.points) ? p.points : []).slice(0, 12).map(pt => ({ id: s(pt?.id) || blockId(), text: s(pt?.text).slice(0, 300), blocks: (Array.isArray(pt?.blocks) ? pt.blocks : []).map(block).filter(Boolean).slice(0, 40) }));
-  out.inbox = (Array.isArray(p.inbox) ? p.inbox : []).map(block).filter(Boolean).slice(-100);
+  out.points = (Array.isArray(p.points) ? p.points : []).slice(0, 60).map(pt => ({ id: s(pt?.id) || blockId(), text: s(pt?.text).slice(0, 300), blocks: (Array.isArray(pt?.blocks) ? pt.blocks : []).map(block).filter(Boolean).slice(0, 200) }));
+  out.inbox = (Array.isArray(p.inbox) ? p.inbox : []).map(block).filter(Boolean).slice(-500);
   out.preached = (Array.isArray(p.preached) ? p.preached : []).filter(x => /^\d{4}-\d{2}-\d{2}$/.test(s(x?.date))).map(x => ({ date: x.date, where: s(x.where).slice(0, 80) })).slice(-20);
   out.id = SERMON_ID.test(str(p.id, 40)) ? p.id : (out.id || key);
   for (const k of ["name", "occasion", "audience", "venue", "seriesId"]) out[k] = str(p[k], 160);
@@ -64,11 +64,11 @@ export function cleanPrep(p, key, title) {
   out.status = STATUS[p.status] ? p.status : (out.preached.length ? "preached" : "draft");
   out.tags = (Array.isArray(p.tags) ? p.tags : []).map(t => str(t, 40).trim()).filter(Boolean).slice(0, 20);
   out.target = Number.isFinite(p.target) ? Math.max(1, Math.min(180, Math.round(p.target))) : 25;
-  out.manuscript = (Array.isArray(p.manuscript) ? p.manuscript : []).map(cleanBlock).filter(Boolean).slice(0, 400);
-  out.notes = (Array.isArray(p.notes) ? p.notes : []).map(cleanNote).filter(Boolean).slice(-500);
-  out.versions = (Array.isArray(p.versions) ? p.versions : []).filter(v => v && typeof v === "object").slice(-25).map(v => ({ at: str(v.at, 30), label: str(v.label, 80), idea: str(v.idea, 500), manuscript: (Array.isArray(v.manuscript) ? v.manuscript : []).map(cleanBlock).filter(Boolean) }));
+  out.manuscript = (Array.isArray(p.manuscript) ? p.manuscript : []).map(cleanBlock).filter(Boolean).slice(0, 1500);
+  out.notes = (Array.isArray(p.notes) ? p.notes : []).map(cleanNote).filter(Boolean).slice(-2000);
+  out.versions = trimVersions((Array.isArray(p.versions) ? p.versions : []).filter(v => v && typeof v === "object")).map(v => ({ at: str(v.at, 30), label: str(v.label, 80), idea: str(v.idea, 500), manuscript: (Array.isArray(v.manuscript) ? v.manuscript : []).map(cleanBlock).filter(Boolean) }));
   out.structure = p.structure && Array.isArray(p.structure.rows) ? { t: str(p.structure.t, 10), rows: p.structure.rows.slice(0, 400).map(r => ({ text: str(r?.text, 600), verse: Number.isInteger(r?.verse) ? r.verse : null, indent: Math.max(0, Math.min(5, r?.indent | 0)), rel: RELATIONS.includes(r?.rel) ? r.rel : "", note: str(r?.note, 300) })) } : null;
-  out.recordings = (Array.isArray(p.recordings) ? p.recordings : []).filter(r => r && typeof r === "object" && /^r[a-z0-9]{4,20}$/.test(str(r.id, 24))).slice(-20).map(r => ({ id: r.id, at: str(r.at, 30), name: str(r.name, 120), mime: str(r.mime, 60), dur: Number.isFinite(r.dur) ? r.dur : 0, kind: r.kind === "rehearsal" ? "rehearsal" : "sermon", segs: r.segs | 0, complete: !!r.complete,
+  out.recordings = (Array.isArray(p.recordings) ? p.recordings : []).filter(r => r && typeof r === "object" && /^r[a-z0-9]{4,20}$/.test(str(r.id, 24))).map(r => ({ id: r.id, at: str(r.at, 30), name: str(r.name, 120), mime: str(r.mime, 60), dur: Number.isFinite(r.dur) ? r.dur : 0, kind: r.kind === "rehearsal" ? "rehearsal" : "sermon", segs: r.segs | 0, complete: !!r.complete,
     transcript: (Array.isArray(r.transcript) ? r.transcript : []).slice(0, 4000).map(x => ({ t: Number.isFinite(x?.t) ? x.t : 0, text: str(x?.text, 2000) })), marks: (Array.isArray(r.marks) ? r.marks : []).slice(0, 200).map(m => ({ t: Number.isFinite(m?.t) ? m.t : 0, label: str(m?.label, 120) })) }));
   out.readings = str(p.readings, 600); out.serviceNotes = str(p.serviceNotes, 4000);
   out.groupQs = (Array.isArray(p.groupQs) ? p.groupQs : []).map(q => str(q, 400)).filter(Boolean).slice(0, 20);
@@ -78,6 +78,12 @@ export function cleanPrep(p, key, title) {
   return out;
 }
 
+/** Versions you named are always kept; automatic ones ("Autosaved…", "Before…") keep the newest 40. */
+export const isAutoVersion = v => /^(Autosaved|Before )/.test(v.label || "");
+export function trimVersions(vs) {
+  const autos = vs.filter(isAutoVersion), drop = new Set(autos.slice(0, Math.max(0, autos.length - 40)));
+  return vs.filter(v => !drop.has(v)).slice(-200);
+}
 /** The display name of a sermon: its own title, else the passage. */
 export const sermonName = p => p.name || p.title;
 /** Sections of a manuscript: each heading starts a section; blocks before the first heading form an introduction. */

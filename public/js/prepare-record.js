@@ -5,7 +5,7 @@ import { sermonName, wordCount, minutesAt } from "./prep-core.js";
 import { sermonRefs } from "./sermon.js";
 import * as idb from "./idb.js";
 
-let A, C, esc, rec = null;
+let A, C, esc, rec = null, currentRedraw = null;
 const fmt = s => { s = Math.max(0, Math.round(s)); const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, x = s % 60; return `${h ? h + ":" + String(m).padStart(2, "0") : m}:${String(x).padStart(2, "0")}`; };
 const newRecId = () => "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 const vtt = s => { const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, x = (s % 60).toFixed(3).padStart(6, "0"); return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${x}`; };
@@ -16,24 +16,28 @@ export function parseTranscript(raw) {
   const ts = x => { const p = x.trim().replace(",", ".").split(":").map(Number); return p.length === 3 ? p[0] * 3600 + p[1] * 60 + p[2] : p.length === 2 ? p[0] * 60 + p[1] : +p[0] || 0; };
   if (/-->/.test(s)) {
     for (const block of s.split(/\n\s*\n/)) {
-      const lines = block.split("\n").filter(l => l.trim() && !/^WEBVTT/.test(l) && !/^\d+$/.test(l.trim()));
-      const cue = lines.findIndex(l => l.includes("-->")); if (cue < 0) continue;
+      const lines = block.split("\n").filter(l => l.trim() && !/^WEBVTT/.test(l));
+      const cue = lines.findIndex(l => l.includes("-->")); if (cue < 0) continue; // lines before the timing (a cue number) are ignored
       const text = lines.slice(cue + 1).join(" ").replace(/<[^>]+>/g, "").trim(); if (text) out.push({ t: ts(lines[cue].split("-->")[0]), text });
     }
     return out;
   }
-  for (const line of s.split("\n")) { const m = line.match(/^\s*\[?(\d{1,2}:\d{2}(?::\d{2})?)\]?\s+(.*)$/); if (m) out.push({ t: ts(m[1]), text: m[2].trim() }); else if (line.trim()) out.push({ t: out.at(-1)?.t || 0, text: line.trim() }); }
+  for (const line of s.split("\n")) { const m = line.match(/^\s*(?:\[(\d{1,2}:\d{2}(?::\d{2})?)\]|(\d{2}:\d{2}(?::\d{2})?))\s+(.*)$/); if (m) out.push({ t: ts(m[1] || m[2]), text: m[3].trim() }); else if (line.trim()) out.push({ t: out.at(-1)?.t || 0, text: line.trim() }); }
   return out;
 }
 
 export async function recordTab(api, g, body) {
   A = api; C = api.C; esc = api.esc;
   const draw = async () => {
+    if (!body.isConnected) return;
     const p = A.loadPrep(g), stored = await idb.storedRecordings().catch(() => new Set());
+    const orphans = [...stored].filter(id => !C.store.recordingInUse(id) && !(rec && rec.id === id));
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     body.innerHTML = `<div class="recordtab">
       <section class="recnew"><h2>Record</h2>
-        ${navigator.mediaDevices?.getUserMedia && window.MediaRecorder ? `<form id="rform" class="recform">
+        ${rec ? `<div class="reclive" role="status"><b>${rec.gid === g.id ? "Recording this sermon" : "Another sermon is being recorded"}</b> <span class="recclock" id="rlclock">${fmt(rec.elapsed())}</span>
+          ${rec.gid === g.id ? `<div class="actions"><button class="btn" type="button" id="rlpause">${rec.mr.state === "paused" ? "Resume" : "Pause"}</button><button class="btn" type="button" id="rlmark">Mark this moment</button><button class="btn pri" type="button" id="rlstop">Stop and save</button></div>` : `<p class="small"><a href="/prepare/${esc(rec.gid)}?tab=record">Go to that sermon to stop it</a>.</p>`}</div>`
+        : navigator.mediaDevices?.getUserMedia && window.MediaRecorder ? `<form id="rform" class="recform">
           <label><span>What is it?</span><select id="rkind"><option value="rehearsal">A rehearsal</option><option value="sermon">The sermon as preached</option></select></label>
           <label><span>Name (optional)</span><input id="rname" maxlength="120" placeholder="e.g. Sunday 9:30"></label>
           ${SR ? `<label class="chk"><input type="checkbox" id="rlive"> Also make a live transcript (your browser sends the audio to its speech service)</label>` : `<p class="small">This browser cannot make a live transcript; you can add or import one afterwards.</p>`}
@@ -41,12 +45,26 @@ export async function recordTab(api, g, body) {
             <span class="recclock" id="rclock" aria-live="off">0:00</span><span class="meter" aria-hidden="true"><i id="rlevel"></i></span></div>
           <p class="small" id="rstat" aria-live="polite">Audio is saved to this device every few seconds while you record.</p>
           <div class="livetx" id="rlivetx" hidden></div></form>` : `<p class="empty">This browser cannot record audio. You can still import a recording.</p>`}
-        <div class="actions"><label class="btn"><input type="file" id="rimport" accept="audio/*,video/mp4,video/webm" hidden>Import a recording</label><span class="small">An audio file from your phone or the church sound desk, kept on this device with the sermon.</span></div></section>
+        <div class="actions"><label class="btn filebtn"><input type="file" id="rimport" accept="audio/*,video/mp4,video/webm" class="sr">Import a recording</label><span class="small">An audio file from your phone or the church sound desk, kept on this device with the sermon.</span></div></section>
       <section><h2>Recordings <span class="small">(${p.recordings.length})</span></h2>
         ${p.recordings.length ? `<ul class="reclist">${[...p.recordings].reverse().map(r => recCard(p, r, stored.has(r.id))).join("")}</ul>` : `<p class="small">No recordings yet. Record a rehearsal to check your timing, or record the sermon on the day.</p>`}</section>
+      ${orphans.length ? `<section><h2>Audio not linked to a sermon</h2><p class="small">${orphans.length} ${orphans.length === 1 ? "recording is" : "recordings are"} stored on this device without a sermon (for example after storage filled up during recording).</p><button class="btn" type="button" id="rorph">Add ${orphans.length === 1 ? "it" : "them"} to this sermon</button></section>` : ""}
       <p class="small">Recordings stay in this browser's storage and are not part of the backup file: download any you want to keep. Planned length: ${p.target} minutes; the manuscript reads at about ${minutesAt(wordCount(p.manuscript))} minutes.</p></div>`;
     wire(g, draw);
+    if (rec && rec.gid === g.id) {
+      const tickEl = () => { const c = document.getElementById("rlclock"); if (!c) return clearInterval(liveT); c.textContent = fmt(rec ? rec.elapsed() : 0); };
+      const liveT = setInterval(tickEl, 1000);
+      body.querySelector("#rlpause")?.addEventListener("click", e => { const st = rec.pause(); e.currentTarget.textContent = st === "paused" ? "Resume" : "Pause"; });
+      body.querySelector("#rlmark")?.addEventListener("click", () => rec.mark());
+      body.querySelector("#rlstop")?.addEventListener("click", e => { e.currentTarget.disabled = true; rec.stop(); });
+    }
+    body.querySelector("#rorph")?.addEventListener("click", async () => {
+      const q = A.loadPrep(g);
+      for (const id of orphans) { const segs = await idb.segments(id).catch(() => []); q.recordings.push({ id, at: new Date(segs[0]?.at || Date.now()).toISOString(), name: "Recovered recording", mime: segs[0]?.blob?.type || "", dur: 0, kind: "sermon", segs: segs.length, complete: false, transcript: [], marks: [] }); }
+      A.savePrep(q, { now: true }); draw();
+    });
   };
+  currentRedraw = draw;
   await draw();
 }
 
@@ -63,7 +81,7 @@ function recCard(p, r, has) {
     ${refs.length ? `<p class="small"><b>Passages mentioned:</b> ${refs.map(x => `<button type="button" class="linkbtn" data-seek="${x.t}">${fmt(x.t)}</button> <a href="${x.href}">${esc(x.ref)}</a>`).join(" · ")}</p>` : ""}
     <details class="txed" ${r.transcript.length && r.transcript.length < 60 ? "" : ""}><summary>Transcript (${r.transcript.length} ${r.transcript.length === 1 ? "line" : "lines"})</summary>
       <ol class="txlines">${r.transcript.map((x, i) => `<li><button type="button" class="linkbtn tts" data-seek="${x.t}" aria-label="Play from ${fmt(x.t)}">${fmt(x.t)}</button><label class="sr" for="tx${esc(r.id)}${i}">Transcript line ${i + 1}</label><textarea id="tx${esc(r.id)}${i}" data-tx="${i}" rows="1">${esc(x.text)}</textarea><button type="button" class="ib" data-txdel="${i}" aria-label="Delete line">×</button></li>`).join("")}</ol>
-      <div class="actions"><button type="button" class="btn small" data-txadd>Add a line at the current time</button><label class="btn small"><input type="file" data-tximp accept=".vtt,.srt,.txt,text/plain,text/vtt" hidden>Import a transcript</label></div>
+      <div class="actions"><button type="button" class="btn small" data-txadd>Add a line at the current time</button><label class="btn small filebtn"><input type="file" data-tximp accept=".vtt,.srt,.txt,text/plain,text/vtt" class="sr">Import a transcript</label></div>
       <form class="txfix" data-fix><span class="small">Correct a name, term or reference everywhere:</span><label><span class="sr">Find</span><input data-from placeholder="Find, e.g. Habakuk"></label><label><span class="sr">Replace with</span><input data-to placeholder="Replace with, e.g. Habakkuk"></label><button class="btn small">Replace all</button></form></details>
     <div class="actions">${has ? `<button type="button" class="btn small" data-dl>Download the audio</button>` : ""}${r.transcript.length ? `<button type="button" class="btn small" data-dltx="vtt">Transcript (.vtt)</button><button type="button" class="btn small" data-dltx="txt">Transcript (.txt)</button>` : ""}
       ${!r.complete && has ? `<button type="button" class="btn small" data-complete>Mark as complete</button>` : ""}
@@ -100,7 +118,7 @@ function wire(g, redraw) {
     li.querySelector("[data-dl]")?.addEventListener("click", async () => { const r = A.loadPrep(g).recordings.find(x => x.id === id), blob = await idb.recordingBlob(id, r?.mime); if (!blob) return C.toast("The audio is not on this device"); A.download(`${A.slug(sermonName(A.loadPrep(g)))}-${A.slug(r.name || r.kind)}.${/mp4|m4a|aac/.test(blob.type) ? "m4a" : /mpeg|mp3/.test(blob.type) ? "mp3" : /wav/.test(blob.type) ? "wav" : /ogg/.test(blob.type) ? "ogg" : "webm"}`, blob); });
     li.querySelectorAll("[data-dltx]").forEach(b => b.addEventListener("click", () => {
       const r = A.loadPrep(g).recordings.find(x => x.id === id), lines = r.transcript;
-      const txt = b.dataset.dltx === "vtt" ? "WEBVTT\n\n" + lines.map((x, i) => `${i + 1}\n${vtt(x.t)} --> ${vtt(lines[i + 1]?.t ?? x.t + 5)}\n${x.text}\n`).join("\n") : lines.map(x => `[${fmt(x.t)}] ${x.text}`).join("\n");
+      const txt = b.dataset.dltx === "vtt" ? "WEBVTT\n\n" + lines.map((x, i) => `${i + 1}\n${vtt(x.t)} --> ${vtt(Math.max(x.t + 1, lines[i + 1]?.t ?? x.t + 5))}\n${x.text}\n`).join("\n") : lines.map(x => `[${fmt(x.t)}] ${x.text}`).join("\n");
       A.download(`${A.slug(sermonName(A.loadPrep(g)))}-transcript.${b.dataset.dltx}`, txt, b.dataset.dltx === "vtt" ? "text/vtt" : "text/plain");
     }));
     li.querySelector("[data-complete]")?.addEventListener("click", () => { upd(id, r => { r.complete = true; }); redraw(); });
@@ -113,7 +131,9 @@ function wire(g, redraw) {
     });
     li.querySelector("[data-rdel]").addEventListener("click", async e => {
       const b = e.currentTarget; if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Select again to delete the audio and transcript"; setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = "Delete"; } }, 5000); return; }
-      await idb.removeRecording(id).catch(() => {}); const q = A.loadPrep(g); q.recordings = q.recordings.filter(x => x.id !== id); A.savePrep(q, { now: true }); if (url) URL.revokeObjectURL(url); redraw();
+      const q = A.loadPrep(g); q.recordings = q.recordings.filter(x => x.id !== id); A.savePrep(q, { now: true });
+      if (!C.store.recordingInUse(id)) await idb.removeRecording(id).catch(() => {}); // another copy of this sermon may still use the audio
+      if (url) URL.revokeObjectURL(url); redraw();
     });
   });
 }
@@ -147,8 +167,8 @@ async function startRecording(g, redraw) {
     sr.onend = () => { if (rec && !pauseAt) try { sr.start(); } catch {} };
     try { sr.start(); } catch { sr = null; }
   }
-  rec = { mr, stream, sr };
-  mr.start(5000);
+  rec = { mr, stream, sr, gid: g.id, elapsed: () => elapsed(), mark: () => { const t = elapsed(); meta(r => r.marks.push({ t, label: "" })); C.toast(`Marked ${fmt(t)}`); }, stop: () => { if (mr.state !== "inactive") mr.stop(); }, pause: () => { if (mr.state === "recording") { mr.pause(); pauseAt = Date.now(); sr?.stop(); } else if (mr.state === "paused") { mr.resume(); pausedMs += Date.now() - pauseAt; pauseAt = null; try { sr?.start(); } catch {} } return mr.state; } };
+  mr.start(5000); rec.id = id; document.body.dataset.recording = "1";
   const lockP = navigator.wakeLock?.request("screen").catch(() => null);
   ["rstart"].forEach(k => $(k).disabled = true); ["rpause", "rmark", "rstop"].forEach(k => $(k).disabled = false);
   stat.textContent = "Recording. Audio is being saved every five seconds.";
@@ -162,10 +182,12 @@ async function startRecording(g, redraw) {
     const end = elapsed();
     cancelAnimationFrame(raf); ac?.close?.(); stream.getTracks().forEach(t => t.stop()); try { sr?.stop(); } catch {} (await lockP)?.release?.().catch(() => {});
     removeEventListener("beforeunload", warn); removeEventListener("routechange", leave); rec = null;
-    setTimeout(() => { meta(r => { r.complete = !failed; r.dur = end; r.segs = n; }); if (document.querySelector(".recordtab")) redraw(); C.toast("Recording saved with the sermon"); }, 400);
+    delete document.body.dataset.recording;
+    setTimeout(() => { meta(r => { r.complete = !failed; r.dur = end; r.segs = n; }); currentRedraw?.(); C.toast("Recording saved with the sermon"); }, 400);
   };
-  const leave = () => { if (mr.state !== "inactive") mr.stop(); };
-  addEventListener("routechange", leave); // leaving the page stops and saves the recording
+  // Moving around this sermon (into the preaching view, say) keeps recording; leaving the sermon stops and saves it.
+  const leave = () => setTimeout(() => { if (mr.state !== "inactive" && !location.pathname.startsWith(`/prepare/${g.id}`)) mr.stop(); }, 0);
+  addEventListener("routechange", leave);
   $("rstop").addEventListener("click", () => { $("rstop").disabled = true; stat.textContent = "Saving…"; mr.stop(); });
 }
 function warn(e) { e.preventDefault(); e.returnValue = "A recording is in progress."; }

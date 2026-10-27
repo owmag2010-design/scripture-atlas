@@ -49,8 +49,9 @@ export async function present(api, g) {
   C.setTitle(`Preach ${sermonName(p)}`);
   const S = slides(p, g.title);
   let i = 0, started = null, paused = 0, pausedAt = null, lock = null, tick = null, size = C.store.setting("preachSize", 34), loose = C.store.setting("preachLoose", true);
-  const host = document.createElement("div"); host.className = "present"; host.setAttribute("role", "dialog"); host.setAttribute("aria-label", `Preach ${sermonName(p)}`);
+  const host = document.createElement("div"); host.className = "present"; host.setAttribute("role", "dialog"); host.setAttribute("aria-modal", "true"); host.setAttribute("aria-label", `Preach ${sermonName(p)}`);
   document.body.appendChild(host); document.body.classList.add("presenting");
+  const behind = [...document.body.children].filter(x => x !== host && !x.inert); behind.forEach(x => { x.inert = true; });
   try { lock = await navigator.wakeLock?.request("screen"); } catch { lock = null; }
   const fmt = ms => { const m = Math.floor(ms / 60000), s = Math.floor(ms / 1000) % 60; return `${m}:${String(s).padStart(2, "0")}`; };
   const elapsed = () => started ? (pausedAt || Date.now()) - started - paused : 0;
@@ -61,7 +62,7 @@ export async function present(api, g) {
       ${mode === "manuscript" ? `<span class="prsize"><button type="button" data-sz="-4" aria-label="Smaller text">A−</button><button type="button" data-sz="4" aria-label="Larger text">A+</button><button type="button" data-ls aria-pressed="${loose}" aria-label="Wider line spacing">↕</button></span>` : ""}
       <button type="button" data-pass>Passage</button>
       <span class="prclock" aria-label="Time now">${clock()}</span>
-      <button type="button" data-t class="prtime" aria-label="${started ? (pausedAt ? "Resume the timer" : "Pause the timer") : "Start the timer"}">${started ? fmt(elapsed()) : "Start timer"}</button><span class="prtarget">/ ${p.target}:00</span><button type="button" data-r aria-label="Reset the timer">↺</button></div>`;
+      <button type="button" data-t class="prtime" aria-label="${started ? `Timer ${fmt(elapsed())}${pausedAt ? ", paused. Select to resume" : ". Select to pause"}` : "Start the timer"}">${started ? fmt(elapsed()) : "Start timer"}</button><span class="prtarget">/ ${p.target}:00</span><button type="button" data-r aria-label="Reset the timer">↺</button></div>`;
   const msHtml = () => {
     let n = 0;
     return `<div class="prms" style="--ps:${size}px;--pl:${loose ? 1.65 : 1.4}">${p.manuscript.map((b, k) => {
@@ -108,7 +109,7 @@ export async function present(api, g) {
         <div class="prnav"><button type="button" data-p ${i === 0 ? "disabled" : ""}>‹ Back</button><span>${i + 1} / ${S.length}</span><button type="button" data-n ${i === S.length - 1 ? "disabled" : ""}>Next ›</button></div>`;
       host.querySelector("[data-p]").addEventListener("click", () => { if (i > 0) { i--; draw(); } });
       host.querySelector("[data-n]").addEventListener("click", () => { if (i < S.length - 1) { i++; draw(); } });
-      host.querySelector("[data-n]")?.focus({ preventScroll: true });
+      (host.querySelector("[data-n]:not([disabled])") || host.querySelector("[data-p]:not([disabled])") || host.querySelector("[data-x]"))?.focus({ preventScroll: true });
     }
     host.querySelector("[data-x]").addEventListener("click", close);
     host.querySelector("[data-t]").addEventListener("click", () => { if (!started) started = Date.now(); else if (pausedAt) { paused += Date.now() - pausedAt; pausedAt = null; } else pausedAt = Date.now(); tickNow(); });
@@ -120,7 +121,7 @@ export async function present(api, g) {
     const t = host.querySelector(".prtime"), c = host.querySelector(".prclock"); if (c) c.textContent = clock();
     if (!t) return; t.textContent = started ? fmt(elapsed()) + (pausedAt ? " (paused)" : "") : "Start timer";
     t.classList.toggle("over", started && elapsed() > p.target * 60000);
-    t.setAttribute("aria-label", started ? (pausedAt ? "Resume the timer" : "Pause the timer") : "Start the timer");
+    t.setAttribute("aria-label", started ? `Timer ${fmt(elapsed())}${pausedAt ? ", paused. Select to resume" : ". Select to pause"}` : "Start the timer");
   };
   function passage() {
     const ov = document.createElement("div"); ov.className = "prpass"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", g.title);
@@ -131,8 +132,10 @@ export async function present(api, g) {
     x.addEventListener("click", shut); ov.addEventListener("click", e => { if (e.target === ov) shut(); }); ov.addEventListener("keydown", e => { if (e.key === "Escape") { e.stopPropagation(); shut(); } });
   }
   const key = e => {
-    if (host.querySelector(".prpass")) return;
+    const pop = host.querySelector(".prpass");
+    if (pop) { if (e.key === "Escape") { e.preventDefault(); pop.querySelector("[data-cx]").click(); } else if (e.key === "Tab") { e.preventDefault(); pop.querySelector("[data-cx]").focus(); } return; }
     if (/^(SELECT|INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    if ((e.key === " " || e.key === "Enter") && e.target.closest?.("button, a")) return; // let Space and Enter press the focused button
     if (mode === "manuscript" && scroller) {
       if (["ArrowDown", "PageDown", " ", "ArrowRight"].includes(e.key)) { scroller.scrollBy({ top: scroller.clientHeight * (e.key === "ArrowDown" ? 0.25 : 0.8), behavior: "smooth" }); e.preventDefault(); }
       else if (["ArrowUp", "PageUp", "ArrowLeft"].includes(e.key)) { scroller.scrollBy({ top: -scroller.clientHeight * (e.key === "ArrowUp" ? 0.25 : 0.8), behavior: "smooth" }); e.preventDefault(); }
@@ -141,7 +144,7 @@ export async function present(api, g) {
     if (e.key === "Escape") close();
   };
   let x0 = null; const ts = e => { x0 = e.touches[0].clientX; }, te = e => { if (x0 == null || mode === "manuscript") return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 60) { if (dx < 0 && i < S.length - 1) i++; else if (dx > 0 && i > 0) i--; draw(); } };
-  const cleanup = () => { document.removeEventListener("keydown", key); host.removeEventListener("touchstart", ts); host.removeEventListener("touchend", te); clearInterval(tick); A.flush(); lock?.release?.().catch(() => {}); host.remove(); document.body.classList.remove("presenting"); };
+  const cleanup = () => { behind.forEach(x => { x.inert = false; }); document.removeEventListener("keydown", key); host.removeEventListener("touchstart", ts); host.removeEventListener("touchend", te); clearInterval(tick); A.flush(); lock?.release?.().catch(() => {}); host.remove(); document.body.classList.remove("presenting"); };
   function close() { cleanup(); C.go(`/prepare/${g.id}?tab=preach`, { replace: true }); }
   document.addEventListener("keydown", key); host.addEventListener("touchstart", ts, { passive: true }); host.addEventListener("touchend", te);
   tick = setInterval(tickNow, 1000);

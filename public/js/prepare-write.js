@@ -1,7 +1,7 @@
 // Write: the sermon manuscript editor, with the passage and research on one side and the notebook on the other.
 // Also the Notebook tab and "Trace this point". Text is saved as you type; structural edits can be undone, and named
 // versions can be restored. No AI is used here; anything pasted from an AI tool can be labelled as such.
-import { BLOCK_TYPES, ORIGINS, NOTE_TYPES, KIND_LABEL, cleanBlock, cleanNote, blockId, manuscriptFromOutline, reviewFlags, tracePoint, sections, wordCount, minutesAt, sermonName } from "./prep-core.js";
+import { BLOCK_TYPES, ORIGINS, NOTE_TYPES, KIND_LABEL, trimVersions, cleanBlock, cleanNote, blockId, manuscriptFromOutline, reviewFlags, tracePoint, sections, wordCount, minutesAt, sermonName } from "./prep-core.js";
 
 let A, C, esc;
 const TYPE_LABEL = Object.fromEntries(BLOCK_TYPES);
@@ -54,7 +54,7 @@ function saveVersion(p, label) {
   const last = p.versions.at(-1);
   if (last && JSON.stringify(last.manuscript) === snap(p) && !label) return p;
   p.versions.push({ at: new Date().toISOString(), label: label || "Saved", idea: p.idea, manuscript: structuredClone(p.manuscript) });
-  if (p.versions.length > 25) p.versions.splice(0, p.versions.length - 25);
+  p.versions = trimVersions(p.versions);
   return p;
 }
 // Leaving the editor keeps a recoverable version when the manuscript changed and the last version is more than ten minutes old.
@@ -68,6 +68,7 @@ addEventListener("routechange", () => {
 /* ---------- the Write tab ---------- */
 export async function writeTab(api, g, body) {
   setup(api); autoFor = g; review = false; focusIdx = -1;
+  hist.delete(g.id); fut.delete(g.id); // the manuscript may have changed elsewhere (e.g. an illustration added), so undo starts fresh
   const p = A.loadPrep(g), wide = matchMedia("(min-width: 1100px)").matches;
   body.innerHTML = `<div class="writebar" role="toolbar" aria-label="Manuscript tools">
       <button class="btn" type="button" id="wundo" title="Undo (Ctrl+Z outside a text box)">Undo</button><button class="btn" type="button" id="wredo">Redo</button>
@@ -109,14 +110,14 @@ function insert(g, block, { atEnd = false } = {}) {
   const at = atEnd || focusIdx < 0 || focusIdx >= p.manuscript.length ? p.manuscript.length : focusIdx + 1;
   p.manuscript.splice(at, 0, block); A.savePrep(p, { now: true }); focusIdx = at; drawEditor(g, at);
 }
-function drawEditor(g, focusAt = null) {
+function drawEditor(g, focusAt = null, focusSel = "[data-text]") {
   const p = A.loadPrep(g), list = document.getElementById("mlist"); if (!list) return;
   const heads = p.manuscript.filter(b => b.type === "heading");
   list.innerHTML = p.manuscript.length ? p.manuscript.map((b, i) => `<li class="mblock t-${b.type} o-${b.origin}" data-i="${i}">
-      <div class="mbhead"><label class="sr" for="mt${i}">Block type</label><select id="mt${i}" data-type>${BLOCK_TYPES.map(([k, l]) => `<option value="${k}" ${k === b.type ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>
-        <label class="sr" for="mo${i}">Whose words</label><select id="mo${i}" data-origin class="osel">${Object.entries(ORIGINS).map(([k, l]) => `<option value="${k}" ${k === b.origin ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>
+      <div class="mbhead"><label class="sr" for="mt${i}">Type of block ${i + 1}</label><select id="mt${i}" data-type>${BLOCK_TYPES.map(([k, l]) => `<option value="${k}" ${k === b.type ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>
+        <label class="sr" for="mo${i}">Whose words, block ${i + 1}</label><select id="mo${i}" data-origin class="osel">${Object.entries(ORIGINS).map(([k, l]) => `<option value="${k}" ${k === b.origin ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>
         ${b.type === "heading" ? `<button type="button" class="btn small trace" data-trace>Trace this point</button>` : ""}
-        <span class="obact"><button type="button" class="ib" data-mv="-1" ${i === 0 ? "disabled" : ""} aria-label="Move up">↑</button><button type="button" class="ib" data-mv="1" ${i === p.manuscript.length - 1 ? "disabled" : ""} aria-label="Move down">↓</button><button type="button" class="ib" data-dup aria-label="Duplicate">⧉</button><button type="button" class="ib" data-del aria-label="Remove">×</button></span></div>
+        <span class="obact"><button type="button" class="ib" data-mv="-1" ${i === 0 ? "disabled" : ""} aria-label="Move block ${i + 1} up">↑</button><button type="button" class="ib" data-mv="1" ${i === p.manuscript.length - 1 ? "disabled" : ""} aria-label="Move block ${i + 1} down">↓</button><button type="button" class="ib" data-dup aria-label="Duplicate block ${i + 1}">⧉</button><button type="button" class="ib" data-del aria-label="Remove block ${i + 1}">×</button></span></div>
       <label class="sr" for="mx${i}">${esc(TYPE_LABEL[b.type])}</label><textarea id="mx${i}" data-text rows="${b.type === "heading" ? 1 : 3}" placeholder="${esc(placeholder(b.type))}">${esc(b.text)}</textarea>
       ${CITED.has(b.type) || b.cite || b.origin === "quote" || b.origin === "interp" ? `<label class="mcite"><span class="sr">Source for this block</span><input data-cite value="${esc(b.cite)}" placeholder="Source or reference, e.g. John 1:14 (KJV) or Matthew Henry on John 1:14"></label>` : ""}
       <div class="mflag" data-flag></div></li>`).join("")
@@ -129,14 +130,14 @@ function drawEditor(g, focusAt = null) {
     li.querySelectorAll("select, input, button").forEach(el => el.addEventListener("focus", () => { focusIdx = i; }));
     ta.addEventListener("input", () => { const q = A.loadPrep(g); if (!q.manuscript[i]) return; if (!editing) { pushUndo(q); editing = true; } q.manuscript[i].text = ta.value; A.savePrep(q); grow(ta); stats(g); });
     li.querySelector("[data-cite]")?.addEventListener("input", e => { const q = A.loadPrep(g); if (q.manuscript[i]) { q.manuscript[i].cite = e.target.value; A.savePrep(q); } });
-    li.querySelector("[data-type]").addEventListener("change", e => { const q = A.loadPrep(g); pushUndo(q); const b = q.manuscript[i]; b.type = e.target.value; if (b.type === "scripture") b.origin = "scripture"; else if (b.origin === "scripture") b.origin = "mine"; A.savePrep(q, { now: true }); drawEditor(g, i); });
-    li.querySelector("[data-origin]").addEventListener("change", e => { const q = A.loadPrep(g); pushUndo(q); q.manuscript[i].origin = e.target.value; A.savePrep(q, { now: true }); drawEditor(g, i); });
-    li.querySelectorAll("[data-mv]").forEach(b => b.addEventListener("click", () => { const q = A.loadPrep(g), j = i + +b.dataset.mv; pushUndo(q); [q.manuscript[i], q.manuscript[j]] = [q.manuscript[j], q.manuscript[i]]; A.savePrep(q, { now: true }); drawEditor(g, j); }));
+    li.querySelector("[data-type]").addEventListener("change", e => { const q = A.loadPrep(g); pushUndo(q); const b = q.manuscript[i]; b.type = e.target.value; if (b.type === "scripture") b.origin = "scripture"; else if (b.origin === "scripture") b.origin = "mine"; A.savePrep(q, { now: true }); drawEditor(g, i, "[data-type]"); });
+    li.querySelector("[data-origin]").addEventListener("change", e => { const q = A.loadPrep(g); pushUndo(q); q.manuscript[i].origin = e.target.value; A.savePrep(q, { now: true }); drawEditor(g, i, "[data-origin]"); });
+    li.querySelectorAll("[data-mv]").forEach(b => b.addEventListener("click", () => { const q = A.loadPrep(g), d = +b.dataset.mv, j = i + d; pushUndo(q); [q.manuscript[i], q.manuscript[j]] = [q.manuscript[j], q.manuscript[i]]; A.savePrep(q, { now: true }); drawEditor(g, j, `[data-mv="${d}"]:not([disabled]), [data-text]`); }));
     li.querySelector("[data-dup]").addEventListener("click", () => { const q = A.loadPrep(g); pushUndo(q); q.manuscript.splice(i + 1, 0, { ...q.manuscript[i], id: blockId() }); A.savePrep(q, { now: true }); drawEditor(g, i + 1); });
-    li.querySelector("[data-del]").addEventListener("click", () => { const q = A.loadPrep(g); pushUndo(q); q.manuscript.splice(i, 1); A.savePrep(q, { now: true }); focusIdx = Math.min(i, q.manuscript.length - 1); drawEditor(g); C.toast("Block removed. Undo brings it back."); });
+    li.querySelector("[data-del]").addEventListener("click", () => { const q = A.loadPrep(g); pushUndo(q); q.manuscript.splice(i, 1); A.savePrep(q, { now: true }); focusIdx = Math.min(i, q.manuscript.length - 1); drawEditor(g, focusIdx >= 0 ? focusIdx : null); if (focusIdx < 0) document.getElementById("wundo")?.focus(); C.toast("Block removed. Undo brings it back."); });
     li.querySelector("[data-trace]")?.addEventListener("click", () => traceDialog(g, A.loadPrep(g).manuscript[i].id));
   });
-  if (focusAt != null) list.querySelector(`.mblock[data-i="${focusAt}"] [data-text]`)?.focus();
+  if (focusAt != null) list.querySelector(`.mblock[data-i="${focusAt}"]`)?.querySelector(focusSel)?.focus();
   stats(g); if (review) drawFlags(g);
   // keep point headings in the notebook's "link to point" list current
   const sel = document.getElementById("nbpoint"); if (sel) { const cur = sel.value; sel.innerHTML = `<option value="">No point</option>${heads.map(h => `<option value="${esc(h.pointId || h.id)}">${esc(h.text.slice(0, 50) || "Untitled point")}</option>`).join("")}`; sel.value = cur; }
@@ -271,7 +272,8 @@ export async function notebookTab(api, g, body) {
 /* ---------- trace this point ---------- */
 function traceDialog(g, headingId) {
   const p = A.loadPrep(g), tr = tracePoint(p, headingId); if (!tr) return;
-  const prev = document.activeElement;
+  document.querySelector(".tracedlg")?.remove();
+  const prevId = document.activeElement?.closest(".mblock")?.dataset.i;
   const col = (h, items, empty, render = x => `<p>${esc(x.text.length > 320 ? x.text.slice(0, 320) + "…" : x.text)}</p>${x.cite ? `<p class="small">${esc(x.cite)}</p>` : ""}`) => `<section><h3>${h}</h3>${items.length ? `<ul>${items.map(x => `<li>${render(x)}</li>`).join("")}</ul>` : `<p class="small missing">${empty}</p>`}</section>`;
   const host = document.createElement("div"); host.className = "tracedlg"; host.setAttribute("role", "dialog"); host.setAttribute("aria-modal", "true"); host.setAttribute("aria-labelledby", "trh");
   host.innerHTML = `<div class="trbox"><div class="trtop"><h2 id="trh">Trace: ${esc(tr.point || "Untitled point")}</h2><button type="button" class="ib" data-x aria-label="Close">×</button></div>
@@ -287,8 +289,13 @@ function traceDialog(g, headingId) {
     ${tr.flags.length ? `<ul class="trflags">${tr.flags.map(f => `<li>${esc(f.msg)}</li>`).join("")}</ul>` : ""}
     <p class="small">Your own words in this section: ${tr.mine.length} ${tr.mine.length === 1 ? "block" : "blocks"}. Labels come from the “Whose words” setting on each block.</p></div>`;
   document.body.appendChild(host);
-  const close = () => { host.remove(); document.removeEventListener("keydown", esc_); prev?.focus?.(); };
-  const esc_ = e => { if (e.key === "Escape") close(); };
+  const behind = [...document.body.children].filter(x => x !== host && !x.inert); behind.forEach(x => { x.inert = true; });
+  const close = () => { behind.forEach(x => { x.inert = false; }); host.remove(); document.removeEventListener("keydown", esc_); removeEventListener("routechange", close); document.querySelector(`.mblock[data-i="${prevId}"] [data-trace]`)?.focus(); };
+  const esc_ = e => {
+    if (e.key === "Escape") return close();
+    if (e.key === "Tab") { const f = [...host.querySelectorAll("button, a[href], [tabindex]")]; if (!f.length) return; const first = f[0], last = f.at(-1); if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } else if (!host.contains(document.activeElement)) { e.preventDefault(); first.focus(); } }
+  };
+  addEventListener("routechange", close, { once: true });
   host.addEventListener("click", e => { if (e.target === host) close(); });
   host.querySelector("[data-x]").addEventListener("click", close); document.addEventListener("keydown", esc_);
   host.querySelector("[data-x]").focus();

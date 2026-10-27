@@ -19,9 +19,9 @@ function passageOf(spec) {
 /** A sermon id or a passage → the sermon to open. A passage opens its most recently edited sermon, or a new one. */
 function resolve(spec) {
   const rec = SERMON_ID.test(spec) ? C.store.prep(spec) : null;
-  if (rec) { const g = passageOf(rec.key); if (g) return { ...g, id: rec.id || spec }; }
+  if (rec) { const g = passageOf(rec.key); if (g) return { ...g, id: spec }; }
   const g = passageOf(spec); if (!g) return null;
-  const list = C.store.sermonsFor(g.key);
+  const list = C.store.sermonsFor(g.key).filter(x => SERMON_ID.test(x.id));
   if (list.length) return { ...g, id: list[0].id };
   return { ...g, id: C.store.prep(g.key) ? newSermonId() : g.key };
 }
@@ -36,6 +36,7 @@ function flush() {
   const s = document.getElementById("prepsaved"); if (s) { s.textContent = lastSaveOk ? "Saved on this device" : "Not saved: this browser's storage is full. Download a backup from Details."; s.classList.toggle("bad", !lastSaveOk); }
 }
 function savePrep(p, { now = false } = {}) {
+  if (pending && pending.id !== p.id) flush(); // never drop another sermon's unsaved edit
   pending = structuredClone(p); clearTimeout(saveTimer);
   const s = document.getElementById("prepsaved"); if (s && !now) s.textContent = "Saving…";
   if (now) flush(); else saveTimer = setTimeout(flush, 400);
@@ -89,7 +90,7 @@ function wireStart(id = "pf") {
     C.go(`/prepare/${sid}`);
   });
 }
-const allSermons = () => C.store.preps().map(r => { const p = cleanPrep(r, r.key, r.title || r.key); p.id = r.id; return p; }).filter(p => p.key);
+const allSermons = () => C.store.preps().filter(r => SERMON_ID.test(r.id) && r.key).map(r => { const p = cleanPrep(r, r.key, r.title || r.key); p.id = r.id; return p; });
 function sermonRow(p) {
   const n = doneCount(p), w = wordCount(p.manuscript);
   const bits = [p.name ? esc(p.title) : "", p.date ? esc(fmtDate(p.date)) : "", p.venue ? esc(p.venue) : "", `${n} of ${STEPS.length} steps`, w ? `${w.toLocaleString()} words` : "", p.recordings.length ? `${p.recordings.length} ${p.recordings.length === 1 ? "recording" : "recordings"}` : ""].filter(Boolean);
@@ -159,7 +160,7 @@ export async function renderPrepare(ctx, spec, sub) {
   if (spec === "import") return (await import("./prepare-tools.js")).importPage(api());
   const g = resolve(spec);
   if (!g) { C.view.innerHTML = `<div class="pagehead"><h1>Sermon not found</h1><p class="small">It may have been made on another device, or the passage is not recognised. Try a passage such as John 1:1-18.</p>${startForm()}</div>`; wireStart(); return; }
-  if (g.id !== spec) C.setPath(`/prepare/${g.id}${sub ? "/" + sub : ""}${location.search}`);
+  if (g.id !== spec) C.setPath(`/prepare/${esc(g.id)}${sub ? "/" + sub : ""}${location.search}`);
   if (sub === "present") return (await import("./prepare-preach.js")).present(api(), g);
   if (sub === "handout" || sub === "group") return handout(g, sub);
   if (sub === "sheet") return passageSheet(g);
@@ -171,10 +172,9 @@ export async function renderPrepare(ctx, spec, sub) {
 const TABS = [["study", "Study"], ["write", "Write"], ["notes", "Notebook"], ["docs", "Documents"], ["preach", "Preach"], ["record", "Record"], ["details", "Details"]];
 async function workspace(g) {
   const p = loadPrep(g);
-  if (!C.store.prep(g.id)) { C.store.savePrep(p); }
   const qp = new URLSearchParams(location.search);
   const tab = TABS.some(([k]) => k === qp.get("tab")) ? qp.get("tab") : (qp.get("step") ? "study" : (p.manuscript.length ? "write" : "study"));
-  const n = doneCount(p), others = C.store.sermonsFor(g.key).filter(x => x.id !== g.id);
+  const n = doneCount(p), others = C.store.sermonsFor(g.key).filter(x => x.id !== g.id && SERMON_ID.test(x.id));
   C.setTitle(`${sermonName(p)} · Prepare`);
   C.store.setSetting("activePrep", g.id);
   const w = wordCount(p.manuscript);
@@ -204,7 +204,7 @@ async function studyTab(g, body) {
       <a class="btn" href="${C.readUrl(t, g.book, g.chapter, g.from)}">Open in the Research Desk</a><a class="btn pri" href="/prepare/${esc(g.id)}?tab=write">Write the sermon</a></div>
     <div class="prep">
     <nav class="prepsteps" aria-label="Preparation steps"><ol>${STEPS.map(([k, l, d], i) => `<li><a href="/prepare/${esc(g.id)}?tab=study&step=${k}" data-step="${k}" ${k === step ? 'aria-current="step"' : ""} class="${p.steps[k]?.done ? "done" : ""}"><span class="pn" aria-hidden="true">${p.steps[k]?.done ? "✓" : i + 1}</span><span><b>${l}</b><span class="small">${d}</span></span></a></li>`).join("")}</ol></nav>
-    <section class="prepmain" id="prepmain" aria-live="polite"><p class="loading">Opening ${esc(STEPS.find(s => s[0] === step)[1])}…</p></section>
+    <section class="prepmain" id="prepmain"><p class="loading">Opening ${esc(STEPS.find(s => s[0] === step)[1])}…</p></section>
   </div>`;
   document.getElementById("ptr").addEventListener("change", e => { C.store.setSetting("prepT", e.target.value); workspace(g); });
   await renderStep(g, step);
@@ -256,7 +256,7 @@ function detailsTab(g, body) {
   $("ddel").addEventListener("click", e => {
     const b = e.currentTarget;
     if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Select again to delete it permanently"; setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = "Delete this sermon"; } }, 5000); return; }
-    const recs = loadPrep(g).recordings; pending = null; clearTimeout(saveTimer); C.store.removePrep(g.id); import("./idb.js").then(m => Promise.all(recs.map(r => m.removeRecording(r.id)))).catch(() => {});
+    const recs = loadPrep(g).recordings; pending = null; clearTimeout(saveTimer); C.store.removePrep(g.id); import("./idb.js").then(m => Promise.all(recs.filter(r => !C.store.recordingInUse(r.id)).map(r => m.removeRecording(r.id)))).catch(() => {});
     C.toast("Sermon deleted"); C.go("/prepare");
   });
   import("./idb.js").then(async m => { const ok = await m.persist(), est = await m.estimate(); const el = $("persist"); if (el) el.textContent = `${ok ? "This browser has agreed to keep Ereunia's storage." : "This browser may clear Ereunia's storage when space is low."}${est?.quota ? ` Using ${(est.usage / 1048576).toFixed(1)} MB of about ${(est.quota / 1048576).toFixed(0)} MB available.` : ""}${C.store.setting("lastBackup", "") ? ` Last backup: ${fmtDate(C.store.setting("lastBackup", ""))}.` : " No backup downloaded yet."}`; }).catch(() => {});
@@ -307,7 +307,7 @@ async function renderStep(g, step) {
   const notes = p.steps[k]?.notes || "", done = !!p.steps[k]?.done;
   main.innerHTML = `<h2>${i + 1}. ${label}</h2><p class="small stepdesc">${desc}</p>${body}
     ${k === "outline" ? "" : `<div class="stepnotes"><label for="snotes"><b>Your notes</b></label><textarea id="snotes" rows="6" placeholder="What you see in ${esc(g.title)}…">${esc(notes)}</textarea></div>`}
-    <div class="actions stepnav"><button class="btn ${done ? "on" : ""}" type="button" id="sdone" aria-pressed="${done}">${done ? "Step done" : "Mark step done"}</button>${next ? `<a class="btn pri" href="/prepare/${g.id}?tab=study&step=${next[0]}">Next: ${next[1]}</a>` : `<a class="btn pri" href="/prepare/${g.id}?tab=write">Write the sermon</a>`}</div>`;
+    <div class="actions stepnav"><button class="btn ${done ? "on" : ""}" type="button" id="sdone" aria-pressed="${done}">${done ? "Step done" : "Mark step done"}</button>${next ? `<a class="btn pri" href="/prepare/${esc(g.id)}?tab=study&step=${next[0]}">Next: ${next[1]}</a>` : `<a class="btn pri" href="/prepare/${esc(g.id)}?tab=write">Write the sermon</a>`}</div>`;
   document.querySelectorAll(".prepsteps a").forEach(a => { if (a.dataset.step === k) a.setAttribute("aria-current", "step"); else a.removeAttribute("aria-current"); });
   const pp = () => loadPrep(g);
   document.getElementById("snotes")?.addEventListener("input", e => { const q = pp(); q.steps[k] = { ...(q.steps[k] || {}), notes: e.target.value }; savePrep(q); });
@@ -423,7 +423,7 @@ const STEP_BODY = {
   async apply(g, p) {
     return `<ul class="prompts">${C.APPLY.map(q => `<li>${esc(q)}</li>`).join("")}</ul>
       <p>When the outline is ready, prepare for Sunday and after:</p>
-      <div class="actions"><a class="btn pri" href="/prepare/${g.id}?tab=write">Write the sermon</a><a class="btn" href="/prepare/${g.id}?tab=docs">Make the documents</a><a class="btn" href="/prepare/${g.id}?tab=preach">Preach from it</a></div>`;
+      <div class="actions"><a class="btn pri" href="/prepare/${esc(g.id)}?tab=write">Write the sermon</a><a class="btn" href="/prepare/${esc(g.id)}?tab=docs">Make the documents</a><a class="btn" href="/prepare/${esc(g.id)}?tab=preach">Preach from it</a></div>`;
   }
 };
 
@@ -449,13 +449,17 @@ function wireRead(g) {
 function wireOutline(g) {
   const main = document.getElementById("prepmain");
   const rerender = () => renderStep(g, "outline");
-  const mutate = (fn, { redraw = true } = {}) => { const q = loadPrep(g); fn(q); savePrep(q, { now: true }); if (redraw) rerender(); };
+  const mutate = (fn, { redraw = true, focus = "#addpoint" } = {}) => { const q = loadPrep(g); fn(q); savePrep(q, { now: true }); if (redraw) Promise.resolve(rerender()).then(() => document.querySelector(focus)?.focus()); };
   document.getElementById("oidea").addEventListener("input", e => { const q = loadPrep(g); q.idea = e.target.value; savePrep(q); });
-  document.getElementById("addpoint").addEventListener("click", () => mutate(q => q.points.push({ id: blockId(), text: "", blocks: [] })));
+  document.getElementById("addpoint").addEventListener("click", () => { if (loadPrep(g).points.length >= 60) return C.toast("An outline can have up to 60 points"); mutate(q => q.points.push({ id: blockId(), text: "", blocks: [] }), { focus: ".opoint:last-child [data-ptext]" }); });
   main.querySelectorAll(".opoint").forEach(li => {
     const pi = +li.dataset.pi;
     li.querySelector("[data-ptext]").addEventListener("input", e => { const q = loadPrep(g); if (q.points[pi]) q.points[pi].text = e.target.value; savePrep(q); });
-    li.querySelector("[data-pdel]").addEventListener("click", () => { if (loadPrep(g).points[pi].blocks.length && !confirmRemove()) return; mutate(q => { const [pt] = q.points.splice(pi, 1); q.inbox.push(...pt.blocks.filter(b => b.kind !== "note")); }); });
+    li.querySelector("[data-pdel]").addEventListener("click", e => {
+      const b = e.currentTarget, typed = loadPrep(g).points[pi].blocks.some(x => x.kind === "note" && x.text.trim());
+      if (typed && !b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Delete point and its notes?"; b.classList.add("armed"); setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = "×"; b.classList.remove("armed"); } }, 5000); return; }
+      mutate(q => { const [pt] = q.points.splice(pi, 1); q.inbox.push(...pt.blocks.filter(x => x.kind !== "note")); });
+    });
     li.querySelectorAll("[data-pmove]").forEach(b => b.addEventListener("click", () => mutate(q => { const j = pi + +b.dataset.pmove; [q.points[pi], q.points[j]] = [q.points[j], q.points[pi]]; })));
     li.querySelector("[data-addnote]").addEventListener("click", () => mutate(q => q.points[pi].blocks.push({ id: blockId(), kind: "note", text: "", cite: "", href: "" })));
     li.querySelectorAll(".oblock").forEach(bl => {
@@ -471,8 +475,7 @@ function wireOutline(g) {
     li.querySelector("[data-idel]").addEventListener("click", () => mutate(q => q.inbox.splice(ii, 1)));
   });
 }
-// Removing a point returns its material to the collection, so nothing is lost; notes typed in it are the only loss.
-const confirmRemove = () => true;
+// Removing a point returns its collected material to the collection; notes typed in it need a second press.
 
 /* ---------- printable handout and small-group guide ---------- */
 async function handout(g, kind) {
@@ -481,7 +484,7 @@ async function handout(g, kind) {
   C.setTitle(`${group ? "Small-group guide" : "Handout"}: ${g.title}`);
   const sources = [...new Set(p.points.flatMap(pt => pt.blocks.map(b => b.cite).filter(Boolean)))];
   const qs = [...C.OBSERVE.slice(0, 3), ...C.interpretQuestions(C.groupOf(g.book)).slice(0, 2), ...C.APPLY.slice(0, 3)];
-  C.view.innerHTML = `<div class="actions noprint handoutbar"><a class="btn" href="/prepare/${g.id}?tab=study&step=${group ? "apply" : "outline"}">‹ Back to preparation</a><button class="btn pri" type="button" id="hprint">Print or save as PDF</button><span class="small">Choose “Save as PDF” in the print window for a PDF.</span></div>
+  C.view.innerHTML = `<div class="actions noprint handoutbar"><a class="btn" href="/prepare/${esc(g.id)}?tab=study&step=${group ? "apply" : "outline"}">‹ Back to preparation</a><button class="btn pri" type="button" id="hprint">Print or save as PDF</button><span class="small">Choose “Save as PDF” in the print window for a PDF.</span></div>
   <article class="handout">
     <header><p class="small">${group ? "Small-group guide" : "Sermon notes"} · ${esc(C.META[t].name)}</p><h1>${esc(g.title)}</h1>${p.idea ? `<p class="hidea">${esc(p.idea)}</p>` : ""}</header>
     <section><h2>The passage</h2><p class="htext">${verses.map(([n, v]) => `<sup>${n}</sup>${esc(v)}`).join(" ")}</p></section>
@@ -508,7 +511,7 @@ async function passageSheet(g) {
   const p = loadPrep(g), t0 = translation(), t = C.langOf(t0) === "en" ? t0 : "kjv", { verses } = await passageVerses(g, t);
   C.setTitle(`Study sheet: ${g.title}`);
   const rep = C.repeatedWords(verses.map(v => v[1])).slice(0, 8);
-  C.view.innerHTML = `<div class="actions noprint handoutbar"><a class="btn" href="/prepare/${g.id}?tab=study&step=observe">‹ Back to preparation</a><button class="btn pri" type="button" id="hprint">Print or save as PDF</button><span class="small">The wide margin is for your own marks and notes.</span></div>
+  C.view.innerHTML = `<div class="actions noprint handoutbar"><a class="btn" href="/prepare/${esc(g.id)}?tab=study&step=observe">‹ Back to preparation</a><button class="btn pri" type="button" id="hprint">Print or save as PDF</button><span class="small">The wide margin is for your own marks and notes.</span></div>
   <article class="handout studysheet">
     <header><p class="small">Passage study sheet · ${esc(C.META[t].name)}</p><h1>${esc(g.title)}</h1></header>
     <div class="sheetgrid"><div class="struct">${clauses(verses).map(x => `<p class="cl i${x.indent}">${x.verse ? `<sup>${x.verse}</sup>` : ""}${esc(x.text)}</p>`).join("")}</div><div class="smargin" aria-hidden="true"></div></div>
@@ -534,7 +537,7 @@ async function familySheet(g) {
   C.setTitle(`Family sheet: ${g.title}`);
   const short = verses.length > 12;
   const qs = ["What happens in this passage? Tell it in your own words.", "What does it show us about God?", "Is there someone in the passage you would like to be like? Why?", "What is one thing we could do this week because of it?", "What could we thank God for, or ask him for, after reading it?"];
-  C.view.innerHTML = `<div class="actions noprint handoutbar"><a class="btn" href="/prepare/${g.id}?tab=study&step=apply">‹ Back to preparation</a><button class="btn pri" type="button" id="hprint">Print or save as PDF</button><span class="small">For families to take home after the service.</span></div>
+  C.view.innerHTML = `<div class="actions noprint handoutbar"><a class="btn" href="/prepare/${esc(g.id)}?tab=study&step=apply">‹ Back to preparation</a><button class="btn pri" type="button" id="hprint">Print or save as PDF</button><span class="small">For families to take home after the service.</span></div>
   <article class="handout family">
     <header><p class="small">To read together at home · ${esc(C.META[t].name)}</p><h1>${esc(g.title)}</h1>${p.idea ? `<p class="hidea">${esc(p.idea)}</p>` : ""}</header>
     <section><h2>Read it together</h2><p class="htext">${(short ? verses.slice(0, 12) : verses).map(([n, v]) => `<sup>${n}</sup>${esc(v)}`).join(" ")}${short ? ` <i>Read on to the end of ${esc(g.title)} in your Bible.</i>` : ""}</p></section>
