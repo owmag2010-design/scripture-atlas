@@ -1782,3 +1782,24 @@ body.kidsmode main, body.kidsmode footer.site { --lapis: #2E2820; --lapis-soft: 
 .prpbox h2 { margin: 0; color: var(--gold); font-family: var(--serif); }
 .prptext { font: 1.4rem/1.6 var(--serif); margin-top: 10px; } .prptext sup { color: var(--gold); font: 700 .6em var(--sans); margin: 0 3px; }
 .prpbox .ib { color: #F5EFE6; }
+
+/* record tab */
+.recordtab section { margin-bottom: 26px; }
+.recform { display: grid; gap: 10px; padding: 16px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--page); }
+.recform > label:not(.chk) { display: grid; gap: 3px; max-width: 420px; font-size: .9rem; color: var(--muted); }
+.recform select, .recform input:not([type=checkbox]) { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--bg); color: var(--ink); }
+.recclock { font: 600 1.4rem var(--sans); font-variant-numeric: tabular-nums; min-width: 4ch; }
+.meter { display: inline-block; width: 120px; height: 8px; border-radius: 4px; background: var(--soft); overflow: hidden; } .meter i { display: block; height: 100%; width: 0; background: var(--gilt); transition: width .08s; }
+.livetx { padding: 10px 12px; background: var(--soft); border-radius: 8px; font-size: .95rem; max-height: 160px; overflow: auto; } .livetx p { margin: 2px 0; } .livetx .interim { color: var(--muted); font-style: italic; }
+.reclist { list-style: none; padding: 0; display: grid; gap: 14px; }
+.reccard { border: 1px solid var(--line); border-radius: var(--r-sm); padding: 14px 16px; background: var(--page); display: grid; gap: 8px; }
+.reccard audio { width: 100%; }
+.rchead { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; }
+.txed summary { cursor: pointer; font-weight: 600; min-height: 24px; }
+.txlines { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 4px; max-height: 460px; overflow: auto; }
+.txlines li { display: grid; grid-template-columns: 4.5em 1fr auto; gap: 6px; align-items: start; }
+.txlines textarea { border: 1px solid transparent; border-radius: 6px; padding: 4px 6px; background: transparent; font: inherit; resize: none; color: var(--ink); }
+.txlines textarea:focus { border-color: var(--line); background: var(--bg); outline: none; }
+.tts { font-variant-numeric: tabular-nums; }
+.txfix { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; } .txfix input { border: 1px solid var(--line); border-radius: 8px; padding: 6px 9px; background: var(--bg); }
+.missing { color: var(--rubric); }
