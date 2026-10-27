@@ -2,8 +2,12 @@
 // Present, handout and Word exports. Everything is kept on this device. No AI is used here.
 import { STEPS, KIND_LABEL, cleanPrep, newPrep, doneCount, outlineDoc, slides, blockId, clauses, linkCounts, cleanSeries, weekDates, seriesIcs, preachedLog } from "./prep-core.js";
 import { buildDocx } from "./docx.js";
+import { STUDY_VISUALS, studyRoute } from "./pastor-visuals.js";
+import { createSourceDrawer } from "./pastor-source-drawer.js";
 
 let C; // context from app.js
+let room = null, stepSequence = 0;
+addEventListener("routechange",()=>{stepSequence++;room?.drawer.close();room=null;});
 const esc = s => C.esc(s);
 
 /* ---------- shared ---------- */
@@ -60,12 +64,12 @@ function prepList() {
 }
 
 export async function renderPastors(ctx, section, id) {
-  const { renderStudio } = await import('./pastor-studio.js?v=editions3');
+  const { renderStudio } = await import('./pastor-studio.js?v=immersive1');
   return renderStudio(ctx, section, id);
 }
 
 export async function renderPrepare(ctx, spec, sub) {
-  C = ctx; C.setNav("pastors"); await C.getIndex();
+  room?.drawer.close();room=null;C = ctx; C.setNav("pastors"); await C.getIndex();
   if (!spec) {
     C.setTitle("Prepare");
     C.view.innerHTML = `<div class="pagehead"><span class="eyebrow"><a href="/pastors">For pastors and teachers</a></span><h1>Prepare a sermon or lesson</h1><p class="small">Choose a passage. Ereunia walks you through it in eight steps and keeps your work on this device.</p>${startForm()}</div><section class="prepstart"><h2>Your preparations</h2>${prepList()}${planLinks()}</section>`;
@@ -80,6 +84,43 @@ export async function renderPrepare(ctx, spec, sub) {
   if (sub === "sheet") return passageSheet(g);
   if (sub === "family") return familySheet(g);
   return workspace(g);
+}
+
+
+/* A complete preparation, mounted inside Pastors or inside an existing sermon. */
+export async function mountPastorStudy(ctx, spec, host, {sermonId='', onSnapshot=null, onOutline=null}={}) {
+  flush();room?.drawer.close();C=ctx;await C.getIndex();const g=passageOf(spec);
+  if(!g){host.innerHTML='<p class="empty">Choose a valid Bible passage to begin.</p>';return;}
+  const p=loadPrep(g), qp=new URLSearchParams(location.search),step=STEPS.some(([k])=>k===qp.get('step'))?qp.get('step'):'read';
+  C.store.setSetting('activePrep',g.key);
+  const drawer=createSourceDrawer({...C,studyBook:g.book},item=>{const q=loadPrep(g);q.inbox.push({id:blockId(),...item});savePrep(q,{now:true});updateCollection();C.toast('Kept with this passage. Arrange it in Outline.');});
+  room={g,host,sermonId,drawer,onOutline};host.classList.add('pastor-study-room');
+  host.innerHTML=`<header class="room-heading"><div><span class="eyebrow">${sermonId?'YOUR SERMON / STUDY ROOM':'PASTORS / THE STUDY ROOM'}</span><h${sermonId?'2':'1'}>${esc(g.title)}</h${sermonId?'2':'1'}></div><div class="room-actions"><label class="sr" for="ptr">Study translation</label><select id="ptr">${C.translationOptions(translation())}</select><button type="button" class="btn" id="room-collection"><span id="collection-count">${p.inbox.length}</span> collected ↓</button><button type="button" class="btn pri" id="room-manuscript">${sermonId?'Save study':'Start a sermon'} →</button></div></header>
+    <nav class="room-stages prepsteps" aria-label="Preparation steps"><ol>${STEPS.map(([k,label])=>{const v=STUDY_VISUALS[k];return `<li><a data-step="${k}" aria-label="${label}, study space ${v.mark}" href="${studyRoute(g.key,k,sermonId)}" ${step===k?'aria-current="step"':''} class="${p.steps[k]?.done?'done':''}"><span class="room-stage-image">${C.pic(v.image,{sizes:'130px'})}<span class="pn">${p.steps[k]?.done?'✓':v.mark}</span></span><b>${label}</b></a></li>`;}).join('')}</ol></nav>
+    <div class="prepbar room-progress"><div class="progress" role="progressbar" aria-label="Steps done" aria-valuemin="0" aria-valuemax="8" aria-valuenow="${doneCount(p)}"><i style="width:${doneCount(p)/8*100}%"></i></div><span class="small"><span id="prepcount">${doneCount(p)} of 8 steps done</span> · <span id="prepsaved">Saved on this device</span></span></div>
+    <section id="prepmain" class="prepmain room-main" aria-live="polite"></section><button type="button" id="room-notes-toggle" class="room-notes-toggle" aria-controls="room-notebook" aria-expanded="false">✎ Notebook</button>`;
+  const openStep=async key=>{flush();C.setPath(studyRoute(g.key,key,sermonId));await renderStep(g,key);};
+  host.onclick=e=>{
+    if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;
+    if(e.target.closest('#room-notes-toggle,[data-close-notes]')){const open=!host.classList.contains('notebook-open');host.classList.toggle('notebook-open',open);host.querySelector('#room-notes-toggle').setAttribute('aria-expanded',String(open));if(open)host.querySelector('#snotes')?.focus();else host.querySelector('#room-notes-toggle').focus();return;}
+    const pdf=e.target.closest('[data-room-pdf]');if(pdf){downloadRoomPdf(g,pdf);return;}
+    if(e.target.closest('#room-finish')){document.getElementById('room-manuscript').click();return;}
+    const art=e.target.closest('[data-room-art]');if(art){drawer.artwork(art.dataset.roomArt);return;}
+    const a=e.target.closest('a[href]');if(!a)return;
+    const href=a.getAttribute('href'),key=a.dataset.step||(/^\/prepare\//.test(href)?new URL(href,location.href).searchParams.get('step'):null);
+    if(key&&STEPS.some(([k])=>k===key)){e.preventDefault();openStep(key);return;}
+    if(drawer.supports(href)){e.preventDefault();drawer.show(href);}
+  };
+  host.onkeydown=e=>{if(e.key==='Escape'&&host.classList.contains('notebook-open')){host.classList.remove('notebook-open');host.querySelector('#room-notes-toggle').setAttribute('aria-expanded','false');host.querySelector('#room-notes-toggle').focus();}};
+  host.querySelector('#ptr').onchange=e=>{flush();C.store.setSetting('prepT',e.target.value);renderStep(g,host.querySelector('[aria-current="step"]').dataset.step);};
+  host.querySelector('#room-collection').onclick=()=>openStep('outline');
+  host.querySelector('#room-manuscript').onclick=async()=>{
+    flush();const prep=loadPrep(g);
+    if(onSnapshot){await onSnapshot(prep);return;}
+    try{const [{newSermon,fromStudy},{createSermonStore}]=await Promise.all([import('./pastor-core.js'),import('./pastor-storage.js')]);const saved=createSermonStore().save(fromStudy(newSermon(g.key,g.title),prep));C.go('/pastors/sermon/'+saved.id+'?tab=write');}catch(e){C.toast('The sermon could not be saved: '+e.message);}
+  };
+  await renderStep(g,step);
+  function updateCollection(){const count=host.querySelector('#collection-count');if(count)count.textContent=loadPrep(g).inbox.length;}
 }
 
 /* ---------- workspace ---------- */
@@ -159,17 +200,25 @@ function preachedPage() {
   });
 }
 
+async function downloadRoomPdf(g,button){
+  flush();button.disabled=true;const label=button.textContent;button.textContent='Preparing…';
+  try{const [{newSermon,fromStudy},{createSermonPdf}]=await Promise.all([import('./pastor-core.js'),import('./pastor-pdf.js')]);const p=fromStudy(newSermon(g.key,g.title),loadPrep(g));download(g.key+'-'+button.dataset.roomPdf+'.pdf',await createSermonPdf(p,button.dataset.roomPdf,{privateNotes:false}),'application/pdf');C.toast('PDF downloaded. Review it before sharing.');}catch(e){C.toast('The PDF could not be made: '+e.message);}finally{button.disabled=false;button.textContent=label;}
+}
+function onRoomOutline(){if(room?.onOutline){room.onOutline(loadPrep(room.g));return true;}return false;}
+
 async function renderStep(g, step) {
   const main = document.getElementById("prepmain"); if (!main) return;
+  const ticket=++stepSequence;
   const p = loadPrep(g), t = translation();
   const [k, label, desc] = STEPS.find(s => s[0] === step);
   const i = STEPS.findIndex(s => s[0] === step), next = STEPS[i + 1];
   let body = "";
   try { body = await STEP_BODY[k](g, p, t); } catch (e) { console.error(e); body = `<p class="small">This step could not load. Check your connection and try again.</p>`; }
+  if(ticket!==stepSequence||!main.isConnected)return;
   const notes = p.steps[k]?.notes || "", done = !!p.steps[k]?.done;
-  main.innerHTML = `<h2>${i + 1}. ${label}</h2><p class="small stepdesc">${desc}</p>${body}
-    ${k === "outline" ? "" : `<div class="stepnotes"><label for="snotes"><b>Your notes</b></label><textarea id="snotes" rows="6" placeholder="What you see in ${esc(g.title)}…">${esc(notes)}</textarea></div>`}
-    <div class="actions stepnav"><button class="btn ${done ? "on" : ""}" type="button" id="sdone" aria-pressed="${done}">${done ? "Step done" : "Mark step done"}</button>${next ? `<a class="btn pri" href="/prepare/${g.key}?step=${next[0]}">Next: ${next[1]}</a>` : `<a class="btn pri" href="/prepare/${g.key}/present">Present</a>`}</div>`;
+  main.innerHTML = `${room?`<div class="room-step-heading"><button type="button" class="room-art" data-room-art="${STUDY_VISUALS[k].image}" aria-label="View ${label} study artwork">${C.pic(STUDY_VISUALS[k].image,{sizes:'200px'})}<span>View artwork ↗</span></button><div><span class="eyebrow">${STUDY_VISUALS[k].mark} / ${label.toUpperCase()}</span><h2>${STUDY_VISUALS[k].verb}</h2><p>${desc}</p></div></div><div class="room-study-layout"><div class="room-study-content">`:`<h2>${i + 1}. ${label}</h2><p class="small stepdesc">${desc}</p>`}${body}${room?'</div><aside class="room-notebook" id="room-notebook"><button type="button" class="room-notes-close" data-close-notes aria-label="Close notebook">Close ×</button>':''}
+    ${k === "outline" ? "" : `<div class="stepnotes"><label for="snotes"><b>Your notes</b></label><textarea id="snotes" rows="6" placeholder="Keep an observation, question or insight…">${esc(notes)}</textarea></div>`}
+    <div class="actions stepnav"><button class="btn ${done ? "on" : ""}" type="button" id="sdone" aria-pressed="${done}">${done ? "Step done" : "Mark step done"}</button>${next ? `<a class="btn pri" href="${room?studyRoute(g.key,next[0],room.sermonId):`/prepare/${g.key}?step=${next[0]}`}">Next: ${next[1]}</a>` : `<${room?'button type="button" id="room-finish"':'a href="/prepare/'+g.key+'/present"'} class="btn pri">${room?'Keep study & write →':'Present'}</${room?'button':'a'}>`}</div>${room?`<p class="small room-note-tip">Your notes and collected sources stay with ${esc(g.title)} as you move between spaces.</p></aside></div>`:""}`;
   document.querySelectorAll(".prepsteps a").forEach(a => { if (a.dataset.step === k) a.setAttribute("aria-current", "step"); else a.removeAttribute("aria-current"); });
   const pp = () => loadPrep(g);
   document.getElementById("snotes")?.addEventListener("input", e => { const q = pp(); q.steps[k] = { ...(q.steps[k] || {}), notes: e.target.value }; savePrep(q); });
@@ -185,6 +234,13 @@ async function renderStep(g, step) {
     const q = pp(); q.inbox.push({ id: blockId(), kind: d.kind, text: d.text, cite: d.cite, href: d.href || "" }); savePrep(q, { now: true });
     b.textContent = "Added"; b.disabled = true; C.toast("Added to collected material. Place it in a point in the Outline step.");
   }));
+  const collection=document.getElementById('collection-count');if(collection)collection.textContent=loadPrep(g).inbox.length;
+  if(room){
+    main.querySelectorAll('.prompts li').forEach(li=>{const text=li.textContent;li.innerHTML=`<button type="button" class="prompt-question">${esc(text)} <span aria-hidden="true">＋</span></button>`;li.querySelector('button').onclick=()=>{const field=main.querySelector('#snotes');if(!field)return;field.value+=(field.value?'\n\n':'')+text+'\n';field.dispatchEvent(new Event('input',{bubbles:true}));field.focus();};});
+    const collectBtn=main.querySelector('#addsel');collectBtn?.addEventListener('click',()=>setTimeout(()=>{const count=document.getElementById('collection-count');if(count)count.textContent=loadPrep(g).inbox.length;},0));
+    main.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>{const count=document.getElementById('collection-count');if(count)count.textContent=loadPrep(g).inbox.length;}));
+    if(k==='outline'){const side=main.querySelector('.room-notebook');side.insertAdjacentHTML('afterbegin',`<h3>Ready to write?</h3><p>Keep this study with your sermon, then develop the manuscript.</p><button type="button" class="btn pri" id="room-outline-finish">${room.sermonId?'Append outline to manuscript':'Create sermon from outline'} →</button>`);side.querySelector('button').onclick=()=>{flush();if(onRoomOutline())return;document.getElementById('room-manuscript').click();};}
+  }
   if (k === "outline") wireOutline(g);
   if (k === "commentaries") main.querySelectorAll("[data-cm]").forEach(b => b.addEventListener("click", () => { C.store.setSetting("commentary", b.dataset.cm); renderStep(g, "commentaries"); }));
   if (k === "read") wireRead(g);
@@ -231,7 +287,9 @@ const STEP_BODY = {
     const P = [...ppl].filter(x => x !== "god_1324").map(x => pm.get(x)).filter(Boolean).slice(0, 10), L = [...pls].map(x => lm.get(x)).filter(Boolean).slice(0, 8), E = [...evs].map(x => em.get(x)).filter(Boolean).slice(0, 6);
     const il = await C.illustrationsFor(g.book, g.chapter, g.from, g.to).catch(() => []);
     const bg = `${C.NAMES[g.book]}. Author: ${c[0]} Date: ${c[1]}. Setting: ${c[4]}`;
-    return `<dl class="facts"><dt>Book</dt><dd>${C.NAMES[g.book]} · ${C.testamentOf(g.book)} · ${C.groupOf(g.book)}</dd><dt>Author</dt><dd>${esc(c[0])}</dd><dt>Date</dt><dd>${esc(c[1])}</dd><dt>Setting</dt><dd>${esc(c[4])}</dd><dt>Themes</dt><dd>${esc(c[5])}</dd></dl>
+    const finds=il.filter(x=>x.kind==='discovery').map(x=>C.DISCOVERIES.find(d=>x.href==='/discoveries/'+d.id)).filter(d=>d?.image?.local).slice(0,3);
+    const gallery=room&&finds.length?`<div class="room-find-gallery">${finds.map(d=>`<figure><a href="/discoveries/${d.id}">${C.discImg(d,{sizes:'400px'})}<span>${esc(d.name)} ↗</span></a><figcaption>${C.discCredit(d)}</figcaption></figure>`).join('')}</div>`:'';
+    return `${gallery}<dl class="facts"><dt>Book</dt><dd>${C.NAMES[g.book]} · ${C.testamentOf(g.book)} · ${C.groupOf(g.book)}</dd><dt>Author</dt><dd>${esc(c[0])}</dd><dt>Date</dt><dd>${esc(c[1])}</dd><dt>Setting</dt><dd>${esc(c[4])}</dd><dt>Themes</dt><dd>${esc(c[5])}</dd></dl>
       <div class="actions">${addButton({ kind: "context", text: bg, cite: "Ereunia book notes", href: `/books` }, "Add background")}</div>
       ${E.length ? `<p><b>Events:</b> ${E.map(e => `${esc(e.title)} (${C.yearText(e.year)})`).join("; ")}</p>` : ""}
       ${P.length ? `<p><b>People:</b> ${P.map(r => `<a href="/person/${esc(r[0])}">${esc(r[1])}</a>`).join(", ")}</p>` : ""}
@@ -240,18 +298,19 @@ const STEP_BODY = {
       <p class="small">Book notes give traditional and academic views side by side. People, places and events: Theographic (CC BY-SA 4.0).</p>`;
   },
   async commentaries(g, p, t) {
-    const { avail, cm } = await C.commentaryChoice(g.book);
+    let { avail, cm } = await C.commentaryChoice(g.book);
     if (!cm) return `<p class="small">No commentary covers ${C.NAMES[g.book]} yet.</p>`;
-    const data = await C.loadComm(cm.id, g.book, g.chapter).catch(() => null);
+    let data = await C.loadComm(cm.id, g.book, g.chapter).catch(() => null),fallback='';
+    if(!data){const preferred=cm;for(const candidate of avail.filter(x=>x.id!==cm.id)){const loaded=await C.loadComm(candidate.id,g.book,g.chapter).catch(()=>null);if(loaded){cm=candidate;data=loaded;fallback=`${preferred.name} is unavailable for this chapter. Showing ${cm.name}.`;break;}}}
     const { from, to } = await passageVerses(g, "kjv");
     const entries = (data?.e || []).filter(([a, z]) => z >= from && a <= to);
     const near = !entries.length ? C.commentFor(data, from) : null;
-    const list = entries.length ? entries : near ? [near.entry] : [];
+    const list = entries.length ? entries : near ? [near.entry] : data?.intro ? [[from,to,data.intro]] : [];
     return `<p>Commentaries are interpretation. Read them after your own study, weigh them against the text, and note where they disagree.</p>
-      <div class="cmpick" role="group" aria-label="Choose a commentary">${avail.map(c => `<button type="button" data-cm="${c.id}" aria-pressed="${c.id === cm.id}">${esc(C.CM_SHORT[c.id] || c.author)}</button>`).join("")}</div>
+      ${fallback?`<p class="small">${esc(fallback)}</p>`:""}<div class="cmpick" role="group" aria-label="Choose a commentary">${avail.map(c => `<button type="button" data-cm="${c.id}" aria-pressed="${c.id === cm.id}">${esc(C.CM_SHORT[c.id] || c.author)}</button>`).join("")}</div>
       <p class="cmmeta"><b>${esc(cm.name)}</b><br><span class="small">${esc(cm.author)}, ${esc(cm.date)}. ${esc(cm.tradition)}. Public domain.</span></p>
       ${list.length ? list.map(en => { const txt = C.plainText(en[2]), short = txt.length > 700 ? txt.slice(0, 700).replace(/\s\S*$/, "") + " …" : txt; return `<section class="cmentry"><h3 class="cmon">On ${C.cmOn(g.book, g.chapter, en)}</h3><details class="cmfold"><summary>${esc(short.slice(0, 220))}${short.length > 220 ? "…" : ""}</summary><div class="cmtext">${en[2]}</div></details><div class="actions">${addButton({ kind: "commentary", text: short, cite: `${cm.author}, ${cm.name} (${cm.date}), on ${C.cmOn(g.book, g.chapter, en)}`, href: `/read/kjv/${C.toOsis(g.book, g.chapter, en[0])}?panel=cm` }, "Add quote")}</div></section>`; }).join("") : `<p class="small">${esc(cm.author)} has no comment on this passage.</p>`}
-      <p class="small">To quote a different sentence, open the Commentaries tab in the Research Desk, select the words and use “Add to preparation”.</p>`;
+      <p class="small">Open an entry to read its full commentary. Keep a sourced excerpt with “Add quote”, then arrange it in Outline.</p>`;
   },
   async connections(g, p, t) {
     const { from, to } = await passageVerses(g, "kjv");
@@ -280,6 +339,7 @@ const STEP_BODY = {
     </div>`;
   },
   async apply(g, p) {
+    if(room)return `<p>Choose a question to bring it into your notebook. Shape a response for your hearers, grounded in this passage.</p><ul class="prompts">${C.APPLY.map(q=>`<li>${esc(q)}</li>`).join('')}</ul><h3>Give the message a life beyond Sunday.</h3><div class="actions">${[['handout','Sermon handout'],['group','Small-group guide'],['family','Family reading sheet']].map(([kind,label])=>`<button type="button" class="btn" data-room-pdf="${kind}">${label} PDF ↓</button>`).join('')}</div><p class="small">Documents use the outline and collected material you have arranged. Private study notes are excluded from shared resources.</p>`;
     return `<ul class="prompts">${C.APPLY.map(q => `<li>${esc(q)}</li>`).join("")}</ul>
       <p>When the outline is ready, prepare for Sunday and after:</p>
       <div class="actions"><a class="btn pri" href="/prepare/${g.key}/present">Present or preach from it</a><a class="btn" href="/prepare/${g.key}/handout">Print a handout</a><a class="btn" href="/prepare/${g.key}/group">Print a small-group guide</a><a class="btn" href="/prepare/${g.key}/family">Print a family take-home sheet</a></div>`;

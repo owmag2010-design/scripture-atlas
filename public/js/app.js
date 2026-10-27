@@ -2591,7 +2591,7 @@ async function renderTrails(openId) {
 
 
 function prepCtx() {
-  return { view, esc, go, setPath, store, toast, setTitle, setNav, pic, credit, getIndex, parseReference, chapterCount, formatRef, toOsis, readUrl, loadBook, loadOrig, loadXref, loadLex, H, CONTEXT, NAMES, BOOKS, groupOf, testamentOf, META, TR, translationOptions, unpackRef, verseText, keyLemmas, repeatedWords, mergeCrossRefs, OBSERVE, APPLY, interpretQuestions, discForChapter, DISCOVERIES, bIdx, displayStrong, langOf, dirOf, parseGuideSpec, guideSpec, loadComm, commentaryChoice, commentFor, cmOn, plainText, CM_SHORT, yearText, illustrationsFor, ilList, KID_STORIES, fromOsis, dateCertainty };
+  return { view, esc, go, setPath, store, toast, setTitle, setNav, pic, credit, discImg, discCredit, getIndex, parseReference, chapterCount, formatRef, toOsis, readUrl, loadBook, loadOrig, loadXref, loadLex, H, CONTEXT, NAMES, BOOKS, MANUSCRIPTS, groupOf, testamentOf, META, TR, translationOptions, unpackRef, verseText, keyLemmas, repeatedWords, mergeCrossRefs, OBSERVE, APPLY, interpretQuestions, discForChapter, DISCOVERIES, bIdx, displayStrong, langOf, dirOf, parseGuideSpec, guideSpec, loadComm, commentaryChoice, commentFor, cmOn, plainText, CM_SHORT, yearText, illustrationsFor, ilList, KID_STORIES, fromOsis, dateCertainty };
 }
 function renderAbout() {
   setNav(""); setTitle("About Ereunia");
@@ -2680,7 +2680,7 @@ async function route() {
     else if (head === "membership") { const m=await import("./membership.js"); m.renderMembership(prepCtx()); }
     else if (head === "privacy") renderPrivacy();
     else if (head === "about") renderAbout();
-    else if (head === "pastors" || head === "prepare") { await getIndex(); const m = await import("./prepare.js?v=editions3"); const ctx = prepCtx(); if (head === "pastors") await m.renderPastors(ctx, rest[0], rest[1]); else await m.renderPrepare(ctx, rest[0], rest[1]); }
+    else if (head === "pastors" || head === "prepare") { await getIndex(); const m = await import("./prepare.js?v=immersive1"); const ctx = prepCtx(); if (head === "pastors") await m.renderPastors(ctx, rest[0], rest[1]); else await m.renderPrepare(ctx, rest[0], rest[1]); }
     else if (head === "share") await renderShare(rest[0], rest[1], rest[2]);
     else if (head === "atlas") { await getIndex(); setNav("atlas"); setTitle("Atlas"); const { renderAtlas } = await import("./atlas-app.js"); await renderAtlas({ view, H, esc, go, DISCOVERIES, JOURNEYS, NAMES, BOOKS, ERAS, unpackRef, readUrl, formatRef, PRECISION, toOsis, fromOsis, labelOf, discImg, discCredit, discMini, yearText, verseText, rangeHref, rangeLabel, project, MAP_SIZE, SECTIONS, parseRef: q => parseReference(q, chapterCount) }, rest); }
     else if (head === "discoveries") { await getIndex(); await renderDiscoveries(rest[0]); }
