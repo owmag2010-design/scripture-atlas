@@ -245,7 +245,7 @@ export function cleanSeries(x) {
   return {
     id: x.id, title: s(x.title).slice(0, 120) || "Untitled series", start: ISO.test(s(x.start)) ? x.start : "",
     every: [7, 14].includes(x.every) ? x.every : 7, notes: s(x.notes).slice(0, 4000),
-    weeks: (Array.isArray(x.weeks) ? x.weeks : []).slice(0, 60).map(w => ({ spec: /^[1-3]?[A-Za-z]+\.\d+(?:\.\d+(?:-\d+)?)?$/.test(s(w?.spec)) ? w.spec : "", label: s(w?.label).slice(0, 80), title: s(w?.title).slice(0, 120) })),
+    weeks: (Array.isArray(x.weeks) ? x.weeks : []).slice(0, 60).map(w => ({ spec: /^[1-3]?[A-Za-z]+\.\d+(?:\.\d+(?:-\d+)?)?$/.test(s(w?.spec)) ? w.spec : "", label: s(w?.label).slice(0, 80), title: s(w?.title).slice(0, 120), sermonId: /^(?:s-[a-z0-9]{6,16}|[1-3]?[A-Za-z]+\.\d+(?:\.\d+(?:-\d+)?)?)$/.test(s(w?.sermonId)) ? w.sermonId : "", readings: s(w?.readings).slice(0, 300) })),
     updated: x.updated || null
   };
 }

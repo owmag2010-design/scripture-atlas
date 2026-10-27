@@ -326,7 +326,9 @@ async function renderStep(g, step) {
   if (k === "outline") wireOutline(g);
   if (k === "commentaries") main.querySelectorAll("[data-cm]").forEach(b => b.addEventListener("click", () => { C.store.setSetting("commentary", b.dataset.cm); renderStep(g, "commentaries"); }));
   if (k === "read") wireRead(g);
+  if (k === "observe" && lastObs) import("./prepare-tools.js").then(m => m.structureBoard(api(), g, document.getElementById("sboard"), lastObs.sv, lastObs.st));
 }
+let lastObs = null;
 
 /* ---------- step bodies ---------- */
 const STEP_BODY = {
@@ -343,7 +345,8 @@ const STEP_BODY = {
     const { verses } = await passageVerses(g, "kjv");
     const rep = C.repeatedWords(verses.map(v => v[1]));
     const st = C.langOf(t) === "en" ? t : "kjv", sv = st === "kjv" ? verses : (await passageVerses(g, st)).verses;
-    return `${structureHtml(sv, st)}${rep.length ? `<p><b>Repeated words</b> (KJV): ${rep.map(([w, n]) => `<span class="chip">${esc(w)} × ${n}</span>`).join(" ")}</p>` : ""}
+    lastObs = { sv, st };
+    return `${structureHtml(sv, st)}<div id="sboard" class="sbwrap"></div>${rep.length ? `<p><b>Repeated words</b> (KJV): ${rep.map(([w, n]) => `<span class="chip">${esc(w)} × ${n}</span>`).join(" ")}</p>` : ""}
       <ul class="prompts">${C.OBSERVE.map(q => `<li>${esc(q)}</li>`).join("")}</ul>
       <p class="small">Questions suited to ${esc(C.groupOf(g.book).toLowerCase())}:</p><ul class="prompts">${C.interpretQuestions(C.groupOf(g.book)).map(q => `<li>${esc(q)}</li>`).join("")}</ul>`;
   },
@@ -420,7 +423,7 @@ const STEP_BODY = {
   async apply(g, p) {
     return `<ul class="prompts">${C.APPLY.map(q => `<li>${esc(q)}</li>`).join("")}</ul>
       <p>When the outline is ready, prepare for Sunday and after:</p>
-      <div class="actions"><a class="btn pri" href="/prepare/${g.id}/present">Present or preach from it</a><a class="btn" href="/prepare/${g.id}/handout">Print a handout</a><a class="btn" href="/prepare/${g.id}/group">Print a small-group guide</a><a class="btn" href="/prepare/${g.id}/family">Print a family take-home sheet</a></div>`;
+      <div class="actions"><a class="btn pri" href="/prepare/${g.id}?tab=write">Write the sermon</a><a class="btn" href="/prepare/${g.id}?tab=docs">Make the documents</a><a class="btn" href="/prepare/${g.id}?tab=preach">Preach from it</a></div>`;
   }
 };
 
@@ -546,11 +549,10 @@ async function familySheet(g) {
 
 /* ---------- sermon series planner ---------- */
 const newId = () => Math.random().toString(36).slice(2, 10).padEnd(6, "0");
-function prepStatus(spec) {
-  if (!spec) return "";
-  const raw = C.store.prep(spec); if (!raw) return `<span class="small">Not started</span>`;
-  const p = cleanPrep(raw, spec, spec), n = doneCount(p);
-  return `<span class="small">${n} of ${STEPS.length} steps${p.preached.length ? " · preached" : ""}</span>`;
+function prepStatus(w) {
+  const raw = w.sermonId ? C.store.prep(w.sermonId) : null; if (!raw) return `<span class="small">Not started</span>`;
+  const p = cleanPrep(raw, raw.key, raw.title), n = doneCount(p), words = wordCount(p.manuscript);
+  return `<span class="small">${statusChip(p)} ${n}/${STEPS.length} steps${words ? ` · ${words.toLocaleString()} words` : ""}</span>`;
 }
 const LECTIONARY_NOTE = `<p class="small">Following a lectionary? Type each week's reading into the plan. Ereunia does not include the Revised Common Lectionary tables: they belong to the Consultation on Common Texts, and they will be added only with its permission.</p>`;
 
@@ -585,8 +587,8 @@ function seriesPage(id) {
       <div class="actions"><label><span class="small">First Sunday</span> <input type="date" id="ss" value="${esc(x.start)}"></label>
         <label><span class="small">Every</span> <select id="se"><option value="7" ${x.every === 7 ? "selected" : ""}>week</option><option value="14" ${x.every === 14 ? "selected" : ""}>two weeks</option></select></label></div></div>
     <ol class="weeks noprint">${x.weeks.map((w, i) => `<li class="week" data-i="${i}"><div class="wdate"><b>Week ${i + 1}</b><span class="small">${esc(fmtDate(d[i])) || "No date"}</span></div>
-        <div class="wfields"><label><span class="sr">Passage for week ${i + 1}</span><input data-pass value="${esc(w.label)}" placeholder="Passage, e.g. Mark 1:1-15"></label><label><span class="sr">Sermon title for week ${i + 1}</span><input data-title value="${esc(w.title)}" maxlength="120" placeholder="Sermon title (optional)"></label></div>
-        <div class="wact">${w.spec ? `<a class="btn" href="/prepare/${esc(w.spec)}">Prepare</a>${prepStatus(w.spec)}` : `<span class="small">Add a passage</span>`}
+        <div class="wfields"><label><span class="sr">Passage for week ${i + 1}</span><input data-pass value="${esc(w.label)}" placeholder="Passage, e.g. Mark 1:1-15"></label><label><span class="sr">Sermon title for week ${i + 1}</span><input data-title value="${esc(w.title)}" maxlength="120" placeholder="Sermon title (optional)"></label><label class="wread"><span class="sr">Supporting readings for week ${i + 1}</span><input data-read value="${esc(w.readings)}" maxlength="300" placeholder="Supporting readings (optional)"></label></div>
+        <div class="wact">${w.spec ? `<button type="button" class="btn" data-prep>${w.sermonId && C.store.prep(w.sermonId) ? "Open" : "Prepare"}</button>${w.sermonId && C.store.prep(w.sermonId) ? `<a class="btn small" href="/prepare/${esc(w.sermonId)}?tab=docs">Service materials</a>` : ""}${prepStatus(w)}` : `<span class="small">Add a passage</span>`}
           <span class="obact"><button type="button" class="ib" data-mv="-1" ${i === 0 ? "disabled" : ""} aria-label="Move week ${i + 1} up">↑</button><button type="button" class="ib" data-mv="1" ${i === x.weeks.length - 1 ? "disabled" : ""} aria-label="Move week ${i + 1} down">↓</button><button type="button" class="ib" data-del aria-label="Remove week ${i + 1}">×</button></span></div></li>`).join("")}</ol>
     <div class="actions noprint"><button type="button" class="btn" id="addw">Add a week</button><button type="button" class="btn pri" id="ics" ${x.start && x.weeks.length ? "" : "disabled"}>Add to calendar (.ics)</button><button type="button" class="btn" id="sprint">Print the plan</button><button type="button" class="btn" id="sdel">Delete this series</button></div>
     ${x.start ? "" : `<p class="small noprint">Choose a first Sunday to date each week and add the series to your calendar.</p>`}
@@ -605,7 +607,7 @@ function seriesPage(id) {
       C.store.removeSeries(x.id); C.toast("Series deleted. Its preparations are kept."); C.go("/prepare/series");
     });
     $("#ics").addEventListener("click", () => {
-      const weeks = x.weeks.map((w, i) => ({ date: d[i], label: w.label, title: w.title, url: w.spec ? `https://ereunia.com/prepare/${w.spec}` : "" })).filter(w => w.date);
+      const weeks = x.weeks.map((w, i) => ({ date: d[i], label: w.label, title: w.title, url: w.sermonId || w.spec ? `https://ereunia.com/prepare/${w.sermonId || w.spec}` : "" })).filter(w => w.date);
       download(`${x.title.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "series"}.ics`, seriesIcs(x.title, weeks), "text/calendar");
     });
     document.querySelectorAll(".week").forEach(li => {
@@ -617,7 +619,13 @@ function seriesPage(id) {
         if (!r) { C.toast("Enter a passage such as Mark 1:1-15"); return; }
         x.weeks[i] = { ...x.weeks[i], spec: C.guideSpec(r.book, r.chapter, r.verse, r.verseEnd), label: C.formatRef(r.book, r.chapter, r.verse, r.verseEnd) }; save(); draw();
       });
-      li.querySelector("[data-title]").addEventListener("change", e => { x.weeks[i].title = e.target.value.trim(); save(); });
+      li.querySelector("[data-title]").addEventListener("change", e => { x.weeks[i].title = e.target.value.trim(); save(); const sid = x.weeks[i].sermonId, raw = sid && C.store.prep(sid); if (raw && !raw.name) C.store.savePrep({ ...raw, name: x.weeks[i].title }); });
+      li.querySelector("[data-read]").addEventListener("change", e => { x.weeks[i].readings = e.target.value.trim(); save(); const sid = x.weeks[i].sermonId, raw = sid && C.store.prep(sid); if (raw) C.store.savePrep({ ...raw, readings: x.weeks[i].readings }); });
+      li.querySelector("[data-prep]")?.addEventListener("click", () => {
+        const w = x.weeks[i]; let sid = w.sermonId && C.store.prep(w.sermonId) ? w.sermonId : null;
+        if (!sid) { const pg = passageOf(w.spec); if (!pg) return; sid = newSermonFor(pg, { name: w.title, date: d[i] || "", seriesId: x.id, readings: w.readings || "" }); w.sermonId = sid; save(); }
+        C.go(`/prepare/${sid}`);
+      });
       li.querySelectorAll("[data-mv]").forEach(b => b.addEventListener("click", () => { const j = i + +b.dataset.mv; [x.weeks[i], x.weeks[j]] = [x.weeks[j], x.weeks[i]]; save(); draw(); }));
       li.querySelector("[data-del]").addEventListener("click", () => { x.weeks.splice(i, 1); save(); draw(); });
     });

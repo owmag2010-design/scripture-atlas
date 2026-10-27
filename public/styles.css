@@ -1803,3 +1803,33 @@ body.kidsmode main, body.kidsmode footer.site { --lapis: #2E2820; --lapis-soft: 
 .tts { font-variant-numeric: tabular-nums; }
 .txfix { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; } .txfix input { border: 1px solid var(--line); border-radius: 8px; padding: 6px 9px; background: var(--bg); }
 .missing { color: var(--rubric); }
+
+/* illustration collection */
+.illtools { display: flex; flex-wrap: wrap; gap: 10px; align-items: start; margin-bottom: 8px; }
+.illtools form[role=search] { display: flex; gap: 8px; flex: 1 1 380px; } .illtools form[role=search] label:first-child { flex: 1; }
+.illtools input, .illtools select { border: 1px solid var(--line); border-radius: 999px; padding: 9px 14px; background: var(--page); width: 100%; box-sizing: border-box; }
+.illnew { flex: 1 1 100%; } .illnew > summary { list-style: none; display: inline-flex; cursor: pointer; } .illnew > summary::-webkit-details-marker { display: none; } .illnew form { margin-top: 12px; padding: 14px; background: var(--page); border: 1px solid var(--line); border-radius: var(--r-sm); }
+.illcoll { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+.illcard { display: grid; gap: 6px; padding: 12px 14px; background: var(--page); border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: var(--r-sm); }
+.illcard.v-checked { border-left-color: #3E7C6B; } .illcard.v-unchecked { border-left-color: var(--gold); } .illcard.v-disputed { border-left-color: var(--rubric); } .illcard.v-personal { border-left-color: var(--ink); }
+.ilhead { display: flex; gap: 6px; } .ilhead input { flex: 1; font: 600 1.05rem var(--serif); border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); padding: 4px 0; }
+.ilhead select, .illcard [data-use] { border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; background: var(--bg); font-size: .84rem; max-width: 100%; }
+.illcard textarea { border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; background: var(--bg); font: .98rem/1.5 var(--serif); color: var(--ink); resize: vertical; }
+.ilmeta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } .ilmeta label { display: grid; } .ilmeta input { border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; background: var(--bg); }
+.illcard p { margin: 0; }
+/* structure board */
+.sbwrap { margin: 0 0 18px; }
+.sbstart { padding: 12px 14px; border: 1px dashed var(--gilt); border-radius: var(--r-sm); } .sbstart p { margin: 0 0 8px; }
+.sboard { padding: 12px 14px; border: 1px solid var(--line); border-top: 3px solid var(--gilt); border-radius: var(--r-sm); background: var(--page); }
+.sbtop { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; } .sbtop h3 { margin: 0; } .sbtop .btn { margin-left: auto; }
+.sbrows { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 4px; }
+.sbrow { display: grid; grid-template-columns: 2em 8.5em minmax(0, 1fr) auto; gap: 4px 6px; align-items: start; margin-left: calc(var(--in) * 1.6em); padding: 4px 6px; border-left: 3px solid var(--line); border-radius: 4px; }
+.sbrow input[data-note] { grid-column: 3 / -1; border: 0; border-bottom: 1px dashed var(--line); background: transparent; font-size: .85rem; color: var(--muted); padding: 2px 0; }
+.sbrow textarea { border: 1px solid transparent; border-radius: 6px; padding: 3px 6px; background: transparent; font: 1.02rem/1.45 var(--serif); color: var(--ink); resize: none; }
+.sbrow textarea:focus { border-color: var(--line); background: var(--bg); outline: none; }
+.sbrow select { border: 1px solid var(--line); border-radius: 999px; padding: 3px 6px; font-size: .8rem; background: var(--bg); color: var(--muted); }
+.sbv { font: 700 .72rem var(--sans); color: var(--rubric); padding-top: 6px; text-align: right; }
+.sbrow.rel-reason { border-left-color: #3E7C6B; } .sbrow.rel-contrast { border-left-color: var(--rubric); } .sbrow.rel-purpose, .sbrow.rel-result { border-left-color: #4C6FA8; } .sbrow.rel-conclusion { border-left-color: var(--ink); } .sbrow.rel-promise { border-left-color: var(--gold); } .sbrow.rel-condition { border-left-color: #8A5BA8; } .sbrow.rel-command { border-left-color: #C77A1A; }
+@media (max-width: 700px) { .sbrow { grid-template-columns: 2em minmax(0, 1fr); margin-left: calc(var(--in) * .8em); } .sbrow select, .sbrow .obact, .sbrow input[data-note] { grid-column: 2; } }
+.wfields .wread { grid-column: 1 / -1; }
+.preplist .schip { justify-self: start; width: fit-content; }

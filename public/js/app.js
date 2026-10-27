@@ -2199,7 +2199,8 @@ async function renderSermon(openId) {
   const saved = sermonsLoad();
   const cur = (openId && saved.find(x => x.id === openId)) || { id: Date.now().toString(36), title: "", speaker: "", date: new Date().toISOString().slice(0, 10), transcript: "", outline: null };
   view.innerHTML = `${artHead("era-gospels")}<span class="eyebrow">Sermon studio</span><h1>Record a sermon. Keep every word and every verse.</h1>
-      <p>Transcribe live from your microphone, catch each Bible reference as it is spoken, and turn the message into study notes for your small group.</p></div>
+      <p>Transcribe live from your microphone, catch each Bible reference as it is spoken, and turn the message into study notes for your small group.</p>
+      <p class="small">Preparing your own sermon? Record it in the sermon's <a href="/prepare">Record tab</a> instead: the audio, transcript and manuscript stay together, and recording works even where live transcription does not.</p></div>
     <div class="sermon">
       <section class="card recorder">
         <div class="recrow">
