@@ -88,3 +88,58 @@ Preview: https://deploy-preview-1--scripture-atlas-om.netlify.app (Netlify team 
 - **Sourced illustrations:** a new Illustrations tab in the Research Desk and a section in the Context step: discoveries (with what they do not show), dated events, places with archaeology and manuscripts, each with its source and an "Add" button.
 - **Print menu:** handout, small-group guide, a passage study sheet (phrase layout with a ruled margin) and a family take-home sheet (reading in modern English, questions, the matching Ereunia Kids story, a drawing box).
 - No AI is used in any of these tools.
+
+## Sermon workspace (all four stages of the pastor plan)
+
+**Foundation**
+- Each sermon is its own record. Several sermons can share a passage. The first sermon on a passage keeps the passage as its id, so older links and saved preparations open unchanged.
+- Workspace tabs: Study, Write, Notebook, Documents, Preach, Record and Details.
+- Write: a manuscript editor with eight block types (heading, paragraph, Scripture, quotation, illustration, transition, private delivery cue, conclusion), between a research pane (passage, collected material, commentary) and the notebook.
+  - Inserted material keeps its citation.
+  - Undo and redo; autosave; named versions with restore. A version is also kept automatically before rebuilding and on leaving after changes.
+  - Word count against the planned length.
+- Notebook: observations, questions, quotations, illustrations, applications and interpretation, linked to verses and points.
+- Details: title, date, venue, occasion, audience, series, status, topics, readings and notes for the service team.
+  - Backups of everything, single-sermon files, duplicate and delete.
+  - A request for persistent storage, with usage and the last-backup date shown.
+
+**Sunday essentials**
+- PDF studio, made in the browser with pdf-lib and fontkit (MIT), embedding EB Garamond and Schibsted Grotesk (OFL, trimmed copies in /fonts/pdf). Six templates:
+  - study dossier;
+  - full manuscript with page footnotes;
+  - pulpit copy;
+  - congregation handout with optional fill-in blanks;
+  - small-group guide with editable questions;
+  - family sheet.
+- A4 or US Letter, page numbers, translation credits. Private notes and cues only when ticked.
+- Word export of the manuscript.
+- Preaching view:
+  - manuscript mode in adjustable large type, with line spacing, a clock, a pausable timer against the planned length, a passage overlay and jump-to-point;
+  - the reading position is saved;
+  - Notes and Slides modes are kept.
+- Opt-in offline copy: the passage is saved with the sermon, and a network-first service worker (/sw.js) keeps the files the preaching view needs.
+
+**Recording and archive**
+- Recording with MediaRecorder, independent of speech recognition. Audio is saved to IndexedDB every five seconds, so an interrupted recording is recoverable.
+- Other recording tools:
+  - pause, and marks during recording;
+  - level meter;
+  - optional live transcript;
+  - import of audio and of .vtt, .srt or timed-text transcripts;
+  - editable transcript with timestamps that seek the audio;
+  - detection of the passages mentioned;
+  - find-and-replace corrections;
+  - downloads of audio and transcripts;
+  - planned against actual length;
+  - "Keep the manuscript as preached".
+- Sermon library at /prepare: search by title, passage, topic, occasion, venue and date, with book, series and status filters.
+
+**Deeper capabilities**
+- "Trace this point": passage → observations → supporting sources → interpretation → application. Missing steps, quotations without citations, Scripture that does not match its cited translation, and AI-labelled text are flagged. Every block carries a "whose words" label.
+- An editable structure board in the Observe step (indent, split, join, relation labels, notes), labelled as the pastor's analysis and kept distinct from the automatic reading aid.
+- Series weeks create and link their own sermons, carry supporting readings and link to service materials.
+- Illustration collection (/prepare/illustrations): source, how far checked, themes, passages and every use.
+- Service pack: a zip of the chosen PDFs, 16:9 slides and a service brief.
+- Sermon files can be shared and opened at /prepare/import.
+
+**Not built:** account sync and live team collaboration need a server and accounts; sharing is by file for now. No AI is used anywhere in the workspace.

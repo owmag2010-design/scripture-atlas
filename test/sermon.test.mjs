@@ -1,39 +1,52 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { normaliseSpoken, sermonRefs, checkOutline, sermonMarkdown } from "../public/js/sermon.js";
-import { formatRef, parseReference } from "../public/js/ref.js";
+import { cleanPrep, manuscriptFromOutline, reviewFlags, tracePoint, searchSermons, sections, wordCount, SERMON_ID } from "../public/js/prep-core.js";
+import { parseTranscript } from "../public/js/prepare-record.js";
 
-const index = JSON.parse(readFileSync(new URL("../public/data/index.json", import.meta.url)));
-const cc = i => index.books[i].verses.length;
-const labels = t => sermonRefs(t, cc).map(r => formatRef(r.book, r.chapter, r.verse, r.verseEnd));
+const base = () => cleanPrep({ id: "s-abc123def", name: "Light", idea: "The Word became flesh", tags: ["christmas"], venue: "Evening",
+  points: [{ id: "p1", text: "The Word was God", blocks: [{ id: "b1", kind: "verse", text: "In the beginning was the Word", cite: "John 1:1 (KJV)" }, { id: "b2", kind: "commentary", text: "A person, not a speech", cite: "Matthew Henry on John 1:1" }] }],
+  notes: [{ id: "n1", type: "obs", text: "Light and darkness", pointId: "p1" }, { id: "n2", type: "apply", text: "Come to the light", pointId: "p1" }] }, "John.1.1-18", "John 1:1–18");
 
-test("spoken references become written ones", () => {
-  assert.equal(normaliseSpoken("turn with me to John chapter three verse sixteen"), "turn with me to John 3:16");
-  assert.equal(normaliseSpoken("first Corinthians chapter thirteen verses four to seven"), "1 Corinthians 13:4-7");
-  assert.equal(normaliseSpoken("Psalm one hundred and nineteen verse one hundred and five"), "Psalm 119:105");
-  assert.equal(normaliseSpoken("Romans eight verse twenty-eight"), "Romans 8:28");
-  assert.equal(normaliseSpoken("Psalm one hundred and nineteen verse one hundred and five, thy word"), "Psalm 119:105, thy word");
+test("old passage-keyed preparations still load, and ids are validated", () => {
+  const p = cleanPrep({ key: "John.1.1-18", idea: "x" }, "John.1.1-18", "John 1:1–18");
+  assert.equal(p.id, "John.1.1-18"); assert.equal(p.status, "draft"); assert.deepEqual(p.manuscript, []);
+  assert.equal(cleanPrep({ id: "../../etc" }, "John.1.1", "John 1:1").id, "John.1.1");
+  assert.ok(SERMON_ID.test("s-abc123def") && SERMON_ID.test("1Cor.13.1-13") && !SERMON_ID.test("javascript:x"));
 });
-
-test("references are found in a natural transcript, in order", () => {
-  const t = "Good morning church. Our text today is Romans chapter eight, verse twenty eight. Paul also writes in Philippians 4:13 that we can do all things. Later, first John chapter four verse eight reminds us God is love.";
-  assert.deepEqual(labels(t), ["Romans 8:28", "Philippians 4:13", "1 John 4:8"]);
+test("a manuscript drafted from the outline keeps sources and point links", () => {
+  const p = base(); const ms = manuscriptFromOutline(p);
+  assert.equal(ms[0].text, "The Word became flesh");
+  assert.equal(ms[1].type, "heading"); assert.equal(ms[1].pointId, "p1");
+  assert.equal(ms[2].type, "scripture"); assert.equal(ms[2].cite, "John 1:1 (KJV)");
+  assert.equal(ms[3].origin, "interp"); assert.equal(ms.at(-1).type, "concl");
+  assert.equal(sections(ms).length, 2);
 });
-
-test("ordinary numbers in speech are not mistaken for references", () => {
-  assert.deepEqual(labels("We had twenty three people at the picnic and three cakes."), []);
+test("review flags quotations without sources, mismatched Scripture and AI text", () => {
+  const ms = cleanPrep({ manuscript: [{ type: "quote", text: "No source here" }, { type: "scripture", text: "In the beginning was the Ward", cite: "John 1:1 (KJV)" }, { type: "para", text: "Generated", origin: "ai" }, { type: "scripture", text: "In the beginning was the Word", cite: "John 1:1 (KJV)" }] }, "John.1.1", "John 1:1").manuscript;
+  const f = reviewFlags(ms, cite => (cite === "John 1:1 (KJV)" ? "In the beginning was the Word, and the Word was with God" : null));
+  assert.equal(f.length, 3);
+  assert.match(f[0].msg, /without a citation/); assert.match(f[1].msg, /does not match/); assert.equal(f[2].level, "info");
 });
-
-test("the outline check keeps verbatim quotes and real references only", () => {
-  const transcript = "God works all things together for good, even the hard days.";
-  const real = r => !!parseReference(r, cc);
-  const { outline, dropped } = checkOutline({ title: "Good", points: [{ heading: "All things", summary: "s", quote: "works all things together for good" }, { heading: "Made up", summary: "s", quote: "a sentence nobody said" }], scriptures: ["Romans 8:28", "Hezekiah 3:1"], questions: ["Q?"], application: ["A"] }, transcript, real);
-  assert.equal(outline.points[0].quote, "works all things together for good");
-  assert.equal(outline.points[1].quote, "");
-  assert.deepEqual(outline.scriptures, ["Romans 8:28"]);
-  assert.equal(dropped.length, 2);
-  const md = sermonMarkdown({ title: "Good", transcript, refs: ["Romans 8:28"], outline });
-  assert.match(md, /AI-generated outline/);
-  assert.match(md, /## Transcript\nGod works/);
+test("tracing a point gathers passage, observations, sources, interpretation and application", () => {
+  const p = base(); p.manuscript = manuscriptFromOutline(p);
+  const tr = tracePoint(p, p.manuscript[1].id);
+  assert.equal(tr.passage[0].cite, "John 1:1 (KJV)");
+  assert.equal(tr.observations[0].text, "Light and darkness");
+  assert.equal(tr.interpretation[0].text, "A person, not a speech");
+  assert.equal(tr.sources.length, 0, "commentary counts as interpretation, not as a supporting source");
+  assert.ok(tr.application.some(a => a.text === "Come to the light"));
+});
+test("sermon search matches title, topic, venue and passage", () => {
+  const p = base(), q = cleanPrep({ id: "Rom.8", key: "Rom.8", name: "More than conquerors", status: "final" }, "Rom.8", "Romans 8");
+  assert.equal(searchSermons([p, q], "christmas").length, 1);
+  assert.equal(searchSermons([p, q], "evening light").length, 1);
+  assert.equal(searchSermons([p, q], "", { status: "final" })[0].name, "More than conquerors");
+  assert.equal(searchSermons([p, q], "", { book: "Rom" }).length, 1);
+  assert.equal(wordCount([{ type: "para", text: "one two three" }, { type: "cue", text: "pause here" }]), 3);
+});
+test("transcripts import from WebVTT, SRT and timed text", () => {
+  const v = parseTranscript("WEBVTT\n\n1\n00:00:01.500 --> 00:00:03.000\nHello <b>church</b>\n\n2\n00:01:02.000 --> 00:01:05.000\nJohn 3:16\n");
+  assert.deepEqual(v, [{ t: 1.5, text: "Hello church" }, { t: 62, text: "John 3:16" }]);
+  assert.equal(parseTranscript("1\n00:00:02,000 --> 00:00:04,000\nGrace\n")[0].t, 2);
+  assert.deepEqual(parseTranscript("[1:05] Turn to Romans 8\nand read on"), [{ t: 65, text: "Turn to Romans 8" }, { t: 65, text: "and read on" }]);
 });

@@ -910,14 +910,22 @@ function wireIllustrationsPane() {
 /* ---------- adding material to the active preparation ---------- */
 function prepTitle(key) { const g = parseGuideSpec(key); return g ? formatRef(g.book, g.chapter, g.from, g.to) : key; }
 function addToPrep(block) {
-  let key = store.setting("activePrep", null);
-  const g = key && parseGuideSpec(key);
-  if (!g || g.book !== R.book) key = guideSpec(R.book, R.chapter);
-  const p = cleanPrep(store.prep(key), key, prepTitle(key));
+  // The sermon being prepared, if it is on this book; otherwise this chapter's sermon (created if needed).
+  let id = store.setting("activePrep", null);
+  let rec = id ? store.prep(id) : null;
+  const rg = rec && parseGuideSpec(rec.key);
+  if (!rec || !rg || rg.book !== R.book) {
+    const key = guideSpec(R.book, R.chapter);
+    const list = store.sermonsFor(key);
+    id = list.length ? list[0].id : key; rec = store.prep(id);
+  }
+  const key = rec?.key || id;
+  const p = cleanPrep(rec, key, prepTitle(key)); p.id = id;
   p.inbox.push({ ...block, id: blockId() });
-  store.savePrep(p); store.setSetting("activePrep", key);
-  toast(`Added to your preparation of ${prepTitle(key)}`);
-  store.trailAdd({ kind: "note", label: `Added to preparation: ${prepTitle(key)}`, href: `/prepare/${key}?step=outline` });
+  store.savePrep(p); store.setSetting("activePrep", id);
+  const name = p.name || prepTitle(key);
+  toast(`Added to ${name}`);
+  store.trailAdd({ kind: "note", label: `Added to preparation: ${name}`, href: `/prepare/${id}?tab=write` });
 }
 
 function askPane() {
@@ -2191,7 +2199,8 @@ async function renderSermon(openId) {
   const saved = sermonsLoad();
   const cur = (openId && saved.find(x => x.id === openId)) || { id: Date.now().toString(36), title: "", speaker: "", date: new Date().toISOString().slice(0, 10), transcript: "", outline: null };
   view.innerHTML = `${artHead("era-gospels")}<span class="eyebrow">Sermon studio</span><h1>Record a sermon. Keep every word and every verse.</h1>
-      <p>Transcribe live from your microphone, catch each Bible reference as it is spoken, and turn the message into study notes for your small group.</p></div>
+      <p>Transcribe live from your microphone, catch each Bible reference as it is spoken, and turn the message into study notes for your small group.</p>
+      <p class="small">Preparing your own sermon? Record it in the sermon's <a href="/prepare">Record tab</a> instead: the audio, transcript and manuscript stay together, and recording works even where live transcription does not.</p></div>
     <div class="sermon">
       <section class="card recorder">
         <div class="recrow">
@@ -2591,7 +2600,7 @@ async function renderTrails(openId) {
 
 
 function prepCtx() {
-  return { view, esc, go, setPath, store, toast, setTitle, setNav, getIndex, parseReference, chapterCount, formatRef, toOsis, readUrl, loadBook, loadOrig, loadXref, loadLex, H, CONTEXT, NAMES, BOOKS, groupOf, testamentOf, META, TR, translationOptions, unpackRef, verseText, keyLemmas, repeatedWords, mergeCrossRefs, OBSERVE, APPLY, interpretQuestions, discForChapter, DISCOVERIES, bIdx, displayStrong, langOf, dirOf, parseGuideSpec, guideSpec, loadComm, commentaryChoice, commentFor, cmOn, plainText, CM_SHORT, yearText, illustrationsFor, ilList, KID_STORIES, fromOsis, dateCertainty };
+  return { view, esc, go, setPath, pic, credit, store, toast, setTitle, setNav, getIndex, parseReference, chapterCount, formatRef, toOsis, readUrl, loadBook, loadOrig, loadXref, loadLex, H, CONTEXT, NAMES, BOOKS, groupOf, testamentOf, META, TR, translationOptions, unpackRef, verseText, keyLemmas, repeatedWords, mergeCrossRefs, OBSERVE, APPLY, interpretQuestions, discForChapter, DISCOVERIES, bIdx, displayStrong, langOf, dirOf, parseGuideSpec, guideSpec, loadComm, commentaryChoice, commentFor, cmOn, plainText, CM_SHORT, yearText, illustrationsFor, ilList, KID_STORIES, fromOsis, dateCertainty };
 }
 function renderAbout() {
   setNav(""); setTitle("About Ereunia");

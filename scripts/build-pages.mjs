@@ -57,8 +57,8 @@ const SECTIONS = [
   ["/ai", "Research assistant", "Ask a question and see exactly which sources the answer rests on."],
   ["/search", "Search", "Search passages, original words, people, places, discoveries and manuscripts."],
   ["/share", "Share cards", "Make a branded card of any Bible verse or documented discovery to share."],
-  ["/pastors", "For pastors and teachers", "Prepare a sermon or lesson in eight steps: original words, background, classic commentaries, connected Scripture, an outline, a handout and slides."],
-  ["/prepare", "Prepare a sermon or lesson", "Choose a passage and prepare it step by step, with every source kept beside your notes."],
+  ["/pastors", "For pastors and teachers", "Study deeply, prepare faithfully, preach with clarity: a free sermon workspace with study steps, a manuscript editor, branded PDFs, a preaching view and recordings."],
+  ["/prepare", "Sermon library", "Every sermon you have prepared, with its manuscript, documents and recordings, searchable by passage, topic, series, date and venue."],
   ["/about", "About Ereunia", "What Ereunia is, how its pages are written and sourced, and how to send a correction."],
   ["/privacy", "Privacy and your data", "What Ereunia stores on your device and what is sent when you use a feature."]
 ];
