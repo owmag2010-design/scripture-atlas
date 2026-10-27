@@ -3,7 +3,7 @@
 // Keys are OSIS references, e.g. "John.3.16".
 
 const KEY = "scripture-atlas:v1";
-const blank = () => ({ version: 1, notes: {}, bookmarks: {}, highlights: {}, history: [], position: null, settings: {}, progress: {}, days: [], ai: [], guides: {}, trail: { started: null, steps: [] }, trails: [], preps: {}, series: {} });
+const blank = () => ({ version: 1, notes: {}, bookmarks: {}, highlights: {}, history: [], position: null, settings: {}, progress: {}, days: [], ai: [], guides: {}, trail: { started: null, steps: [] }, trails: [], preps: {}, series: {}, illus: {} });
 
 export const today = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
@@ -117,16 +117,25 @@ export function createStore(storage) {
     trail: id => data.trails.find(t => t.id === id) || null,
     removeTrail(id) { data.trails = data.trails.filter(t => t.id !== id); save(); },
 
-    /** Sermon and lesson preparations, keyed by passage (e.g. "John.1.1-18"). */
-    prep: key => (data.preps[key] ? structuredClone(data.preps[key]) : null),
+    /** Sermons and lesson preparations, keyed by sermon id. The first sermon on a passage uses the passage as its id. */
+    prep: id => (data.preps[id] ? structuredClone(data.preps[id]) : null),
     savePrep(p) {
-      if (!p?.key) return;
-      const keep = Object.values(data.preps).filter(x => x.key !== p.key).sort((a, b) => (b.updated || "").localeCompare(a.updated || "")).slice(0, 59);
-      data.preps = Object.fromEntries([...keep, { ...structuredClone(p), updated: now(), created: p.created || now() }].map(x => [x.key, x]));
+      const id = p?.id || p?.key; if (!id) return;
+      const keep = Object.entries(data.preps).filter(([k]) => k !== id).sort((a, b) => (b[1].updated || "").localeCompare(a[1].updated || "")).slice(0, 299);
+      data.preps = Object.fromEntries([...keep, [id, { ...structuredClone(p), id, updated: now(), created: p.created || now() }]]);
       markDay(today()); save();
     },
-    preps: () => Object.values(data.preps).map(x => structuredClone(x)).sort((a, b) => (b.updated || "").localeCompare(a.updated || "")),
-    removePrep(key) { delete data.preps[key]; save(); },
+    preps: () => Object.entries(data.preps).map(([k, x]) => ({ ...structuredClone(x), id: x.id || k })).sort((a, b) => (b.updated || "").localeCompare(a.updated || "")),
+    sermonsFor: key => Object.entries(data.preps).filter(([, x]) => x.key === key).map(([k, x]) => ({ ...structuredClone(x), id: x.id || k })).sort((a, b) => (b.updated || "").localeCompare(a.updated || "")),
+    removePrep(id) { delete data.preps[id]; save(); },
+
+    /** Reusable illustrations, with their source, how far they have been checked, themes and where they were used. */
+    illustrations: () => Object.values(data.illus || {}).map(x => structuredClone(x)).sort((a, b) => (b.updated || "").localeCompare(a.updated || "")),
+    illustration: id => (data.illus?.[id] ? structuredClone(data.illus[id]) : null),
+    saveIllustration(x) { if (!x?.id) return; data.illus = data.illus || {}; data.illus[x.id] = { ...structuredClone(x), updated: now(), created: x.created || now() }; save(); },
+    removeIllustration(id) { if (data.illus) delete data.illus[id]; save(); },
+    /** Free space left for this site's local storage, as far as the browser reports it. */
+    usedBytes: () => { try { return (localStorage.getItem(KEY) || "").length * 2; } catch { return 0; } },
 
     /** Sermon series plans: a title, a first Sunday and a passage per week. */
     seriesList: () => Object.values(data.series).map(x => structuredClone(x)).sort((a, b) => (b.updated || "").localeCompare(a.updated || "")),
@@ -142,7 +151,7 @@ export function createStore(storage) {
       const clean = v => JSON.parse(JSON.stringify(v ?? null));            // drops functions and prototypes
       const plain = o => (o && typeof o === "object" && !Array.isArray(o) ? Object.fromEntries(Object.entries(o).filter(([k]) => !["__proto__", "constructor", "prototype"].includes(k))) : {});
       const next = merge ? data : blank();
-      for (const k of ["notes", "bookmarks", "highlights", "settings", "progress", "guides", "preps", "series"]) next[k] = { ...(merge ? next[k] : {}), ...plain(clean(src[k])) };
+      for (const k of ["notes", "bookmarks", "highlights", "settings", "progress", "guides", "preps", "series", "illus"]) next[k] = { ...(merge ? next[k] : {}), ...plain(clean(src[k])) };
       for (const k of ["history", "days", "ai", "trails"]) if (Array.isArray(src[k])) next[k] = merge ? [...clean(src[k]), ...next[k]].filter((x, i, a) => a.findIndex(y => JSON.stringify(y) === JSON.stringify(x)) === i) : clean(src[k]);
       if (!merge && src.position) next.position = clean(src.position);
       if (src.trail?.steps && Array.isArray(src.trail.steps) && !next.trail.steps.length) next.trail = clean(src.trail);
