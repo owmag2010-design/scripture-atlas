@@ -6,7 +6,7 @@ export const KID_STORIES = [
   {
     id: "creation", title: "God makes the world", ref: "Gen.1.1", range: "Genesis 1:1 – 2:3", colour: "#FFB703", fx: "stars",
     scenes: [
-      ["In the very beginning there was nothing at all, only darkness. Then God spoke: “Let there be light!” And there was light. God called the light day, and the darkness night.", "Gen.1.3"],
+      ["In the beginning, God created the heavens and the earth. The earth was without form, and darkness was over the deep. Then God spoke: “Let there be light!” And there was light. God called the light day, and the darkness night.", "Gen.1.3"],
       ["God made the sky high above. He gathered the waters together so that dry land appeared, and he filled the land with grass, flowers and trees heavy with fruit.", "Gen.1.9"],
       ["God set the sun in the sky to shine by day, and the moon and the stars to glow at night.", "Gen.1.16"],
       ["God filled the seas with fish and the sky with birds. Then he made animals of every kind: big ones and small ones, fast ones and slow ones.", "Gen.1.21"],
@@ -19,7 +19,7 @@ export const KID_STORIES = [
     id: "noah", title: "Noah and the great flood", ref: "Gen.6.9", range: "Genesis 6 – 9", colour: "#3A86FF", fx: "rain",
     scenes: [
       ["People on the earth had become cruel and violent, and it made God sad. But Noah loved God and did what was right.", "Gen.6.9"],
-      ["God told Noah to build an enormous boat called an ark, big enough for his family and for two of every kind of animal. Noah did everything God told him.", "Gen.6.22"],
+      ["God told Noah to build an enormous boat called an ark, big enough for his family and animals of every kind. Noah did everything God told him.", "Gen.6.22"],
       ["The animals came to the ark two by two. Then the rain fell for forty days and forty nights. Water covered the whole earth, but the ark floated safely on top.", "Gen.7.12"],
       ["Months later the ark came to rest on the mountains of Ararat. Noah sent out a dove, and it came back with a fresh olive leaf in its beak. The land was drying!", "Gen.8.11"],
       ["Noah, his family and all the animals stepped out onto dry ground. God put a rainbow in the clouds as a sign of his promise never again to flood the whole earth.", "Gen.9.13"]
@@ -28,14 +28,14 @@ export const KID_STORIES = [
     think: "God keeps his promises. Can you think of a promise you can keep this week?"
   },
   {
-    id: "joseph", title: "Joseph and his colourful coat", ref: "Gen.37.3", range: "Genesis 37 – 45", colour: "#FF006E", fx: "confetti",
+    id: "joseph", title: "Joseph and his colourful coat", ref: "Gen.37.3", range: "Genesis 37 – 50", colour: "#FF006E", fx: "confetti",
     note: "The Hebrew words for Joseph's coat are rare. They may mean a coat of many colours, as in the King James Version, or a long robe with sleeves.",
     scenes: [
       ["Jacob had twelve sons, but he loved Joseph most of all. He gave Joseph a very special coat.", "Gen.37.3"],
       ["Joseph's brothers grew jealous. One day, far from home, they took his coat and sold him to traders who were travelling to Egypt.", "Gen.37.28"],
       ["In Egypt, Joseph was put in prison even though he had done nothing wrong. But God was with him. When the king, Pharaoh, had strange dreams, God helped Joseph explain them: seven years of good harvests, then seven years of hunger.", "Gen.41.29"],
       ["Pharaoh put Joseph in charge of storing up grain. When the hungry years came, Joseph's brothers travelled to Egypt to buy food. They did not recognise him.", "Gen.42.8"],
-      ["“I am Joseph, your brother!” he told them. He forgave them and hugged them, and the whole family was together again. Joseph said, “You meant it for harm, but God meant it for good.”", "Gen.45.4"]
+      ["Joseph told his brothers who he was and welcomed them. Later he reassured them again: “You meant it for harm, but God meant it for good.” He promised to care for them and their children.", "Gen.50.20"]
     ],
     quiz: [["Why were Joseph's brothers unkind to him?", ["They were jealous", "He was rude", "They were hungry"], 0], ["What did God help Joseph do in Egypt?", ["Explain Pharaoh's dreams", "Build a boat", "Find a lost sheep"], 0], ["What did Joseph do when he saw his brothers again?", ["He forgave them", "He sent them away", "He hid from them"], 0]],
     think: "Is there someone you need to forgive, like Joseph did?"

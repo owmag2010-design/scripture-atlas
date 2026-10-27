@@ -2349,13 +2349,14 @@ function renderStory(id) {
   const origins = ["30% 40%", "70% 35%", "50% 70%", "25% 60%", "65% 55%"];
   const fx = kind => Array.from({ length: kind === "rain" ? 40 : 22 }, (_, k) => `<i style="--x:${(k * 37) % 100}%;--y:${(k * 53) % 100}%;--d:${(k % 7) * .45}s;--s:${.6 + (k % 5) * .2}"></i>`).join("");
   view.innerHTML = `<div class="story" style="--c:${s.colour}">
-    <div class="storybar"><a class="btn" href="#/kids">‹ All stories</a><h1>${esc(s.title)}</h1><span class="small">${esc(s.range)}</span></div>
+    <div class="storybar"><a class="btn" href="/kids/stories">‹ All stories</a><h1>${esc(s.title)}</h1><span class="small">${esc(s.range)}</span></div>
     <div class="stage" id="stage">${kidImg(s.id, "st-art")}<div class="fx fx-${s.fx}" aria-hidden="true">${fx(s.fx)}</div>
       <button class="turn prev" id="sprev" type="button" aria-label="Previous page">‹</button><button class="turn next" id="snext" type="button" aria-label="Next page">›</button></div>
     <div class="pagecard" id="pagecard" aria-live="polite"></div>
     <div class="storyctl"><div class="dots" id="dots">${s.scenes.map((_, k) => `<button type="button" data-k="${k}" aria-label="Page ${k + 1}"></button>`).join("")}<button type="button" data-k="${N}" aria-label="Quiz" class="qdot">?</button></div>
       <button class="btn gold" type="button" id="readme">Read to me</button>${KID_NARRATED.has(s.id) ? "" : `<label class="kvoice"><span class="sr">Reading voice</span><select id="kvoice"><option value="">Best voice on this device</option></select></label>`}</div>
-    <p class="small kidsnote">${s.note ? `<b>For grown-ups:</b> ${esc(s.note)} ` : ""}Pictures are illustrations made for Ereunia with an AI image tool, not historical images. ${KID_NARRATED.has(s.id) ? "The narration is a computer-generated voice, recorded for Ereunia." : "“Read to me” uses a voice built into your device."}</p>
+    <div class="kd-story-discover"><a href="/kids/words">Discover Bible words →</a><a href="/kids/read/${s.ref}">Open the Kids Bible →</a><a href="/kids/quests">Follow a wonder trail →</a></div>
+    <p class="small kidsnote">${s.note ? `<b>For grown-ups:</b> ${esc(s.note)} ` : ""}This is an Ereunia story retelling, not a Bible translation. Pictures are illustrations made for Ereunia with an AI image tool, not historical images. ${KID_NARRATED.has(s.id) ? "The narration is a computer-generated voice, recorded for Ereunia." : "“Read to me” uses a voice built into your device."}</p>
   </div>`;
   const art = $(".st-art"), card = $("#pagecard");
   const synth = window.speechSynthesis;
@@ -2411,7 +2412,7 @@ function renderStory(id) {
         const ok = b.dataset.ok === "true"; if (ok) score++;
         b.classList.add(ok ? "right" : "wrong"); if (!ok) q.querySelector('[data-ok="true"]').classList.add("right");
         if (ok) burst(b);
-        if (answered === s.quiz.length) { $("#score").textContent = score === s.quiz.length ? `All ${score} right. Well done!` : `${score} out of ${s.quiz.length}. Try the story again to find the answers.`; if (score === s.quiz.length) store.completeLesson?.("kids", s.id); }
+        if (answered === s.quiz.length) { $("#score").textContent = score === s.quiz.length ? `All ${score} right. Well done!` : `${score} out of ${s.quiz.length}. Try the story again to find the answers.`; if (score === s.quiz.length) store.completeLesson?.("kids", s.id, score, s.quiz.length); }
       }));
     }
   }
@@ -2664,7 +2665,15 @@ async function route() {
     else if (head === "research") await renderResearch(rest);
     else if (head === "lens") await renderLens(rest[0], rest[1]);
     else if (head === "sermon") await renderSermon(rest[0]);
-    else if (head === "kids") await (rest[0] ? renderStory(rest[0]) : renderKids());
+    else if (head === "kids") {
+      if (!document.querySelector('link[data-kids-discover]')) { const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/kids-discover.css'; css.dataset.kidsDiscover = ''; document.head.appendChild(css); }
+      if (KID_STORIES.some(s => s.id === rest[0])) renderStory(rest[0]);
+      else {
+        setNav('kids'); setTitle('Kids · Read & Discover');
+        const { renderKidsDiscovery } = await import('./kids/discover.js');
+        await renderKidsDiscovery({ view, store, esc, labelOf, loadBook, getIndex, KID_STORIES, rerender: route }, rest);
+      }
+    }
     else if (head === "soon") renderSoon(rest[0]);
     else if (head === "books") { await getIndex(); renderBooks(); }
     else if (head === "privacy") renderPrivacy();

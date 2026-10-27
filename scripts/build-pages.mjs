@@ -9,6 +9,7 @@ import { formatRef } from "../public/js/ref.js";
 import { DISCOVERIES } from "../public/js/discoveries-data.js";
 import { STATUS, KINDS } from "../public/js/discoveries.js";
 import { CONTEXT } from "../public/js/context.js";
+import { WORDS as KIDS_WORDS, QUESTS as KIDS_QUESTS, READINGS as KIDS_READINGS } from "../public/js/kids/discover-data.js";
 
 const SITE = "https://ereunia.com";
 const PUB = new URL("../public/", import.meta.url);
@@ -52,7 +53,7 @@ const SECTIONS = [
   ["/credits", "Credits and licences", "Every dataset, image and font used by Ereunia, with its owner and licence."],
   ["/learn", "Courses", "Structured Bible study courses with readings, questions and quizzes."],
   ["/sermon", "Sermon studio", "Record a sermon, catch every Bible reference and turn it into study notes."],
-  ["/kids", "Bible stories for children", "Thirty-six illustrated Bible stories to read and hear, each showing where to find it in the Bible."],
+  ["/kids", "Kids · Read & Discover", `A Bible discovery world for children: 36 illustrated stories, ${KIDS_WORDS.length} Bible words, a Scripture reader, concordance and guided family quests.`],
   ["/ai", "Research assistant", "Ask a question and see exactly which sources the answer rests on."],
   ["/search", "Search", "Search passages, original words, people, places, discoveries and manuscripts."],
   ["/share", "Share cards", "Make a branded card of any Bible verse or documented discovery to share."],
@@ -63,6 +64,20 @@ const SECTIONS = [
 ];
 page("/", { title: "", description: "Ancient Scripture. A new depth of discovery. Every word of the Bible, traced to its source.", body: "<h1>Ereunia: every word of the Bible, traced to its source</h1>" });
 for (const [p, t, d] of SECTIONS) page(p, { title: t, description: d, body: `<h1>${esc(t)}</h1><p>${esc(d)}</p>` });
+
+// Kids learning pages have their own shareable paths and readable fallback content.
+for (const [path, title, description] of [
+  ['stories','The story cove','Eight illustrated Bible retellings with passage links, narration and quizzes.'],
+  ['words','The word garden',`Explore ${KIDS_WORDS.length} Bible words, people and places, with simple explanations and Scripture references.`],
+  ['read','My Bible','Read the World English Bible or King James Version and discover Bible words in context.'],
+  ['find','Find a verse','A children’s concordance: follow exact words and phrases through the Bible.'],
+  ['quests','Wonder trails','Six guided Bible quests connecting stories, words, Scripture and everyday kindness.'],
+  ['passport','My discoveries','Collect Bible words, chapters and discovery stamps in this browser.'],
+  ['family','For grown-ups','A family guide to Ereunia Kids, its sources, reading levels, audio and local discovery progress.']
+]) page('/kids/'+path, {title:title+' · Ereunia Kids', description, body:`<h1>${esc(title)}</h1><p>${esc(description)}</p><p><a href="/kids">Explore Ereunia Kids</a></p>`});
+for (const w of KIDS_WORDS) page('/kids/words/'+w.id, {title:w.word+' · Kids word garden', description:w.simple, body:`<h1>${esc(w.word)}</h1><p>${esc(w.simple)}</p><p>${esc(w.deeper)}</p><p>${w.refs.map(ref=>`<a href="/kids/read/${ref}">${esc(ref)}</a>`).join(' · ')}</p>`});
+for (const q of KIDS_QUESTS) page('/kids/quests/'+q.id, {title:q.title+' · Kids quest', description:q.subtitle, body:`<h1>${esc(q.title)}</h1><p>${esc(q.subtitle)}</p><p><a href="/kids/${q.story}">Explore the story</a> · <a href="/kids/words/${q.word}">Discover ${esc(q.word)}</a> · <a href="/kids/read/${q.ref}">Read the passage</a></p>`});
+for (const r of KIDS_READINGS) page('/kids/read/'+r.ref, {title:r.title+' · Kids Bible', description:r.prompt, body:`<h1>${esc(r.title)}</h1><p>${esc(r.prompt)}</p><p>Read ${esc(r.ref)} in the Kids Bible reader.</p>`});
 
 // KJV chapters with their text
 const index = JSON.parse(readFileSync(new URL("data/index.json", PUB), "utf8"));
