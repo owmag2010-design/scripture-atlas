@@ -36,7 +36,6 @@
     Cross-Origin-Opener-Policy = "same-origin"
     X-Frame-Options = "SAMEORIGIN"
 
-# ereunia.org (and www) is an alias of the site; send every visitor to the same page on ereunia.com.
 # The membership page was withdrawn; old links go to the pastor tools, which are free.
 [[redirects]]
   from = "/membership"
@@ -44,6 +43,14 @@
   status = 301
   force = true
 
+# Public-testing feedback form (Tally). 302 so the destination can change later.
+[[redirects]]
+  from = "/feedback"
+  to = "https://tally.so/r/o99gKO"
+  status = 302
+  force = true
+
+# ereunia.org (and www) is an alias of the site; send every visitor to the same page on ereunia.com.
 [[redirects]]
   from = "https://ereunia.org/*"
   to = "https://ereunia.com/:splat"
