@@ -43,7 +43,7 @@ export async function renderKidsDiscovery(ctx, rest = []) {
       <div class="kd-tools"><label class="kd-level"><span>Reading level</span><select id="kd-level" aria-label="Reading level"><option value="little" ${!older?'selected':''}>Little explorers · 5–8</option><option value="growing" ${older?'selected':''}>Growing explorers · 9–12</option></select></label><a href="/kids/family" class="kd-family" aria-label="For grown-ups">${icon('people')}<span>For grown-ups</span></a></div></header>
     <nav class="kd-nav" aria-label="Kids activities">${navItems.map(([key,i,label,path])=>`<a href="/kids${path?'/'+path:''}" ${section===key?'aria-current="page"':''}>${icon(i)}<span>${label}</span></a>`).join('')}</nav>
     <div id="kd-content" class="kd-content"></div>
-    <footer class="kd-footer"><span>${icon('leaf')} Scripture at the heart. Wonder along the way.</span><a href="/kids/family">Sources, accessibility & family guide</a><a href="/membership">Free Bible & future Kids membership</a><small>Discovery progress stays in this browser. No child account needed.</small></footer>
+    <footer class="kd-footer"><span>${icon('leaf')} Scripture at the heart. Wonder along the way.</span><a href="/kids/family">Sources, accessibility & family guide</a><small>Discovery progress stays in this browser. No child account needed.</small></footer>
     <dialog class="kd-dialog" aria-labelledby="kd-word-title"><button class="kd-dialog-close" type="button" aria-label="Close word explanation">${icon('close')}</button><div id="kd-dialog-content"></div></dialog>
     <div class="kd-announcement sr" role="status" aria-live="polite"></div>
   </div>`;

@@ -2677,7 +2677,6 @@ async function route() {
     }
     else if (head === "soon") renderSoon(rest[0]);
     else if (head === "books") { await getIndex(); renderBooks(); }
-    else if (head === "membership") { const m=await import("./membership.js"); m.renderMembership(prepCtx()); }
     else if (head === "privacy") renderPrivacy();
     else if (head === "about") renderAbout();
     else if (head === "pastors" || head === "prepare") { await getIndex(); const m = await import("./prepare.js?v=immersive1"); const ctx = prepCtx(); if (head === "pastors") await m.renderPastors(ctx, rest[0], rest[1]); else await m.renderPrepare(ctx, rest[0], rest[1]); }

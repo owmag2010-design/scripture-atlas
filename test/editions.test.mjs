@@ -1,10 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {validateSuggestions,shareableDraft} from '../public/js/pastor-ai-core.js';
-import {toolAccess,TRIAL_DAYS} from '../public/js/membership.js';
 import {buildDocx} from '../public/js/docx.js';import {readBackupZip} from '../public/js/pastor-core.js';
 const sources=[{id:'S1',text:'The sower soweth the word.'}];
 test('AI suggestions retain only supported source identifiers and verified quotations',()=>{const good={type:'heading',text:'Listen to the word',cites:['S1','FAKE']};const raw={suggestions:[good,{type:'paragraph',text:'Unknown claim',cites:['FAKE']},{type:'paragraph',text:'Jesus said "you will all be wealthy tomorrow"',cites:['S1']},{type:'script',text:'bad',cites:['S1']}]};assert.deepEqual(validateSuggestions(raw,sources),[{...good,cites:['S1']}]);});
 test('AI draft sharing excludes delivery cues',()=>assert.equal(shareableDraft({blocks:[{type:'cue',text:'PRIVATE'},{type:'paragraph',text:'PUBLIC'}]}),'PUBLIC'));
-test('Bible always stays free including after a trial or subscription ends',()=>{assert.deepEqual(toolAccess(null,'bible'),{allowed:true,reason:'free'});assert(toolAccess({trials:{pastor:{startedAt:'2020-01-01'}}},'bible').allowed);assert(!toolAccess(null,'pastor').allowed);});
-test('14 day trial expires exactly at its server-recorded boundary',()=>{const start=Date.parse('2026-10-28T00:00:00Z'),p={trials:{pastor:{startedAt:new Date(start).toISOString()}}};assert.equal(TRIAL_DAYS,14);assert(toolAccess(p,'pastor',start+14*86400000-1).allowed);assert(!toolAccess(p,'pastor',start+14*86400000).allowed);assert(!toolAccess(p,'pastor',start-1).allowed);assert(!toolAccess(p,'kids',start).allowed);});
-test('Only active unexpired plan entitlements provide subscription access',()=>{const account={entitlements:{pastor:{status:'active',until:'2026-12-01'}}};assert.equal(toolAccess(account,'pastor',Date.parse('2026-11-01')).reason,'subscription');assert(!toolAccess(account,'pastor',Date.parse('2027-01-01')).allowed);assert(!toolAccess({entitlements:{pastor:{status:'active',until:'invalid'}}},'pastor').allowed);});
